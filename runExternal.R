@@ -1,0 +1,59 @@
+install_if_missing <- function(package) {
+    if (!require(package, character.only = TRUE)) {
+        install.packages(package, dependencies = TRUE)
+        library(package, character.only = TRUE)
+    }
+}
+
+install_if_missing("REddyProc")
+
+
+rm(list = ls())
+library(REddyProc)
+source('src/runEddyProcFunctions.R', chdir = T)
+
+# formatR::tidy_rstudio()
+INPUT_FILE = "REddyProc.txt"
+CONFIG_FILE = "config.txt"
+
+
+eddyProcConfiguration <- list(
+    siteId = 'yourSiteID',
+    
+    isToApplyUStarFiltering = TRUE,
+    # uStarSeasoning = "WithinYear", "Continuous" , ...
+    
+    # could be more levels somewhere around
+    uStarSeasoning =  factor("Continuous", levels = "Continuous"),
+    uStarMethod = factor("RTw", levels = "RTw"),
+    
+    isBootstrapUStar = FALSE,
+    
+    isToApplyGapFilling = TRUE,
+    isToApplyPartitioning = TRUE,
+    # "Reichstein05", "Lasslop10", ...
+    partitioningMethods = c("Reichstein05", "Lasslop10"),
+    latitude = 56.5,
+    longitude = 32.6,
+    timezone = +3,
+    
+    # there is also $temperatureVarName ?
+    temperatureDataVariable = "Tair",
+    
+    isCatchingErrorsEnabled = TRUE,
+    
+    input_format = "onlinetool",
+    output_format = "onlinetool",
+    
+    # figureFormat used from processEddyData
+    useDevelopLibraryPath = FALSE,
+    debugFlags = ""
+)
+
+
+# 1.3.2 vs 1.3.3 have different outputs
+# to test,
+# install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
+
+
+processEddyData(eddyProcConfiguration)
