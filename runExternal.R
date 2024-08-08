@@ -38,14 +38,14 @@ eddyProcConfiguration <- list(
 )
 
 
-install_if_missing <- function(package) {
+install_if_missing <- function(package, repos) {
     if (!require(package, character.only = TRUE)) {
-        install.packages(package, dependencies = TRUE)
+        install.packages(package, dependencies = TRUE, repos=repos)
         library(package, character.only = TRUE)
     }
 }
 
-install_if_missing("REddyProc")
+install_if_missing("REddyProc", repos='http://cran.rstudio.com/')
 
 options(max.print = 50)
 
@@ -58,4 +58,4 @@ dir.create("output", showWarnings = FALSE)
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
 
-processEddyData(eddyProcConfiguration)
+processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
