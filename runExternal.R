@@ -1,20 +1,7 @@
-install_if_missing <- function(package) {
-    if (!require(package, character.only = TRUE)) {
-        install.packages(package, dependencies = TRUE)
-        library(package, character.only = TRUE)
-    }
-}
-
-install_if_missing("REddyProc")
-
-
 rm(list = ls())
-library(REddyProc)
-source('src/runEddyProcFunctions.R', chdir = T)
 
 # formatR::tidy_rstudio()
 INPUT_FILE = "REddyProc.txt"
-CONFIG_FILE = "config.txt"
 
 
 eddyProcConfiguration <- list(
@@ -50,6 +37,21 @@ eddyProcConfiguration <- list(
     debugFlags = ""
 )
 
+
+install_if_missing <- function(package) {
+    if (!require(package, character.only = TRUE)) {
+        install.packages(package, dependencies = TRUE)
+        library(package, character.only = TRUE)
+    }
+}
+
+install_if_missing("REddyProc")
+
+options(max.print = 50)
+
+library(REddyProc)
+source("src/runEddyProcFunctions.R", chdir = T)
+dir.create("output", showWarnings = FALSE)
 
 # 1.3.2 vs 1.3.3 have different outputs
 # to test,
