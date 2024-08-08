@@ -1,0 +1,1001 @@
+
+> eddyProcConfiguration <- list(
++     siteId = 'yourSiteID',
++     
++     isToApplyUStarFiltering = TRUE,
++     # uStarSeasoning = "WithinYear", "Con ..." ... [TRUNCATED] 
+
+> # TODO 1.3.2 vs 1.3.3 different outputs?
+> # require(remotes)
+> # install_version("REddyProc", version = "1.3.2", repos = "http://cran.us.r-project. ..." ... [TRUNCATED] 
+List of 18
+ $ siteId                 : chr "yourSiteID"
+ $ isToApplyUStarFiltering: logi TRUE
+ $ uStarSeasoning         : Factor w/ 1 level "Continuous": 1
+ $ uStarMethod            : Factor w/ 1 level "RTw": 1
+ $ isBootstrapUStar       : logi FALSE
+ $ isToApplyGapFilling    : logi TRUE
+ $ isToApplyPartitioning  : logi TRUE
+ $ partitioningMethods    : chr [1:2] "Reichstein05" "Lasslop10"
+ $ latitude               : num 56.5
+ $ longitude              : num 32.6
+ $ timezone               : num 3
+ $ temperatureDataVariable: chr "Tair"
+ $ isCatchingErrorsEnabled: logi TRUE
+ $ input_format           : chr "onlinetool"
+ $ output_format          : chr "onlinetool"
+ $ useDevelopLibraryPath  : logi FALSE
+ $ debugFlags             : chr ""
+ $ figureFormat           : chr "pdf"
+Error in fSetFile(FileName, Dir, T, "fLoadTXTIntoDataframe") : 
+  fLoadTXTIntoDataframe:::fSetFile::: File does not exist or has no read permission: DETha98/input_DETha98.txt
+> source("D:/OWN/MIR/GitRepos/halt9k/filtering-r-to-python/runExternal.R", echo=TRUE)
+
+> rm(list = ls())
+
+> library(REddyProc)
+
+> source("runEddyProcFunctions.R")
+
+> # formatR::tidy_rstudio()
+> INPUT_FILE = "samples/DETha98/input_DETha98.txt"
+
+> CONFIG_FILE = "config.txt"
+
+> eddyProcConfiguration <- list(
++     siteId = 'yourSiteID',
++     
++     isToApplyUStarFiltering = TRUE,
++     # uStarSeasoning = "WithinYear", "Con ..." ... [TRUNCATED] 
+
+> # TODO 1.3.2 vs 1.3.3 different outputs?
+> # require(remotes)
+> # install_version("REddyProc", version = "1.3.2", repos = "http://cran.us.r-project. ..." ... [TRUNCATED] 
+List of 18
+ $ siteId                 : chr "yourSiteID"
+ $ isToApplyUStarFiltering: logi TRUE
+ $ uStarSeasoning         : Factor w/ 1 level "Continuous": 1
+ $ uStarMethod            : Factor w/ 1 level "RTw": 1
+ $ isBootstrapUStar       : logi FALSE
+ $ isToApplyGapFilling    : logi TRUE
+ $ isToApplyPartitioning  : logi TRUE
+ $ partitioningMethods    : chr [1:2] "Reichstein05" "Lasslop10"
+ $ latitude               : num 56.5
+ $ longitude              : num 32.6
+ $ timezone               : num 3
+ $ temperatureDataVariable: chr "Tair"
+ $ isCatchingErrorsEnabled: logi TRUE
+ $ input_format           : chr "onlinetool"
+ $ output_format          : chr "onlinetool"
+ $ useDevelopLibraryPath  : logi FALSE
+ $ debugFlags             : chr ""
+ $ figureFormat           : chr "pdf"
+Loaded file samples/DETha98/input_DETha98.txt with the following variables (units):
+ *** Year(-) DoY(-) Hour(-) NEE(umolm-2s-1) LE(Wm-2) H(Wm-2) Rg(Wm-2) Tair(degC) Tsoil(degC) rH(%) VPD(hPa) Ustar(ms-1)
+Number of '-9999' convertered to NA: 11657
+Converted time format 'YDH' to POSIX with column name 'DateTime'.
+'data.frame':	17520 obs. of  13 variables:
+ $ DateTime: POSIXct, format: "1998-01-01 00:30:00" "1998-01-01 01:00:00" "1998-01-01 01:30:00" ...
+ $ Year    : int  1998 1998 1998 1998 1998 1998 1998 1998 1998 1998 ...
+  ..- attr(*, "varnames")= chr "Year"
+  ..- attr(*, "units")= chr "-"
+ $ DoY     : int  1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "varnames")= chr "DoY"
+  ..- attr(*, "units")= chr "-"
+ $ Hour    : num  0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 ...
+  ..- attr(*, "varnames")= chr "Hour"
+  ..- attr(*, "units")= chr "-"
+ $ NEE     : num  -1.21 1.72 NA NA 2.55 NA NA NA 4.11 NA ...
+  ..- attr(*, "varnames")= chr "NEE"
+  ..- attr(*, "units")= chr "umolm-2s-1"
+ $ LE      : num  1.49 3.8 1.52 3.94 8.3 1.33 0.73 0.63 1.05 -1.53 ...
+  ..- attr(*, "varnames")= chr "LE"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ H       : num  -11.8 -13.5 -18.3 -17.5 -21.4 ...
+  ..- attr(*, "varnames")= chr "H"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ Rg      : num  0 0 0 0 0 0 0 0 0 0 ...
+  ..- attr(*, "varnames")= chr "Rg"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ Tair    : num  7.4 7.5 7.1 6.6 6.6 6.5 6.3 6.1 5.9 6.2 ...
+  ..- attr(*, "varnames")= chr "Tair"
+  ..- attr(*, "units")= chr "degC"
+ $ Tsoil   : num  4.19 4.2 4.22 4.23 4.22 4.21 4.2 4.18 4.15 4.12 ...
+  ..- attr(*, "varnames")= chr "Tsoil"
+  ..- attr(*, "units")= chr "degC"
+ $ rH      : num  55.3 56 57.8 60.2 59.9 ...
+  ..- attr(*, "varnames")= chr "rH"
+  ..- attr(*, "units")= chr "%"
+ $ VPD     : num  4.6 4.6 4.3 3.9 3.9 4 3.9 3.7 3.4 3.4 ...
+  ..- attr(*, "varnames")= chr "VPD"
+  ..- attr(*, "units")= chr "hPa"
+ $ Ustar   : num  0.72 0.52 0.22 0.2 0.33 0.15 0.15 0.14 0.39 0.14 ...
+  ..- attr(*, "varnames")= chr "Ustar"
+  ..- attr(*, "units")= chr "ms-1"
+Data variables picked for gap filling (dataVariablesToFill):  NEE,LE,H,Rg,VPD,rH,Tair,Tsoil 
+No additional columns picked to keep in processing
+New sEddyProc class for site 'yourSiteID'
+[1] "------------- u* Threshold estimation ---------------"
+Estimated UStar threshold of:  0.42 by using controls:
+                       taClasses                    UstarClasses                           swThr 
+                              7                              20                              10 
+           minRecordsWithinTemp          minRecordsWithinSeason            minRecordsWithinYear 
+                            100                             160                            3000 
+isUsingOneBigSeasonOnFewRecords 
+                              1 
+  aggregationMode seasonYear season   uStar
+2            year       1998   <NA> 0.41625
+[1] "------------- Gapfilling ---------------"
+Ustar filtering (u * Th_1 = 0.41625), marked 24% of the data as gap
+Initialized variable 'NEE' with 7832 real gaps for gap filling of all 17520 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'NEE.Ustar_uStar_fqc_0' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................................
+.............................................................
+........................................................16493
+Look up table with window size of 14 days with Rg VPD Tair
+..........394
+Look up table with window size of 7 days with Rg
+......224
+Mean diurnal course with window size of 0 days: .
+....104
+Mean diurnal course with window size of 1 days: .
+...63
+Mean diurnal course with window size of 2 days: .
+..10
+Look up table with window size of 21 days with Rg VPD Tair
+..89
+Look up table with window size of 28 days with Rg VPD Tair
+.31
+Look up table with window size of 35 days with Rg VPD Tair
+.51
+Look up table with window size of 42 days with Rg VPD Tair
+0
+Look up table with window size of 49 days with Rg VPD Tair
+3
+Look up table with window size of 56 days with Rg VPD Tair
+2
+Look up table with window size of 63 days with Rg VPD Tair
+5
+Look up table with window size of 70 days with Rg VPD Tair
+23
+Look up table with window size of 14 days with Rg
+28
+Finished gap filling of 'NEE' in 6 seconds. Artificial gaps filled: 17520, real gaps filled: 7832, unfilled (long) gaps: 0.
+Initialized variable 'LE' with 2456 real gaps for gap filling of all 17520 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'LE' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................................
+.............................................................
+........................................................16717
+Look up table with window size of 14 days with Rg VPD Tair
+........305
+Look up table with window size of 7 days with Rg
+....200
+Mean diurnal course with window size of 0 days: .
+..160
+Mean diurnal course with window size of 1 days: .
+.3
+Mean diurnal course with window size of 2 days: .
+.0
+Look up table with window size of 21 days with Rg VPD Tair
+.62
+Look up table with window size of 28 days with Rg VPD Tair
+7
+Look up table with window size of 35 days with Rg VPD Tair
+9
+Look up table with window size of 42 days with Rg VPD Tair
+0
+Look up table with window size of 49 days with Rg VPD Tair
+4
+Look up table with window size of 56 days with Rg VPD Tair
+2
+Look up table with window size of 63 days with Rg VPD Tair
+3
+Look up table with window size of 70 days with Rg VPD Tair
+22
+Look up table with window size of 14 days with Rg
+26
+Finished gap filling of 'LE' in 4 seconds. Artificial gaps filled: 17520, real gaps filled: 2456, unfilled (long) gaps: 0.
+Initialized variable 'H' with 2500 real gaps for gap filling of all 17520 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'H' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................................
+.............................................................
+........................................................16719
+Look up table with window size of 14 days with Rg VPD Tair
+........331
+Look up table with window size of 7 days with Rg
+....172
+Mean diurnal course with window size of 0 days: .
+..139
+Mean diurnal course with window size of 1 days: .
+.24
+Mean diurnal course with window size of 2 days: .
+.0
+Look up table with window size of 21 days with Rg VPD Tair
+.90
+Look up table with window size of 28 days with Rg VPD Tair
+24
+Look up table with window size of 35 days with Rg VPD Tair
+5
+Look up table with window size of 42 days with Rg VPD Tair
+0
+Look up table with window size of 49 days with Rg VPD Tair
+1
+Look up table with window size of 56 days with Rg VPD Tair
+2
+Look up table with window size of 63 days with Rg VPD Tair
+0
+Look up table with window size of 70 days with Rg VPD Tair
+8
+Look up table with window size of 14 days with Rg
+5
+Finished gap filling of 'H' in 4 seconds. Artificial gaps filled: 17520, real gaps filled: 2500, unfilled (long) gaps: 0.
+Initialized variable 'Rg' with 157 real gaps for gap filling.
+Restriced MDS algorithm for gap filling of 'Rg' with no meteo conditions and hence only MDC.
+Mean diurnal course with window size of 0 days: .
+.5
+Mean diurnal course with window size of 1 days: .
+.152
+Finished gap filling of 'Rg' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 157, unfilled (long) gaps: 0.
+Initialized variable 'VPD' with 0 real gaps for gap filling.
+Limited MDS algorithm for gap filling of 'VPD' with LUT(Rg only) and MDC.
+Finished gap filling of 'VPD' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 0, unfilled (long) gaps: 0.
+Initialized variable 'rH' with 117 real gaps for gap filling.
+Full MDS algorithm for gap filling of 'rH' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+.32
+Look up table with window size of 14 days with Rg VPD Tair
+0
+Look up table with window size of 7 days with Rg
+0
+Mean diurnal course with window size of 0 days: .
+2
+Mean diurnal course with window size of 1 days: .
+83
+Finished gap filling of 'rH' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 117, unfilled (long) gaps: 0.
+Initialized variable 'Tair' with 85 real gaps for gap filling.
+Limited MDS algorithm for gap filling of 'Tair' with LUT(Rg only) and MDC.
+Look up table with window size of 7 days with Rg
+0
+Mean diurnal course with window size of 0 days: .
+2
+Mean diurnal course with window size of 1 days: .
+83
+Finished gap filling of 'Tair' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 85, unfilled (long) gaps: 0.
+Initialized variable 'Tsoil' with 85 real gaps for gap filling.
+Full MDS algorithm for gap filling of 'Tsoil' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+0
+Look up table with window size of 14 days with Rg VPD Tair
+0
+Look up table with window size of 7 days with Rg
+0
+Mean diurnal course with window size of 0 days: .
+2
+Mean diurnal course with window size of 1 days: .
+83
+Finished gap filling of 'Tsoil' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 85, unfilled (long) gaps: 0.
+Saved plot to: ./yourSiteID_1998_FP_NEE.pdf
+Saved plot to: ./yourSiteID_1998_Flux_NEE.pdf
+Saved plot to: ./yourSiteID_1998_FP_LE.pdf
+Saved plot to: ./yourSiteID_1998_Flux_LE.pdf
+Saved plot to: ./yourSiteID_1998_FP_H.pdf
+Saved plot to: ./yourSiteID_1998_Flux_H.pdf
+Saved plot to: ./yourSiteID_1998_FP_Rg.pdf
+Saved plot to: ./yourSiteID_1998_Flux_Rg.pdf
+Saved plot to: ./yourSiteID_1998_FP_VPD.pdf
+Saved plot to: ./yourSiteID_1998_Flux_VPD.pdf
+Saved plot to: ./yourSiteID_1998_FP_rH.pdf
+Saved plot to: ./yourSiteID_1998_Flux_rH.pdf
+Saved plot to: ./yourSiteID_1998_FP_Tair.pdf
+Saved plot to: ./yourSiteID_1998_Flux_Tair.pdf
+Saved plot to: ./yourSiteID_1998_FP_Tsoil.pdf
+Saved plot to: ./yourSiteID_1998_Flux_Tsoil.pdf
+Saved plot to: ./yourSiteID_1998_FP_NEE_uStar_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_NEE_uStar_f.pdf
+Saved plot to: ./yourSiteID_1998_DSumU_NEE_uStar_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_NEE_uStar_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_LE_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_LE_f.pdf
+Saved plot to: ./yourSiteID_1998_DSumU_LE_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_LE_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_H_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_H_f.pdf
+Saved plot to: ./yourSiteID_1998_DSumU_H_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_H_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_Rg_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_Rg_f.pdf
+Saved plot to: ./yourSiteID_1998_DSum_Rg_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_Rg_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_VPD_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_VPD_f.pdf
+Saved plot to: ./yourSiteID_1998_DSum_VPD_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_VPD_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_rH_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_rH_f.pdf
+Saved plot to: ./yourSiteID_1998_DSum_rH_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_rH_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_Tair_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_Tair_f.pdf
+Saved plot to: ./yourSiteID_1998_DSum_Tair_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_Tair_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_Tsoil_f.pdf
+Saved plot to: ./yourSiteID_1998_DC_Tsoil_f.pdf
+Saved plot to: ./yourSiteID_1998_DSum_Tsoil_f.pdf
+Saved plot to: ./yourSiteID_1998_Flux_Tsoil_f.pdf
+[1] "------------- Flux Partitioning ---------------"
+Start flux partitioning for variable NEE_uStar_f with temperature Tair_f.
+Estimate of the temperature sensitivity E_0 from short term data: 138.02.
+Regression of reference temperature R_ref for 85 periods.
+Start daytime flux partitioning for variable NEE_uStar_f with temperature Tair_f.
+  Estimating temperature sensitivity from night time NEE , 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+    increase window size to 24, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+    increase window size to 48, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+  Smoothing temperature sensitivity estimates
+Loading required namespace: mlegp
+  Estimating respiration at reference temperature for smoothed temperature sensitivity from night time NEE , 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+  Estimating light response curve parameters from day time NEE , 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+Start daytime flux partitioning for variable NEE_uStar_f with temperature Tair_f.
+  Estimating temperature sensitivity from night time NEE , 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+    increase window size to 24, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+    increase window size to 48, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+  Smoothing temperature sensitivity estimates
+  Estimating respiration at reference temperature for smoothed temperature sensitivity from night time NEE , 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+  Estimating light response curve parameters from day time NEE , 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181, 183, 185, 187, 189, 191, 193, 195, 197, 199, 201, 203, 205, 207, 209, 211, 213, 215, 217, 219, 221, 223, 225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255, 257, 259, 261, 263, 265, 267, 269, 271, 273, 275, 277, 279, 281, 283, 285, 287, 289, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 317, 319, 321, 323, 325, 327, 329, 331, 333, 335, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357, 359, 361, 363
+Saved plot to: ./yourSiteID_1998_FP_Reco_uStar.pdf
+Saved plot to: ./yourSiteID_1998_FP_GPP_uStar_f.pdf
+Saved plot to: ./yourSiteID_1998_FP_Reco_DT_uStar.pdf
+Saved plot to: ./yourSiteID_1998_FP_GPP_DT_uStar.pdf
+Number of NA convertered to '-9999': 726762
+Wrote tab separated textfile: output/output.txt
+$mode
+[1] "111"
+
+$inputSize
+[1] "17520,13"
+
+$err
+NULL
+
+$EProc
+Reference class object of class "sEddyProc"
+Field "sID":
+[1] "yourSiteID"
+Field "sDATA":
+              sDateTime    NEE     LE      H     Rg VPD    rH Tair Tsoil Ustar
+1   1998-01-01 00:15:00 -1.210   1.49 -11.77   0.00 4.6 55.27  7.4  4.19  0.72
+2   1998-01-01 00:45:00  1.720   3.80 -13.50   0.00 4.6 55.95  7.5  4.20  0.52
+3   1998-01-01 01:15:00     NA   1.52 -18.30   0.00 4.3 57.75  7.1  4.22  0.22
+4   1998-01-01 01:45:00     NA   3.94 -17.47   0.00 3.9 60.20  6.6  4.23  0.20
+5   1998-01-01 02:15:00  2.550   8.30 -21.42   0.00 3.9 59.94  6.6  4.22  0.33
+6   1998-01-01 02:45:00     NA   1.33 -20.55   0.00 4.0 59.25  6.5  4.21  0.15
+7   1998-01-01 03:15:00     NA   0.73  -8.73   0.00 3.9 59.86  6.3  4.20  0.15
+8   1998-01-01 03:45:00     NA   0.63 -15.15   0.00 3.7 61.08  6.1  4.18  0.14
+9   1998-01-01 04:15:00  4.110   1.05 -25.04   0.00 3.4 63.54  5.9  4.15  0.39
+10  1998-01-01 04:45:00     NA  -1.53 -32.04   0.00 3.4 64.14  6.2  4.12  0.14
+11  1998-01-01 05:15:00     NA  -3.72 -17.97   0.00 3.2 66.35  6.1  4.10  0.16
+12  1998-01-01 05:45:00     NA  -6.02 -11.50   0.00 3.0 67.77  6.1  4.07  0.17
+13  1998-01-01 06:15:00     NA  10.49 -20.06   0.00 2.8 70.51  6.2  4.07  0.27
+14  1998-01-01 06:45:00     NA -13.03 -20.31   0.00 2.7 72.83  6.9  4.09  0.27
+15  1998-01-01 07:15:00     NA  -3.65 -15.98   0.00 2.5 75.05  6.9  4.12  0.23
+16  1998-01-01 07:45:00     NA  -3.32 -18.90   0.00 2.3 76.59  6.7  4.16  0.23
+17  1998-01-01 08:15:00  0.840  -5.71 -19.63   5.78 2.2 77.19  6.7  4.20  0.25
+18  1998-01-01 08:45:00     NA     NA     NA  40.82 2.4 76.51  6.9  4.21  0.62
+19  1998-01-01 09:15:00     NA   0.27 -17.07  87.66 2.6 74.78  7.4  4.23  0.30
+20  1998-01-01 09:45:00 -2.740   1.43  -3.39 135.25 2.8 73.65  7.9  4.25  0.34
+21  1998-01-01 10:15:00 -3.440   9.27  23.37 185.45 3.2 71.33  8.6  4.29  0.43
+22  1998-01-01 10:45:00 -5.420   6.21  33.70 203.93 3.7 69.01  9.5  4.34  0.56
+23  1998-01-01 11:15:00 -4.490  13.90  48.63 125.10 3.7 69.21  9.8  4.44  0.48
+24  1998-01-01 11:45:00 -3.430  34.43  51.78  86.96 3.9 68.20 10.0  4.57  0.54
+25  1998-01-01 12:15:00 -3.210  14.24  16.86 122.27 4.0 67.63 10.1  4.71  0.43
+26  1998-01-01 12:45:00 -3.840  15.44  67.08 146.17 4.5 64.67 10.6  4.82  0.47
+27  1998-01-01 13:15:00 -9.100 -18.85  25.08 162.69 4.6 64.23 10.7  4.92  0.69
+28  1998-01-01 13:45:00 -7.090  31.74  69.46 214.61 4.7 63.47 10.7  5.03  0.61
+29  1998-01-01 14:15:00 -2.010  24.05  58.86 174.41 4.8 63.13 10.8  5.11  0.63
+30  1998-01-01 14:45:00 -1.140  19.03  20.50 119.22 4.7 62.82 10.5  5.17  0.43
+31  1998-01-01 15:15:00  1.326   4.07  -3.83   0.00 4.6 63.48 10.3  5.22  0.21
+32  1998-01-01 15:45:00  1.329   0.54 -12.33   0.00 4.1 65.92  9.8  5.24  0.12
+33  1998-01-01 16:15:00  1.331   1.13  -3.19   0.00 3.8 68.13  9.4  5.25  0.15
+34  1998-01-01 16:45:00     NA  -0.08 -18.56   0.00 3.1 71.96  8.5  5.23  0.05
+35  1998-01-01 17:15:00     NA   2.44 -17.05   0.00 3.1 70.83  7.9  5.19  0.17
+36  1998-01-01 17:45:00     NA   0.62 -17.37   0.00 3.0 71.12  7.5  5.15  0.14
+37  1998-01-01 18:15:00     NA   2.05 -13.99   0.00 2.9 71.50  7.4  5.11  0.20
+38  1998-01-01 18:45:00     NA   0.59  -9.11   0.00 2.9 71.56  7.3  5.08  0.16
+39  1998-01-01 19:15:00     NA   5.48 -17.17   0.00 3.0 71.08  7.4  5.05  0.29
+40  1998-01-01 19:45:00     NA  -0.75 -27.69   0.00 2.9 72.11  7.3  5.03  0.22
+41  1998-01-01 20:15:00     NA  -0.85 -17.54   0.00 3.0 71.20  7.8  5.01  0.22
+42  1998-01-01 20:45:00  0.410   3.97 -28.19   0.00 2.9 72.38  7.7  5.00  0.45
+43  1998-01-01 21:15:00  1.550  34.78  -3.49   0.00 2.5 74.22  6.3  5.00  0.47
+44  1998-01-01 21:45:00  4.070  -3.08  -2.92   0.00 2.4 73.33  5.6  4.98  0.53
+45  1998-01-01 22:15:00  5.350   1.86 -19.12   0.00 2.3 74.13  5.2  4.92  0.37
+46  1998-01-01 22:45:00  1.590  11.72 -23.83   0.00 2.3 73.63  5.1  4.87  0.63
+47  1998-01-01 23:15:00  7.490  -4.43 -20.65   0.00 2.4 73.25  5.2  4.80  0.64
+48  1998-01-01 23:45:00     NA  13.78 -27.96   0.00 2.6 70.75  5.3  4.74  0.27
+49  1998-01-02 00:15:00 -3.390   9.45  27.63   0.00 2.9 68.94  5.8  4.70  0.39
+50  1998-01-02 00:45:00 -0.600  11.50 -15.52   0.00 3.6 62.91  6.3  4.68  0.56
+51  1998-01-02 01:15:00  0.940  21.74 -12.91   0.00 3.6 62.48  6.2  4.67  0.73
+52  1998-01-02 01:45:00  4.210  22.56  -1.30   0.00 3.8 59.24  6.1  4.66  0.66
+53  1998-01-02 02:15:00  2.590  25.85  -2.07   0.00 4.1 56.41  5.9  4.64  0.65
+54  1998-01-02 02:45:00  0.090   7.75 -20.23   0.00 4.0 57.04  5.8  4.62  0.42
+55  1998-01-02 03:15:00  0.160   1.44  -7.17   0.00 3.8 58.70  5.8  4.60  0.40
+56  1998-01-02 03:45:00     NA   4.05  -8.43   0.00 3.6 60.33  5.4  4.59  0.64
+57  1998-01-02 04:15:00     NA  -9.83   1.65   0.00 3.3 63.11  5.2  4.56  0.65
+58  1998-01-02 04:45:00     NA -28.93  -3.90   0.00 3.0 66.11  5.0  4.54  0.71
+59  1998-01-02 05:15:00     NA   4.78  -1.36   0.00 2.5 70.29  4.3  4.52  0.58
+60  1998-01-02 05:45:00     NA  -2.13 -11.74   0.00 2.2 72.85  3.9  4.47  0.80
+61  1998-01-02 06:15:00     NA   0.58  -6.77   0.00 2.1 73.85  3.5  4.40  0.75
+62  1998-01-02 06:45:00     NA  -6.87   6.88   0.00 2.0 74.35  3.3  4.33  0.68
+63  1998-01-02 07:15:00     NA  -5.00   4.50   0.00 2.2 73.30  4.1  4.27  0.74
+64  1998-01-02 07:45:00     NA  -0.03  -7.98   0.00 2.2 73.75  4.2  4.25  0.71
+65  1998-01-02 08:15:00     NA  -4.28 -10.96   4.31 1.9 75.24  3.4  4.23  0.74
+66  1998-01-02 08:45:00     NA  -2.45  29.77   9.32 1.6 78.14  2.4  4.19  1.10
+67  1998-01-02 09:15:00     NA     NA  26.53  39.34 1.6 78.78  3.2  4.11  1.02
+68  1998-01-02 09:45:00     NA     NA  33.74  41.74 2.3 73.03  4.7  4.08  1.02
+69  1998-01-02 10:15:00     NA     NA  48.02  66.53 2.4 72.23  4.6  4.10  1.28
+70  1998-01-02 10:45:00     NA     NA  60.19 123.31 2.4 71.94  4.6  4.12  1.20
+71  1998-01-02 11:15:00     NA     NA  76.24 220.82 2.3 72.74  4.7  4.14  1.19
+72  1998-01-02 11:45:00     NA     NA 145.88 271.97 2.4 72.39  5.1  4.16  1.27
+73  1998-01-02 12:15:00     NA     NA 181.04 280.31 2.4 72.33  5.0  4.19  1.26
+74  1998-01-02 12:45:00     NA     NA 105.34 270.37 2.5 71.91  5.3  4.21  1.09
+75  1998-01-02 13:15:00     NA     NA 119.27 251.03 2.7 70.39  5.7  4.24  1.04
+76  1998-01-02 13:45:00     NA     NA  97.57 217.07 2.8 70.58  6.0  4.27  0.71
+77  1998-01-02 14:15:00     NA     NA  57.44  80.00 2.5 72.58  5.4  4.31  0.55
+78  1998-01-02 14:45:00     NA     NA  -3.87  55.09 2.4 73.07  5.2  4.34  0.52
+79  1998-01-02 15:15:00     NA     NA   5.37   0.00 2.3 74.44  5.2  4.35  0.73
+80  1998-01-02 15:45:00     NA     NA  -3.69   0.00 2.2 75.91  5.3  4.36  0.71
+81  1998-01-02 16:15:00     NA     NA  -6.46   0.00 2.0 77.61  5.1  4.37  0.65
+82  1998-01-02 16:45:00     NA     NA -31.83   0.00 2.0 77.67  5.1  4.37  0.56
+83  1998-01-02 17:15:00     NA     NA -25.03   0.00 1.9 78.30  5.0  4.36  0.84
+84  1998-01-02 17:45:00     NA     NA  22.04   0.00 2.0 77.69  5.2  4.36  0.98
+85  1998-01-02 18:15:00     NA     NA   2.50   0.00 2.0 77.34  5.2  4.36  0.64
+86  1998-01-02 18:45:00     NA     NA -34.07   0.00 2.1 76.53  5.2  4.36  0.51
+87  1998-01-02 19:15:00     NA     NA -18.43   0.00 2.7 71.19  5.8  4.36  0.57
+88  1998-01-02 19:45:00     NA     NA     NA   0.00 2.9 69.12  6.2  4.37  0.65
+89  1998-01-02 20:15:00     NA     NA     NA   0.00 2.7 71.02  6.1  4.39  0.66
+90  1998-01-02 20:45:00     NA     NA     NA   0.00 2.6 73.08  6.2  4.42  0.66
+91  1998-01-02 21:15:00     NA     NA     NA   0.00 3.2 68.36  7.2  4.46  0.66
+92  1998-01-02 21:45:00     NA     NA     NA   0.00 3.4 67.14  7.5  4.51  0.66
+93  1998-01-02 22:15:00     NA     NA     NA   0.00 3.9 63.77  8.1  4.56  0.62
+94  1998-01-02 22:45:00     NA     NA     NA   0.00 4.3 61.78  8.6  4.63  0.65
+95  1998-01-02 23:15:00     NA     NA     NA   0.00 4.4 60.95  8.8  4.70  0.68
+96  1998-01-02 23:45:00     NA     NA     NA   0.00 4.1 63.11  8.3  4.77  0.60
+97  1998-01-03 00:15:00     NA     NA     NA   0.00 3.6 65.36  7.6  4.83  0.64
+98  1998-01-03 00:45:00     NA     NA     NA   0.00 3.6 64.49  7.1  4.84  0.60
+99  1998-01-03 01:15:00     NA     NA     NA   0.00 3.6 63.78  6.7  4.83  0.61
+100 1998-01-03 01:45:00     NA     NA     NA   0.00 3.8 62.12  6.8  4.81  0.58
+ [ reached 'max' / getOption("max.print") -- omitted 17420 rows ]
+Field "sINFO":
+$DIMS
+[1] 17520
+
+$DTS
+[1] 48
+
+$Y.START
+[1] 1998
+
+$Y.END
+[1] 1998
+
+$Y.NUMS
+[1] 1
+
+$Y.NAME
+[1] "1998"
+
+Field "sLOCATION":
+$LatDeg
+[1] 56.5
+
+$LongDeg
+[1] 32.6
+
+$TimeZoneHour
+[1] 3
+
+Field "sTEMP":
+            sDateTime  season Ustar_uStar_Thres Ustar_uStar_fqc NEE_uStar_orig NEE_uStar_f
+1 1998-01-01 00:15:00 1998001           0.41625               0          -1.21   -1.210000
+2 1998-01-01 00:45:00 1998001           0.41625               0           1.72    1.720000
+3 1998-01-01 01:15:00 1998001           0.41625               1             NA    0.930000
+4 1998-01-01 01:45:00 1998001           0.41625               1             NA    1.008033
+5 1998-01-01 02:15:00 1998001           0.41625               1             NA    1.019677
+6 1998-01-01 02:45:00 1998001           0.41625               1             NA    1.166935
+7 1998-01-01 03:15:00 1998001           0.41625               1             NA    1.175082
+8 1998-01-01 03:45:00 1998001           0.41625               1             NA    1.165000
+9 1998-01-01 04:15:00 1998001           0.41625               1             NA    1.212500
+  NEE_uStar_fqc NEE_uStar_fall NEE_uStar_fall_qc NEE_uStar_fnum NEE_uStar_fsd NEE_uStar_fmeth
+1             0       1.345652                 1             46      2.540802               1
+2             0       1.372766                 1             47      2.519898               1
+3             1       0.930000                 1             51      3.387815               1
+4             1       1.008033                 1             61      3.188822               1
+5             1       1.019677                 1             62      3.163905               1
+6             1       1.166935                 1             62      2.884802               1
+7             1       1.175082                 1             61      2.909338               1
+8             1       1.165000                 1             62      2.886484               1
+9             1       1.212500                 1             64      2.899672               1
+  NEE_uStar_fwin LE_orig LE_f LE_fqc   LE_fall LE_fall_qc LE_fnum   LE_fsd LE_fmeth LE_fwin H_orig
+1             14    1.49 1.49      0  9.145256          1      78 15.83132        1      14 -11.77
+2             14    3.80 3.80      0  9.924231          1      78 15.42308        1      14 -13.50
+3             14    1.52 1.52      0  9.578659          1      82 16.24154        1      14 -18.30
+4             14    3.94 3.94      0  9.877957          1      93 16.91184        1      14 -17.47
+5             14    8.30 8.30      0  9.981702          1      94 16.85072        1      14 -21.42
+6             14    1.33 1.33      0 10.005579          1      95 16.77971        1      14 -20.55
+7             14    0.73 0.73      0  9.957895          1      95 16.85595        1      14  -8.73
+8             14    0.63 0.63      0 10.025567          1      97 16.84371        1      14 -15.15
+9             14    1.05 1.05      0  9.885700          1     100 16.90893        1      14 -25.04
+     H_f H_fqc      H_fall H_fall_qc H_fnum    H_fsd H_fmeth H_fwin Rg_orig Rg_f Rg_fqc Rg_fall
+1 -11.77     0  0.28081395         1     86 34.46165       1     14       0    0      0       0
+2 -13.50     0  0.09835294         1     85 34.89961       1     14       0    0      0       0
+3 -18.30     0 -1.74966667         1     90 35.85167       1     14       0    0      0       0
+4 -17.47     0 -2.11089109         1    101 35.89277       1     14       0    0      0       0
+5 -21.42     0 -2.61892157         1    102 36.08131       1     14       0    0      0       0
+6 -20.55     0 -3.40737864         1    103 35.92844       1     14       0    0      0       0
+7  -8.73     0 -3.81407767         1    103 35.93357       1     14       0    0      0       0
+8 -15.15     0 -3.72533333         1    105 35.64173       1     14       0    0      0       0
+9 -25.04     0 -3.69972222         1    108 35.15176       1     14       0    0      0       0
+  Rg_fall_qc Rg_fnum Rg_fsd Rg_fmeth Rg_fwin VPD_orig VPD_f VPD_fqc VPD_fall VPD_fall_qc VPD_fnum
+1         NA      NA     NA       NA      NA      4.6   4.6       0      4.6          NA       NA
+2         NA      NA     NA       NA      NA      4.6   4.6       0      4.6          NA       NA
+3         NA      NA     NA       NA      NA      4.3   4.3       0      4.3          NA       NA
+4         NA      NA     NA       NA      NA      3.9   3.9       0      3.9          NA       NA
+5         NA      NA     NA       NA      NA      3.9   3.9       0      3.9          NA       NA
+6         NA      NA     NA       NA      NA      4.0   4.0       0      4.0          NA       NA
+7         NA      NA     NA       NA      NA      3.9   3.9       0      3.9          NA       NA
+8         NA      NA     NA       NA      NA      3.7   3.7       0      3.7          NA       NA
+9         NA      NA     NA       NA      NA      3.4   3.4       0      3.4          NA       NA
+  VPD_fsd VPD_fmeth VPD_fwin rH_orig  rH_f rH_fqc rH_fall rH_fall_qc rH_fnum rH_fsd rH_fmeth rH_fwin
+1      NA        NA       NA   55.27 55.27      0   55.27         NA      NA     NA       NA      NA
+2      NA        NA       NA   55.95 55.95      0   55.95         NA      NA     NA       NA      NA
+3      NA        NA       NA   57.75 57.75      0   57.75         NA      NA     NA       NA      NA
+4      NA        NA       NA   60.20 60.20      0   60.20         NA      NA     NA       NA      NA
+5      NA        NA       NA   59.94 59.94      0   59.94         NA      NA     NA       NA      NA
+6      NA        NA       NA   59.25 59.25      0   59.25         NA      NA     NA       NA      NA
+7      NA        NA       NA   59.86 59.86      0   59.86         NA      NA     NA       NA      NA
+8      NA        NA       NA   61.08 61.08      0   61.08         NA      NA     NA       NA      NA
+9      NA        NA       NA   63.54 63.54      0   63.54         NA      NA     NA       NA      NA
+  Tair_orig Tair_f Tair_fqc Tair_fall Tair_fall_qc Tair_fnum Tair_fsd Tair_fmeth Tair_fwin Tsoil_orig
+1       7.4    7.4        0       7.4           NA        NA       NA         NA        NA       4.19
+2       7.5    7.5        0       7.5           NA        NA       NA         NA        NA       4.20
+3       7.1    7.1        0       7.1           NA        NA       NA         NA        NA       4.22
+4       6.6    6.6        0       6.6           NA        NA       NA         NA        NA       4.23
+5       6.6    6.6        0       6.6           NA        NA       NA         NA        NA       4.22
+6       6.5    6.5        0       6.5           NA        NA       NA         NA        NA       4.21
+7       6.3    6.3        0       6.3           NA        NA       NA         NA        NA       4.20
+8       6.1    6.1        0       6.1           NA        NA       NA         NA        NA       4.18
+9       5.9    5.9        0       5.9           NA        NA       NA         NA        NA       4.15
+  Tsoil_f Tsoil_fqc Tsoil_fall Tsoil_fall_qc Tsoil_fnum Tsoil_fsd Tsoil_fmeth Tsoil_fwin PotRad_uStar
+1    4.19         0       4.19            NA         NA        NA          NA         NA            0
+2    4.20         0       4.20            NA         NA        NA          NA         NA            0
+3    4.22         0       4.22            NA         NA        NA          NA         NA            0
+4    4.23         0       4.23            NA         NA        NA          NA         NA            0
+5    4.22         0       4.22            NA         NA        NA          NA         NA            0
+6    4.21         0       4.21            NA         NA        NA          NA         NA            0
+7    4.20         0       4.20            NA         NA        NA          NA         NA            0
+8    4.18         0       4.18            NA         NA        NA          NA         NA            0
+9    4.15         0       4.15            NA         NA        NA          NA         NA            0
+  FP_NEEnight_uStar FP_Temp_uStar E_0_uStar R_ref_uStar Reco_uStar GPP_uStar_f GPP_uStar_fqc
+1             -1.21           7.4    138.02    1.547842   1.121948  2.33194802             0
+2              1.72           7.5    138.02    1.547842   1.127377 -0.59262269             0
+3                NA           7.1    138.02    1.547842   1.105696  0.17569592             1
+4                NA           6.6    138.02    1.547842   1.078732  0.07069886             1
+5                NA           6.6    138.02    1.547842   1.078732  0.05905423             1
+6                NA           6.5    138.02    1.547842   1.073358 -0.09357781             1
+7                NA           6.3    138.02    1.547842   1.062629 -0.11245293             1
+8                NA           6.1    138.02    1.547842   1.051927 -0.11307347             1
+9                NA           5.9    138.02    1.547842   1.041251 -0.17124938             1
+  PotRad_NEW FP_VARnight FP_VARday NEW_FP_Temp NEW_FP_VPD FP_RRef_Night FP_qc FP_dRecPar FP_errorcode
+1          0       -1.21        NA         7.4        4.6            NA     1         24           NA
+2          0        1.72        NA         7.5        4.6            NA     1         23           NA
+3          0          NA        NA         7.1        4.3            NA     1         22           NA
+4          0          NA        NA         6.6        3.9            NA     1         21           NA
+5          0          NA        NA         6.6        3.9            NA     1         20           NA
+6          0          NA        NA         6.5        4.0            NA     1         19           NA
+7          0          NA        NA         6.3        3.9            NA     1         18           NA
+8          0          NA        NA         6.1        3.7            NA     1         17           NA
+9          0          NA        NA         5.9        3.4            NA     1         16           NA
+  FP_GPP2000 FP_OPT_VPD FP_OPT_NoVPD FP_k FP_beta FP_alpha FP_RRef FP_E0 FP_k_sd FP_beta_sd
+1         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+2         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+3         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+4         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+5         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+6         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+7         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+8         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+9         NA       NULL         NULL   NA      NA       NA      NA    NA      NA         NA
+  FP_alpha_sd FP_RRef_sd FP_E0_sd Reco_DT_uStar GPP_DT_uStar Reco_DT_uStar_SD GPP_DT_uStar_SD
+1          NA         NA       NA    0.08070936            0         1.570279               0
+2          NA         NA       NA    0.08105704            0         1.577022               0
+3          NA         NA       NA    0.07966751            0         1.550073               0
+4          NA         NA       NA    0.07793523            0         1.516474               0
+5          NA         NA       NA    0.07793523            0         1.516474               0
+6          NA         NA       NA    0.07758942            0         1.509766               0
+7          NA         NA       NA    0.07689848            0         1.496365               0
+8          NA         NA       NA    0.07620846            0         1.482980               0
+9          NA         NA       NA    0.07551939            0         1.469614               0
+ [ reached 'max' / getOption("max.print") -- omitted 17511 rows ]
+Field "sUSTAR_DETAILS":
+$uStarTh
+  aggregationMode seasonYear  season     uStar
+1          single         NA    <NA> 0.4162500
+2            year       1998    <NA> 0.4162500
+3          season       1998 1998001 0.4162500
+4          season       1998 1998003 0.4162500
+5          season       1998 1998006 0.3520000
+6          season       1998 1998009 0.3369231
+7          season       1998 1998012 0.1740000
+
+$seasonYear
+  seasonYear nRec uStarMaxSeason uStarAggr uStarPooled
+1       1998 5517        0.41625   0.41625          NA
+
+$season
+  seasonYear  season nRec uStarSeasonEst uStarAggr
+1       1998 1998001 1116             NA 0.4162500
+2       1998 1998003 1218      0.4162500 0.4162500
+3       1998 1998006  779      0.3520000 0.3520000
+4       1998 1998009 1644      0.3369231 0.3369231
+5       1998 1998012  760      0.1740000 0.1740000
+
+$tempInSeason
+     1998001   1998003   1998006   1998009 1998012
+[1,]      NA        NA 0.3520000 0.3369231      NA
+[2,]      NA        NA 0.4160000 0.1854545   0.186
+[3,]      NA 0.7072727        NA        NA      NA
+[4,]      NA 0.3355556        NA        NA      NA
+[5,]      NA 0.3255556 0.4837500        NA   0.162
+[6,]      NA 0.4162500 0.3428571        NA      NA
+[7,]      NA 0.5812500 0.0480000 0.5809091      NA
+
+$bins
+     season tempBin uStarBin
+1   1998001       5       12
+2   1998001       5        8
+3   1998001      NA       NA
+4   1998001      NA       NA
+5   1998001       5        2
+6   1998001      NA       NA
+7   1998001      NA       NA
+8   1998001      NA       NA
+9   1998001       4        5
+10  1998001      NA       NA
+11  1998001      NA       NA
+12  1998001      NA       NA
+13  1998001      NA       NA
+14  1998001      NA       NA
+15  1998001      NA       NA
+16  1998001      NA       NA
+17  1998001       5        1
+18  1998001      NA       NA
+19  1998001      NA       NA
+20  1998001      NA       NA
+21  1998001      NA       NA
+22  1998001      NA       NA
+23  1998001      NA       NA
+24  1998001      NA       NA
+25  1998001      NA       NA
+26  1998001      NA       NA
+27  1998001      NA       NA
+28  1998001      NA       NA
+29  1998001      NA       NA
+30  1998001      NA       NA
+31  1998001       7        1
+32  1998001       7        1
+33  1998001       7        1
+34  1998001      NA       NA
+35  1998001      NA       NA
+36  1998001      NA       NA
+37  1998001      NA       NA
+38  1998001      NA       NA
+39  1998001      NA       NA
+40  1998001      NA       NA
+41  1998001      NA       NA
+42  1998001       5        6
+43  1998001       5        7
+44  1998001       4        9
+45  1998001       4        4
+46  1998001       4       11
+47  1998001       4       11
+48  1998001      NA       NA
+49  1998001       4        5
+50  1998001       5        9
+51  1998001       4       12
+52  1998001       4       12
+53  1998001       4       11
+54  1998001       4        6
+55  1998001       4        5
+56  1998001      NA       NA
+57  1998001      NA       NA
+58  1998001      NA       NA
+59  1998001      NA       NA
+60  1998001      NA       NA
+61  1998001      NA       NA
+62  1998001      NA       NA
+63  1998001      NA       NA
+64  1998001      NA       NA
+65  1998001      NA       NA
+66  1998001      NA       NA
+67  1998001      NA       NA
+68  1998001      NA       NA
+69  1998001      NA       NA
+70  1998001      NA       NA
+71  1998001      NA       NA
+72  1998001      NA       NA
+73  1998001      NA       NA
+74  1998001      NA       NA
+75  1998001      NA       NA
+76  1998001      NA       NA
+77  1998001      NA       NA
+78  1998001      NA       NA
+79  1998001      NA       NA
+80  1998001      NA       NA
+81  1998001      NA       NA
+82  1998001      NA       NA
+83  1998001      NA       NA
+84  1998001      NA       NA
+85  1998001      NA       NA
+86  1998001      NA       NA
+87  1998001      NA       NA
+88  1998001      NA       NA
+89  1998001      NA       NA
+90  1998001      NA       NA
+91  1998001      NA       NA
+92  1998001      NA       NA
+93  1998001      NA       NA
+94  1998001      NA       NA
+95  1998001      NA       NA
+96  1998001      NA       NA
+97  1998001      NA       NA
+98  1998001      NA       NA
+99  1998001      NA       NA
+100 1998001      NA       NA
+101 1998001      NA       NA
+102 1998001      NA       NA
+103 1998001      NA       NA
+104 1998001      NA       NA
+105 1998001      NA       NA
+106 1998001      NA       NA
+107 1998001      NA       NA
+108 1998001      NA       NA
+109 1998001      NA       NA
+110 1998001      NA       NA
+111 1998001      NA       NA
+112 1998001      NA       NA
+113 1998001      NA       NA
+114 1998001      NA       NA
+115 1998001      NA       NA
+116 1998001      NA       NA
+117 1998001      NA       NA
+118 1998001      NA       NA
+119 1998001      NA       NA
+120 1998001      NA       NA
+121 1998001      NA       NA
+122 1998001      NA       NA
+123 1998001      NA       NA
+124 1998001      NA       NA
+125 1998001      NA       NA
+126 1998001      NA       NA
+127 1998001      NA       NA
+128 1998001      NA       NA
+129 1998001      NA       NA
+130 1998001      NA       NA
+131 1998001      NA       NA
+132 1998001      NA       NA
+133 1998001      NA       NA
+134 1998001      NA       NA
+135 1998001      NA       NA
+136 1998001      NA       NA
+137 1998001      NA       NA
+138 1998001      NA       NA
+139 1998001      NA       NA
+140 1998001      NA       NA
+141 1998001      NA       NA
+142 1998001      NA       NA
+143 1998001      NA       NA
+144 1998001      NA       NA
+145 1998001      NA       NA
+146 1998001      NA       NA
+147 1998001      NA       NA
+148 1998001      NA       NA
+149 1998001      NA       NA
+150 1998001      NA       NA
+151 1998001      NA       NA
+152 1998001      NA       NA
+153 1998001      NA       NA
+154 1998001      NA       NA
+155 1998001      NA       NA
+156 1998001      NA       NA
+157 1998001      NA       NA
+158 1998001      NA       NA
+159 1998001      NA       NA
+160 1998001      NA       NA
+161 1998001      NA       NA
+162 1998001      NA       NA
+163 1998001      NA       NA
+164 1998001      NA       NA
+165 1998001      NA       NA
+166 1998001      NA       NA
+167 1998001      NA       NA
+168 1998001      NA       NA
+169 1998001      NA       NA
+170 1998001      NA       NA
+171 1998001      NA       NA
+172 1998001      NA       NA
+173 1998001      NA       NA
+174 1998001      NA       NA
+175 1998001      NA       NA
+176 1998001      NA       NA
+177 1998001      NA       NA
+178 1998001      NA       NA
+179 1998001      NA       NA
+180 1998001      NA       NA
+181 1998001      NA       NA
+182 1998001      NA       NA
+183 1998001      NA       NA
+184 1998001      NA       NA
+185 1998001      NA       NA
+186 1998001      NA       NA
+187 1998001      NA       NA
+188 1998001      NA       NA
+189 1998001      NA       NA
+190 1998001      NA       NA
+191 1998001      NA       NA
+192 1998001      NA       NA
+193 1998001      NA       NA
+194 1998001      NA       NA
+195 1998001      NA       NA
+196 1998001      NA       NA
+197 1998001      NA       NA
+198 1998001      NA       NA
+199 1998001      NA       NA
+200 1998001      NA       NA
+201 1998001      NA       NA
+202 1998001      NA       NA
+203 1998001      NA       NA
+204 1998001      NA       NA
+205 1998001      NA       NA
+206 1998001      NA       NA
+207 1998001      NA       NA
+208 1998001      NA       NA
+209 1998001      NA       NA
+210 1998001      NA       NA
+211 1998001      NA       NA
+212 1998001      NA       NA
+213 1998001      NA       NA
+214 1998001      NA       NA
+215 1998001      NA       NA
+216 1998001      NA       NA
+217 1998001      NA       NA
+218 1998001      NA       NA
+219 1998001      NA       NA
+220 1998001      NA       NA
+221 1998001      NA       NA
+222 1998001      NA       NA
+223 1998001       3       17
+224 1998001       3       16
+225 1998001       3       13
+226 1998001       3       14
+227 1998001       3       15
+228 1998001       4       15
+229 1998001       4       15
+230 1998001       4       15
+231 1998001       4       17
+232 1998001       4       17
+233 1998001       4       15
+234 1998001       4       16
+235 1998001       5       16
+236 1998001       5       16
+237 1998001       5       14
+238 1998001       5       17
+239 1998001       5       17
+240 1998001       4       19
+241 1998001       4       19
+242 1998001       4       19
+243 1998001       4       17
+244 1998001       4       17
+245 1998001       4       15
+246 1998001       3       15
+247 1998001       3       16
+248 1998001       3       15
+249 1998001       3       14
+250 1998001       3       15
+251 1998001       3       14
+252 1998001       3       17
+253 1998001       3       16
+254 1998001       3       18
+255 1998001       2       20
+256 1998001       2       20
+257 1998001       2       20
+258 1998001       2       20
+259 1998001      NA       NA
+260 1998001      NA       NA
+261 1998001      NA       NA
+262 1998001      NA       NA
+263 1998001      NA       NA
+264 1998001      NA       NA
+265 1998001      NA       NA
+266 1998001      NA       NA
+267 1998001      NA       NA
+268 1998001      NA       NA
+269 1998001      NA       NA
+270 1998001      NA       NA
+271 1998001       3       18
+272 1998001       3       18
+273 1998001       3       18
+274 1998001       3       18
+275 1998001       3       18
+276 1998001       3       18
+277 1998001       3       18
+278 1998001       3       17
+279 1998001       3       16
+280 1998001       3       16
+281 1998001       3       17
+282 1998001       3       15
+283 1998001       3       13
+284 1998001       3       14
+285 1998001       2       11
+286 1998001       2        8
+287 1998001       2       14
+288 1998001       2       15
+289 1998001       2        9
+290 1998001       2       10
+291 1998001       2        6
+292 1998001       2        5
+293 1998001       2        8
+294 1998001       2       11
+295 1998001       2        8
+296 1998001       2        4
+297 1998001       2        6
+298 1998001       3        6
+299 1998001       3        4
+300 1998001       3        2
+301 1998001       3        2
+302 1998001       3        7
+303 1998001       3        8
+304 1998001       3        5
+305 1998001       3       12
+306 1998001      NA       NA
+307 1998001      NA       NA
+308 1998001      NA       NA
+309 1998001      NA       NA
+310 1998001      NA       NA
+311 1998001      NA       NA
+312 1998001      NA       NA
+313 1998001      NA       NA
+314 1998001      NA       NA
+315 1998001      NA       NA
+316 1998001      NA       NA
+317 1998001      NA       NA
+318 1998001      NA       NA
+319 1998001       7       16
+320 1998001       7       14
+321 1998001       7       12
+322 1998001       7       14
+323 1998001       7       17
+324 1998001       7       16
+325 1998001       6       19
+326 1998001       6       17
+327 1998001       6       15
+328 1998001       6       15
+329 1998001       6       16
+330 1998001       6       18
+331 1998001       4       19
+332 1998001       3       16
+333 1998001       3        9
+ [ reached 'max' / getOption("max.print") -- omitted 17187 rows ]
+
+Field "sUSTAR":
+Object of class "data.frame"
+data frame with 0 columns and 0 rows
+Field "sUSTAR_SCEN":
+   season   uStar
+1 1998001 0.41625
+2 1998003 0.41625
+3 1998006 0.41625
+4 1998009 0.41625
+5 1998012 0.41625
+
+> 
