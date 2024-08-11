@@ -58,6 +58,7 @@ dir.create("output", showWarnings = FALSE)
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
 
+# very complicated fix of cat function
 original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL, 
                           append = FALSE) 
 {
@@ -78,23 +79,16 @@ original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL,
 
 cat_ex <- function(...){
     args <- list(...)
-    print('args___')
-    print(str(args))
     msg  = args[[1]][1]
-    if (length(args) > 0 && !is.null(msg) && msg != ('.'))
-        original_cat('X')
+    if (length(args) > 0 && !is.null(msg) && msg  %in% c(".", ","))
+        original_cat(msg)
     else
         original_cat(...)
-    print('___end')
 }
 
 
 library(testthat)
 with_mock(
-    cat = cat_ex, NULL
+    cat = cat_ex,
+    processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
 )
-
-output <- capture.output({
-    summary(processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE))
-}, type = c("output", "message"))
-writeLines(output, "output/eddy_tool_log.txt")
