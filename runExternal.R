@@ -58,30 +58,43 @@ dir.create("output", showWarnings = FALSE)
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
 
-cat_ex <- function(...) { 
-    str("WTF")
-    str("WTF")
-    str("WTF")
-    str("WTF")
-    str("WTF")
-    str("WTF")
-    str("WTF")
-    str("WTF")
-}
-unlockBinding("cat", as.environment("package:base"))
-assign("cat", cat_ex)
-lockBinding("cat", as.environment("package:base"))
-
-
-# does intercept cat() bif it's not substituted
-trace("cat", tracer = quote({
-    msg = as.character(list(...)[[1]])
-    # cat('_')
-    if (length(msg) > 0 && startsWith(msg, ".")) {
-        # browser()
-        cat('_')
-        # cats() # does not reproduce spam of R[write to console]: .
+original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL, 
+                          append = FALSE) 
+{
+    if (is.character(file)) 
+        if (file == "") 
+            file <- stdout()
+    else if (startsWith(file, "|")) {
+        file <- pipe(substring(file, 2L), "w")
+        on.exit(close(file))
     }
-}), print = FALSE)
+    else {
+        file <- file(file, ifelse(append, "a", "w"))
+        on.exit(close(file))
+    }
+    .Internal(cat(list(...), file, sep, fill, labels, append))
+}
 
-processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
+
+cat_ex <- function(...){
+    args <- list(...)
+    print('args___')
+    print(str(args))
+    msg  = args[[1]][1]
+    if (length(args) > 0 && !is.null(msg) && msg != ('.'))
+        original_cat('X')
+    else
+        original_cat(...)
+    print('___end')
+}
+
+
+library(testthat)
+with_mock(
+    cat = cat_ex, NULL
+)
+
+output <- capture.output({
+    summary(processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE))
+}, type = c("output", "message"))
+writeLines(output, "output/eddy_tool_log.txt")
