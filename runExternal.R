@@ -79,8 +79,12 @@ original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL,
 
 cat_ex <- function(...){
     args <- list(...)
-    msg  = args[[1]][1]
-    original_cat(msg)
+    # print(args)
+    # original_cat(args[[1]], args[[2]], args[[3]])
+    # original_cat(...)
+    if (!is.null(args[["file"]]))
+        args[["file"]] <- NULL
+    do.call(original_cat, args)
 }
 
 
