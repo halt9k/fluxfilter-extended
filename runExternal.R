@@ -58,4 +58,15 @@ dir.create("output", showWarnings = FALSE)
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
 
-processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
+source("src/test.R", chdir = T)
+trace("cat", tracer = quote({
+    msg = as.character(list(...)[[1]])
+    if (length(msg) > 0 && startsWith(msg, ".")) {
+        # browser()
+        # cats() # does not reproduce spam of R[write to console]: .
+    }
+}), print = FALSE)
+
+sink(file = 'sink.txt', split = TRUE)
+summary(processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE))
+sink(NULL)
