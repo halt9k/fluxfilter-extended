@@ -58,15 +58,30 @@ dir.create("output", showWarnings = FALSE)
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
 
-source("src/test.R", chdir = T)
+cat_ex <- function(...) { 
+    str("WTF")
+    str("WTF")
+    str("WTF")
+    str("WTF")
+    str("WTF")
+    str("WTF")
+    str("WTF")
+    str("WTF")
+}
+unlockBinding("cat", as.environment("package:base"))
+assign("cat", cat_ex)
+lockBinding("cat", as.environment("package:base"))
+
+
+# does intercept cat() bif it's not substituted
 trace("cat", tracer = quote({
     msg = as.character(list(...)[[1]])
+    # cat('_')
     if (length(msg) > 0 && startsWith(msg, ".")) {
         # browser()
+        cat('_')
         # cats() # does not reproduce spam of R[write to console]: .
     }
 }), print = FALSE)
 
-sink(file = 'sink.txt', split = TRUE)
-summary(processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE))
-sink(NULL)
+processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
