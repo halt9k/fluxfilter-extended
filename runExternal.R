@@ -79,17 +79,21 @@ original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL,
 
 cat_ex <- function(...){
     args <- list(...)
-    # print(args)
-    # original_cat(args[[1]], args[[2]], args[[3]])
-    # original_cat(...)
     if (!is.null(args[["file"]]))
         args[["file"]] <- NULL
     do.call(original_cat, args)
 }
 
 
-library(testthat)
-with_mock(
-    cat = cat_ex,
-    processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
-)
+sink(stdout(), type = "message")
+print("using print")
+cat("using cat\n")
+message("using message")
+warning("using warning")
+sink(NULL, type="message")
+warning("after ending sink")
+q("no")
+
+
+processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
+
