@@ -80,10 +80,7 @@ original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL,
 cat_ex <- function(...){
     args <- list(...)
     msg  = args[[1]][1]
-    if (length(args) > 0 && !is.null(msg) && msg  %in% c(".", ","))
-        original_cat(msg)
-    else
-        original_cat(...)
+    original_cat(msg)
 }
 
 
