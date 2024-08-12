@@ -58,42 +58,6 @@ dir.create("output", showWarnings = FALSE)
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
 
-# very complicated fix of cat function
-original_cat <- function(..., file = "", sep = " ", fill = FALSE, labels = NULL, 
-                          append = FALSE) 
-{
-    if (is.character(file)) 
-        if (file == "") 
-            file <- stdout()
-    else if (startsWith(file, "|")) {
-        file <- pipe(substring(file, 2L), "w")
-        on.exit(close(file))
-    }
-    else {
-        file <- file(file, ifelse(append, "a", "w"))
-        on.exit(close(file))
-    }
-    .Internal(cat(list(...), file, sep, fill, labels, append))
-}
-
-
-cat_ex <- function(...){
-    args <- list(...)
-    if (!is.null(args[["file"]]))
-        args[["file"]] <- NULL
-    do.call(original_cat, args)
-}
-
-
 sink(stdout(), type = "message")
-print("using print")
-cat("using cat\n")
-message("using message")
-warning("using warning")
-sink(NULL, type="message")
-warning("after ending sink")
-q("no")
-
-
 processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
 
