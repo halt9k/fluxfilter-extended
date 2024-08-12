@@ -57,7 +57,7 @@ dir.create("output", showWarnings = FALSE)
 # to test,
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 
-
+# fix of stderr output spammed under rpy2.ipython
 sink(stdout(), type = "message")
-processEddyData(eddyProcConfiguration, dataFileName=INPUT_FILE)
 
+processEddyData(eddyProcConfiguration, dataFileName = INPUT_FILE)
