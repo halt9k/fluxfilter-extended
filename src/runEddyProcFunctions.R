@@ -1,3 +1,4 @@
+OUTPUT_DUR = "output"
 
 
 readInputData <- function(dataFileName, input_format) {
@@ -11,7 +12,7 @@ readInputData <- function(dataFileName, input_format) {
 
 
 validateInputData <- function(inputData) {
-    
+
     # delete empty columns in EddyData.F
     iEmptyCols <- which(colSums(is.na(inputData)) == nrow(inputData))
     if (length(iEmptyCols)) {
@@ -19,7 +20,7 @@ validateInputData <- function(inputData) {
         inputData <- inputData[, -iEmptyCols]
         # str(EddyData.F)
     }
-    
+
     # test if VPD is there, if not calculate from Tair and rH
     if (!("VPD" %in% colnames(inputData))) {
         # calculate VPD
@@ -28,7 +29,7 @@ validateInputData <- function(inputData) {
             REddyProc:::fCheckColNum(inputData, ., "validateInputData")
         inputData$VPD <- fCalcVPDfromRHandTair(inputData$rH, inputData$Tair)
     }
-    
+
     # filter long runs
     c("NEE") %>%
         REddyProc:::fCheckColNum(inputData, ., "validateInputData")
@@ -38,20 +39,19 @@ validateInputData <- function(inputData) {
 
 
 getDataVariablesToFill <- function(allDataVariables, eddyProcConfiguration) {
-    
+
     # user specified columns to be filled in addition to standard columns
     mdsVars <- allDataVariables[grep("_MDS$", allDataVariables)]
-    
+
     dataVariablesToFill <- intersect(c("NEE", "LE", "H", "Rg", "VPD", "rH", "Tair", "Tsoil", mdsVars, eddyProcConfiguration$temperatureDataVariable),
         allDataVariables)
-    
+
     # double check for us that temperature column really gets filled
     if (eddyProcConfiguration$isToApplyPartitioning) {
         if (!all(c(eddyProcConfiguration$temperatureDataVariable, "NEE", "Rg") %in% dataVariablesToFill))
             stop(paste0("Missing temperature variable (", eddyProcConfiguration$temperatureDataVariable, "), NEE or Rg.  Those are all required for flux partitioning!"))
     }
-    cat("Data variables picked for gap filling (dataVariablesToFill): ", paste(dataVariablesToFill, collapse = ","),
-        "\n")
+    cat("Data variables picked for gap filling (dataVariablesToFill): ", paste(dataVariablesToFill, collapse = ","), "\n")
     dataVariablesToFill
 }
 
@@ -65,7 +65,7 @@ get_ustar_suffixes <- function(EProc) {
 
 getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables = character(0)) {
     addVariableNames <- intersect(keepDataVariables, allDataVariables)
-    
+
     if (length(addVariableNames)) {
         cat("Additional columns picked to keep in processing: ", paste(addVariableNames, collapse = ","), "\n")
     } else cat("No additional columns picked to keep in processing\n")
@@ -75,10 +75,10 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
 
 .estUStarThreshold <- function(eddyProcConfiguration, EProc) {
     print("------------- u* Threshold estimation ---------------")
-    
+
     nSample <- if (length(grep("fewNBootUStar", eddyProcConfiguration$debug)))
         3L else 200L
-    
+
     seasonFactor <- if (eddyProcConfiguration$uStarSeasoning == "Continuous") {
         usCreateSeasonFactorMonth(EProc$sDATA$sDateTime, startMonth = c(3, 6, 9, 12))
     } else if (eddyProcConfiguration$uStarSeasoning == "WithinYear") {
@@ -88,16 +88,15 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
             stop("Missing column season for user-specifid seasons for ", "u* Threshold estimation.")
         as.factor(EProc$sDATA$season)
     } else stop("unknown value of eddyProcConfiguration$uStarSeasoning")
-    
+
     uStarRes <- if (isTRUE(eddyProcConfiguration$isBootstrapUStar)) {
         EProc$sEstUstarThresholdDistribution(seasonFactor = seasonFactor, nSample = nSample)
     } else {
-        # EProc$trace(sEstUstarThold, browser); #EProc$untrace(sEstUstarThold) trace(usEstUstarThreshold,
-        # recover); #untrace(usEstUstarThreshold) trace(REddyProc:::usGetValidUstarIndices, recover);
-        # #untrace(usGetValidUstarIndices)
+        # EProc$trace(sEstUstarThold, browser); #EProc$untrace(sEstUstarThold) trace(usEstUstarThreshold, recover);
+        # #untrace(usEstUstarThreshold) trace(REddyProc:::usGetValidUstarIndices, recover); #untrace(usGetValidUstarIndices)
         EProc$sEstUstarThold(seasonFactor = seasonFactor)
     }
-    
+
     if (eddyProcConfiguration$uStarSeasoning == "User") {
         print(uStarRes[uStarRes$aggregationMode == "season", ])
         EProc$useSeaonsalUStarThresholds()
@@ -107,7 +106,7 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
         # usGetAnnualSeasonUStarMap(EProc$sGetEstimatedUstarThresholdDistribution())
         EProc$useAnnualUStarThresholds()
     }
-    
+
     uStarTh <- EProc$sGetUstarScenarios()
     list(StarTh = EProc$sGetUstarScenarios(), seasonFactor = seasonFactor, suffixes = get_ustar_suffixes(EProc))
 }
@@ -138,14 +137,12 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
     dataVariablesWithoutUncertainty <- .getDataVariablesWithoutUncertainty(eddyProcConfiguration, dataVariablesToFill)
     for (dataVariable in dataVariablesToFill) {
         if (eddyProcConfiguration$isToApplyUStarFiltering && dataVariable == "NEE") {
-            
+
             # only uStar bootstrap to NEE gapfilling, not to the other variables
-            EProc$sMDSGapFillUStarScens(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty),
-                                        isVerbose = TRUE)
-            
-            # EProc$sMDSGapFillAfterUStarDistr(dataVariable \t\t, uStarTh = uStarRes$uStarTh \t\t,
-            # uStarSuffixes = uStarRes$suffixes \t\t, FillAll = !(dataVariable %in%
-            # dataVariablesWithoutUncertainty) \t\t, isVerbose = T)
+            EProc$sMDSGapFillUStarScens(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty), isVerbose = TRUE)
+
+            # EProc$sMDSGapFillAfterUStarDistr(dataVariable \t\t, uStarTh = uStarRes$uStarTh \t\t, uStarSuffixes =
+            # uStarRes$suffixes \t\t, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty) \t\t, isVerbose = T)
         } else {
             EProc$sMDSGapFill(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty), isVerbose = T)
         }
@@ -154,20 +151,19 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
 
 
 .computeSdNEE <- function(EProc) {
-    # calculate the range over quantiles for each record suffixes <- EProc$sGetUstarSuffixes() # only in newer
-    # version
+    # calculate the range over quantiles for each record suffixes <- EProc$sGetUstarSuffixes() # only in newer version
     suffixes <- names(EProc$sGetUstarScenarios())[-1L]
     if (length(suffixes) > 1L) {
-        
+
         # if suffix is empty do not add underscore
         NEE_names <- paste0("NEE", ifelse(suffixes == "", "", "_"), suffixes, "_f")
         neeRange <- apply(EProc$sTEMP[, NEE_names], 1, function(x) {
             diff(range(x))
         })
-        
+
         # assume gaussian distribution range = 2*1.96*sd
         EProc$sTEMP$NEE_fsdu <- neeRange/(2 * 1.96)
-        
+
         # assume that errors are independent and variances up
         EProc$sTEMP$NEE_fsdug <- sqrt(EProc$sTEMP$NEE_uStar_fsd^2 + EProc$sTEMP$NEE_fsdu^2)
     }
@@ -176,8 +172,8 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
 
 .plotUnfilledDataVariables <- function(eddyProcConfiguration, EProc, dataVariablesToFill) {
     for (dataVariable in dataVariablesToFill) {
-        EProc$sPlotFingerprint(dataVariable, Dir = ".", Format = eddyProcConfiguration$figureFormat)
-        EProc$sPlotHHFluxes(dataVariable, Dir = ".", Format = eddyProcConfiguration$figureFormat)
+        EProc$sPlotFingerprint(dataVariable, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
+        EProc$sPlotHHFluxes(dataVariable, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
     }
 
 }
@@ -187,17 +183,16 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
     processedEddyData <- EProc$sExportResults()
     vars_amend <- if ("NEE" %in% dataVariablesToFill)
         union("NEE_uStar", dataVariablesToFill) else dataVariablesToFill
-    
+
     fillColnamesWithoutUncertainty <- .getDataVariablesWithoutUncertainty(eddyProcConfiguration, vars_amend)
     for (dataVariable in vars_amend) {
         baseNameVal <- paste(dataVariable, "f", sep = "_")
-        baseNameSdVal <- ifelse(dataVariable %in% fillColnamesWithoutUncertainty, "none", paste(dataVariable, "fsd",
-            sep = "_"))
+        baseNameSdVal <- ifelse(dataVariable %in% fillColnamesWithoutUncertainty, "none", paste(dataVariable, "fsd", sep = "_"))
         if (baseNameVal %in% colnames(processedEddyData)) {
-            EProc$sPlotFingerprint(baseNameVal, Dir = ".", Format = eddyProcConfiguration$figureFormat)
-            EProc$sPlotDiurnalCycle(baseNameVal, Dir = ".", Format = eddyProcConfiguration$figureFormat)
-            EProc$sPlotDailySums(baseNameVal, VarUnc = baseNameSdVal, Dir = ".", Format = eddyProcConfiguration$figureFormat)
-            EProc$sPlotHHFluxes(baseNameVal, Dir = ".", Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotFingerprint(baseNameVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotDiurnalCycle(baseNameVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotDailySums(baseNameVal, VarUnc = baseNameSdVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotHHFluxes(baseNameVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
         }
     }
 }
@@ -205,11 +200,11 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
 
 .gapFillAndPlotDataVariables <- function(eddyProcConfiguration, EProc, dataVariablesToFill) {
     print("------------- Gapfilling ---------------")
-    
+
     .gapFillDataVariables(EProc, eddyProcConfiguration, dataVariablesToFill)
     if (length(get_ustar_suffixes(EProc)))
         .computeSdNEE(EProc)
-    
+
     .plotUnfilledDataVariables(eddyProcConfiguration, EProc, dataVariablesToFill)
     .plotFilledDataVariables(eddyProcConfiguration, EProc, dataVariablesToFill)
     # plotting results overview figures for gap filling
@@ -236,16 +231,16 @@ gapFillAndPlotDataVariablesOrError <- function(eddyProcConfiguration, ...) {
     QFTempVar = paste(eddyProcConfiguration$temperatureDataVariable, "_fqc", sep = "")
     uStarScenKeep = if ("U50" %in% get_ustar_suffixes(EProc))
         "U50" else "uStar"
-    
+
     if (length(get_ustar_suffixes(EProc))) {
         # if (eddyProcConfiguration$isToApplyUStarFiltering){
         if ("Reichstein05" %in% eddyProcConfiguration$partitioningMethods) {
             resMR <- EProc$sMRFluxPartitionUStarScens(uStarScenKeep = uStarScenKeep, TempVar = TempVar, QFTempVar = QFTempVar,
-                                                      QFTempValue = 0)
+                QFTempValue = 0)
         }
         if ("Lasslop10" %in% eddyProcConfiguration$partitioningMethods) {
             resGL <- EProc$sGLFluxPartitionUStarScens(uStarScenKeep = uStarScenKeep, TempVar = TempVar, QFTempVar = QFTempVar,
-                                                      QFTempValue = 0)
+                QFTempValue = 0)
         }
     } else {
         if ("Reichstein05" %in% eddyProcConfiguration$partitioningMethods) {
@@ -261,21 +256,21 @@ gapFillAndPlotDataVariablesOrError <- function(eddyProcConfiguration, ...) {
 .plotPartitionedFluxes <- function(eddyProcConfiguration, EProc) {
     suffix <- if (length(get_ustar_suffixes(EProc)))
         "_uStar" else ""
-    
+
     plotFP <- function(varname) {
         if (varname %in% names(EProc$sTEMP)) {
-            EProc$sPlotFingerprint(varname, Dir = ".", Format = eddyProcConfiguration$figureFormat, valueLimits = quantile(EProc$sTEMP[[varname]],
-                                                                                                                           prob = c(0, 0.99), na.rm = TRUE))
+            EProc$sPlotFingerprint(varname, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat, valueLimits = quantile(EProc$sTEMP[[varname]],
+                prob = c(0, 0.99), na.rm = TRUE))
         } else {
             warning("Column '", varname, "' not found. Aborting fingerprint plot.")
         }
     }
-    
+
     if ("Reichstein05" %in% eddyProcConfiguration$partitioningMethods) {
         plotFP(paste0("Reco", suffix))
         plotFP(paste0("GPP", suffix, "_f"))
     }
-    
+
     if ("Lasslop10" %in% eddyProcConfiguration$partitioningMethods) {
         plotFP(paste0("Reco_DT", suffix))
         plotFP(paste0("GPP_DT", suffix))
@@ -304,20 +299,19 @@ partitionAndPlotFluxesOrError <- function(eddyProcConfiguration, ...) {
 }
 
 
-## << if equals 'onlinetool' then for backward compatibility the columns '*_ustar_*' are renamed to '*_*' in
-## the generated output file
-writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isIncludeOnlyFilledBootColumns = TRUE,
-    output_format = "onlinetool") {
+## << if equals 'onlinetool' then for backward compatibility the columns '*_ustar_*' are renamed to '*_*' in the generated
+## output file
+writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isIncludeOnlyFilledBootColumns = TRUE, output_format = "onlinetool") {
     processedEddyData <- EProc$sExportResults()
     if (isTRUE(isIncludeOnlyFilledBootColumns)) {
-        
-        # remove all columns generated during bootstrap, unless the filled, which end with '_f' or start with
-        # Reco or start with GPP
+
+        # remove all columns generated during bootstrap, unless the filled, which end with '_f' or start with Reco or start
+        # with GPP
         suffixes <- get_ustar_suffixes(EProc)
         suffixes_boot <- suffixes[!(suffixes %in% c("", "uStar"))]
         iBootColsRemove <- unlist(sapply(suffixes_boot, function(suffix) {
             iBootCols <- grep(paste0("_", suffix), colnames(processedEddyData))
-            
+
             # colnames(processedEddyData)[iBootCols]
             iKeepFilled <- grep("_f$", colnames(processedEddyData)[iBootCols])
             iKeepReco <- grep("^Reco_", colnames(processedEddyData)[iBootCols])
@@ -326,7 +320,7 @@ writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isInc
             if (length(iKeep))
                 iBootCols[-iKeep] else iBootCols
         }))
-        
+
         # colnames(processedEddyData)[iBootColsRemove]
         if (length(iBootColsRemove))
             processedEddyData <- processedEddyData[, -iBootColsRemove]
@@ -335,16 +329,16 @@ writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isInc
         names(processedEddyData) <- gsub("_uStar_", "_", names(processedEddyData))
         names(processedEddyData) <- gsub("_uStar$", "", names(processedEddyData))
     }
-    
+
     # colnames(FilledEddyData.F) prepend user input file
     combinedData <- cbind(inputData, processedEddyData)
-    
+
     # fWriteDataframeToTextFile(outputFile = 'output.txt', Data.F = outDATA)
     if (output_format %in% c("onlinetool", "reddyproc12")) {
         fWriteDataframeToFile(combinedData, FileName = outputFileName)
     } else if (output_format == "fluxnet15") {
         df_fn15 <- extract_FN15(EProc)
-        
+
         # avoid readr dependency
         write.csv(df_fn15, outputFileName, row.names = FALSE, na = "-9999")
     } else stop("unknown output_format: ", output_format)
@@ -362,22 +356,22 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
 }
 
 
-processEddyData <- function(eddyProcConfiguration,
-                            dataFileName = INPUT_FILE, outputFileName = "output/output.txt", figureFormat = "pdf") {
+processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, outputFileName = file.path(OUTPUT_DUR, "output.txt"),
+    figureFormat = "pdf") {
     caught_error <- NULL
-    
-    
+
+
     eddyProcConfiguration$figureFormat <- figureFormat
     str(eddyProcConfiguration)
-    
+
     inputData <- readInputData(dataFileName, eddyProcConfiguration$input_format)
     str(inputData)
     EddyDataWithPosix <- validateInputData(inputData)
-    
+
     dataVariablesToFill <- getDataVariablesToFill(colnames(EddyDataWithPosix), eddyProcConfiguration)
     addVariableNames <- getAdditionalDataVariablesToKeep(colnames(EddyDataWithPosix), c("NEE_f", "NEE_fqc", paste(eddyProcConfiguration$temperatureDataVariable,
-                                                                                                                  c("_f", "_fqc"), sep = "")))
-    
+        c("_f", "_fqc"), sep = "")))
+
     # keep column season (if exists) for uStarFiltering
     if (eddyProcConfiguration$isToApplyUStarFiltering) {
         if ("Ustar" %in% colnames(EddyDataWithPosix))
@@ -385,34 +379,33 @@ processEddyData <- function(eddyProcConfiguration,
         if ("season" %in% colnames(EddyDataWithPosix))
             addVariableNames <- c(addVariableNames, "season")
     }
-    
-    EProc <- sEddyProc$new(eddyProcConfiguration$siteId, EddyDataWithPosix, union(dataVariablesToFill, addVariableNames),
-                           ColNamesNonNumeric = "season")
-    
+
+    EProc <- sEddyProc$new(eddyProcConfiguration$siteId, EddyDataWithPosix, union(dataVariablesToFill, addVariableNames), ColNamesNonNumeric = "season")
+
     if (eddyProcConfiguration$isToApplyUStarFiltering) {
         ans <- estUStarThresholdOrError(eddyProcConfiguration, EProc)
         if (!length(caught_error) && inherits(ans, "error"))
             caught_error <- ans
     }
-    
+
     if (eddyProcConfiguration$isToApplyGapFilling) {
         ans <- gapFillAndPlotDataVariablesOrError(eddyProcConfiguration, EProc, dataVariablesToFill)
         if (!length(caught_error) && inherits(ans, "error"))
             caught_error <- ans
     }
-    
+
     if (eddyProcConfiguration$isToApplyPartitioning) {
         ans <- partitionAndPlotFluxesOrError(eddyProcConfiguration, EProc)
         if (!length(caught_error) && inherits(ans, "error"))
             caught_error <- ans
     }
-    
-    
+
+
     writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName, output_format = eddyProcConfiguration$output_format)
-    
-    ## value<< list of describe<< << string binary code 0/1 if UstarFiltering, GapFilling, FluxPartitioning was
-    ## used << string of size of the inputFile '<nrow>,<col>' << NULL or error object caught but not stopped <<
-    ## to end up in dump so that maybe debugged end<<
+
+    ## value<< list of describe<< << string binary code 0/1 if UstarFiltering, GapFilling, FluxPartitioning was used <<
+    ## string of size of the inputFile '<nrow>,<col>' << NULL or error object caught but not stopped << to end up in dump so
+    ## that maybe debugged end<<
     list(mode = encodeEddyProcTasks(eddyProcConfiguration), inputSize = paste(dim(inputData), collapse = ","), err = caught_error,
-         EProc = EProc)
+        EProc = EProc)
 }
