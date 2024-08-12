@@ -39,25 +39,25 @@ eddyProcConfiguration <- list(
 # REddyProc global vars
 INPUT_FILE = "REddyProc.txt"
 OUTPUT_DIR = "./output/REddyProc"
+OUTPUT_PLOTS_MASK = "*.png"
 
 dir.create(OUTPUT_DIR, showWarnings = FALSE)
 unlink(file.path(OUTPUT_DIR, "*.png"))
 unlink(file.path(OUTPUT_DIR, "output.txt"))
 
 
+# 1.3.2 vs 1.3.3 have different outputs
+# to test,
+# install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
 install_if_missing <- function(package, repos) {
     if (!require(package, character.only = TRUE)) {
         install.packages(package, dependencies = TRUE, repos=repos)
         library(package, character.only = TRUE)
     }
 }
-
-
-# 1.3.2 vs 1.3.3 have different outputs
-# to test,
-# install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
-
 install_if_missing("REddyProc", repos='http://cran.rstudio.com/')
+
+
 library(REddyProc)
 source("src/runEddyProcFunctions.R", chdir = T)
 
@@ -65,4 +65,18 @@ options(max.print = 50)
 # fix of stderr output spammed under rpy2.ipython
 sink(stdout(), type = "message")
 
-processEddyData(eddyProcConfiguration, dataFileName = INPUT_FILE, figureFormat = "png")
+ext = tools::file_ext(OUTPUT_PLOTS_MASK)
+processEddyData(eddyProcConfiguration, dataFileName = INPUT_FILE, figureFormat = ext)
+
+
+library(png)
+library(grid)
+plot_images <- function(path, pattern) {
+    image_files <- list.files(path = path, pattern = pattern, full.names = TRUE)
+    for (image in image_files) {
+        img <- readPNG(image, native = TRUE)
+        plot.new()
+        rasterImage(img, 0, 0, 1, 1, interpolate = FALSE)
+    }
+}
+plot_images(OUTPUT_DIR, OUTPUT_PLOTS_MASK)
