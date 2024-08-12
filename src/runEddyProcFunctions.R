@@ -1,5 +1,3 @@
-OUTPUT_DUR = "output"
-
 
 readInputData <- function(dataFileName, input_format) {
     if (input_format == "onlinetool") {
@@ -172,8 +170,8 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
 
 .plotUnfilledDataVariables <- function(eddyProcConfiguration, EProc, dataVariablesToFill) {
     for (dataVariable in dataVariablesToFill) {
-        EProc$sPlotFingerprint(dataVariable, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
-        EProc$sPlotHHFluxes(dataVariable, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
+        EProc$sPlotFingerprint(dataVariable, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+        EProc$sPlotHHFluxes(dataVariable, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
     }
 
 }
@@ -189,10 +187,10 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
         baseNameVal <- paste(dataVariable, "f", sep = "_")
         baseNameSdVal <- ifelse(dataVariable %in% fillColnamesWithoutUncertainty, "none", paste(dataVariable, "fsd", sep = "_"))
         if (baseNameVal %in% colnames(processedEddyData)) {
-            EProc$sPlotFingerprint(baseNameVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
-            EProc$sPlotDiurnalCycle(baseNameVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
-            EProc$sPlotDailySums(baseNameVal, VarUnc = baseNameSdVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
-            EProc$sPlotHHFluxes(baseNameVal, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotFingerprint(baseNameVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotDiurnalCycle(baseNameVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotDailySums(baseNameVal, VarUnc = baseNameSdVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+            EProc$sPlotHHFluxes(baseNameVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
         }
     }
 }
@@ -259,7 +257,7 @@ gapFillAndPlotDataVariablesOrError <- function(eddyProcConfiguration, ...) {
 
     plotFP <- function(varname) {
         if (varname %in% names(EProc$sTEMP)) {
-            EProc$sPlotFingerprint(varname, Dir = OUTPUT_DUR, Format = eddyProcConfiguration$figureFormat, valueLimits = quantile(EProc$sTEMP[[varname]],
+            EProc$sPlotFingerprint(varname, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat, valueLimits = quantile(EProc$sTEMP[[varname]],
                 prob = c(0, 0.99), na.rm = TRUE))
         } else {
             warning("Column '", varname, "' not found. Aborting fingerprint plot.")
@@ -356,7 +354,7 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
 }
 
 
-processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, outputFileName = file.path(OUTPUT_DUR, "output.txt"),
+processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, outputFileName = file.path(OUTPUT_DIR, "output.txt"),
     figureFormat = "pdf") {
     caught_error <- NULL
 
