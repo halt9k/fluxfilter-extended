@@ -1,4 +1,4 @@
-Git action который автоматически ге
+Git action который автоматически генерирует compare?
 
 
 ------
@@ -14,7 +14,7 @@ NEE_uStar_f
 2) LE 
 3) H 
 
-Durinal cycles
+DIURNAL cycles
 Суточный ход
 Half-hurly fluxes  (NEE, LE, H)
 

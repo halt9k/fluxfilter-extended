@@ -1,3 +1,6 @@
+# File is kindly provided by REddyProc authors
+# caontain minimal changess and is similar to online tool https://www.bgc-jena.mpg.de/REddyProc/ui/REddyProc.php
+
 
 readInputData <- function(dataFileName, input_format) {
     if (input_format == "onlinetool") {
