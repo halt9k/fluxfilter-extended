@@ -1,0 +1,1 @@
+%CONDA_ENVS%\ipynb-3-11\python.exe -m jupyter nbconvert --to script FluxFilterExtended.ipynb --output FluxFilterExtended.py
