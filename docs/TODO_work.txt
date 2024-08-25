@@ -6,7 +6,7 @@ Git action который автоматически генерирует compar
 
 
 ------
-незаполненый, заполненый, легендав
+незаполненый, заполненый, легенда
 
 Тепловые карты NEE  LE  H 
 1) NEE_ustar_f 
@@ -16,6 +16,7 @@ NEE_uStar_f
 
 DIURNAL cycles
 Суточный ход
+
 Half-hurly fluxes  (NEE, LE, H)
 
 
