@@ -12,14 +12,13 @@ Git action который автоматически генерирует compar
 1) NEE_ustar_f 
 NEE_uStar_f
 2) LE 
-3) H 
+3) H
 
 DIURNAL cycles
 Суточный ход
 
+
 Half-hurly fluxes  (NEE, LE, H)
-
-
 30-минутные потоки  NEE  LE  H 
 Суточные средние
 1)
