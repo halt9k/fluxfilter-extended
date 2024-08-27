@@ -1,4 +1,5 @@
 import io
+from typing import List
 
 from IPython.core.display import Markdown
 from IPython.display import display
@@ -36,7 +37,16 @@ def display_image_row(paths):
 
 
 # TODO extract to tests to simplify non-Jupiter run?
-def draw_reddyproc(remove_legends, removed_legend_postfix, output_order):
+def prepare_images(crop: List[str], crop_postfix,  remove_legends: List[str], removed_legend_postfix):
+    update_img_list(all_img_paths)
+    for tag in crop:
+        path = get_unique_path(tag)
+        new_path = path.replace('.png', crop_postfix + '.png')
+
+        img = Image.open(path)
+        cropped = crop_borders(img)
+        cropped.save(new_path)
+
     update_img_list(all_img_paths)
 
     for tag in remove_legends:
@@ -48,6 +58,8 @@ def draw_reddyproc(remove_legends, removed_legend_postfix, output_order):
         left, _ = split_image_vertical(cropped)
         left.save(new_path)
 
+
+def display_images(output_order):
     update_img_list(all_img_paths)
 
     for output_step in output_order:

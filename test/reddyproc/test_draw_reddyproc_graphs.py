@@ -1,6 +1,9 @@
 def test():
+    CROP_POSTFIX = '_crop'
+    CROP = ['FP_NEE', 'FP_NEE_uStar_f']
+
     REMOVED_LEGEND_POSTFIX = '_bare'
-    REMOVE_LEGENDS = ['FP_NEE']
+    REMOVE_LEGENDS = ['FP_NEE', 'FP_NEE_crop']
 
     OUTPUT_ORDER = (
         "Тепловые карты",
@@ -14,6 +17,6 @@ def test():
         ['Flux_NEE_uStar_f', 'Flux_LE', 'Flux_H']
     )
 
-
-    from src.reddyproc.draw_reddyproc_graphs import draw_reddyproc
-    draw_reddyproc(REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX, OUTPUT_ORDER)
+    from src.reddyproc.draw_reddyproc_graphs import prepare_images, display_images
+    prepare_images(CROP, CROP_POSTFIX, REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX)
+    display_images(OUTPUT_ORDER)
