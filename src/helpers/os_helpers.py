@@ -19,9 +19,9 @@ from sys import path
 
 def ch_project_root_dir():
     this_file_path = Path(__file__).parent
-    assert this_file_path.name == 'src'
+    assert this_file_path.name == 'helpers'
 
-    src_dir = this_file_path
+    src_dir = this_file_path.parent
     assert src_dir.name == 'src'
 
     project_dir = str(src_dir.parent)

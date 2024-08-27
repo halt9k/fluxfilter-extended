@@ -14,10 +14,7 @@ def crop_borders(img):
         return img
 
 
-def split_image(img_path):
-    new_path = img_path.replace(".png", "_no_legend.png")
-    img = Image.open(img_path)
-    img_cp = crop_borders(img)
-    w, h = img_cp.size
-    left_side = img_cp.crop((0, 0, w/2, h)).save(new_path)
-    left_side.save(new_path)
+def split_image_vertical(img):
+    w, h = img.size
+    return img.crop((0, 0, w/2, h)), img.crop((w/2, 0, w, h))
+
