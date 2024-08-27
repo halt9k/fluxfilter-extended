@@ -1,3 +1,5 @@
+import io
+
 from IPython.core.display import Markdown
 from IPython.display import display
 from PIL import Image
@@ -43,16 +45,24 @@ OUTPUT_ORDER = [
 # 'FP_GPP_DT_uStar', 'FP_GPP_uStar_f', 'FP_H', 'FP_H_f', 'FP_LE', 'FP_LE_f', 'FP_NEE', 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f']
 
+def display_images(img_tags):
+    img_widgets = []
+    for tag in img_tags:
+        path = get_unique_path(tag)
+        byte_arr = io.BytesIO()
+        Image.open(path).save(byte_arr, format='PNG')
+        img_widgets += [widgets.Image(value=byte_arr.getvalue(), format="PNG")]
 
-for step in OUTPUT_ORDER:
-    if type(step) is str:
-        title_text = step
+    hbox = HBox(img_widgets)
+    # display(hbox)
+
+
+for output_step in OUTPUT_ORDER:
+    if type(output_step) is str:
+        title_text = output_step
         display(Markdown("## " + title_text))
-    elif type(step) is list:
-        img_paths = [get_unique_path(tag) for tag in step]
-        imgs = [Image.open(path) for path in img_paths]
-        img_widgets = [widgets.Image(value=img.tobytes(), format="PNG") for img in imgs]
-        hbox = HBox(img_widgets)
-        display(hbox)
+    elif type(output_step) is list:
+        d
+        display_images(output_step)
     else:
         raise Exception("Wrong OUTPUT_HEADERS contents")
