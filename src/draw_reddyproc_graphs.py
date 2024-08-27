@@ -45,24 +45,25 @@ OUTPUT_ORDER = [
 # 'FP_GPP_DT_uStar', 'FP_GPP_uStar_f', 'FP_H', 'FP_H_f', 'FP_LE', 'FP_LE_f', 'FP_NEE', 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f']
 
-def display_images(img_tags):
+def display_image_row(paths):
     img_widgets = []
-    for tag in img_tags:
-        path = get_unique_path(tag)
+    for path in paths:
         byte_arr = io.BytesIO()
         Image.open(path).save(byte_arr, format='PNG')
         img_widgets += [widgets.Image(value=byte_arr.getvalue(), format="PNG")]
 
     hbox = HBox(img_widgets)
-    # display(hbox)
+    display(hbox)
 
 
+# TODO extract entierly into non-Jupyter tests?
+# def draw_reddyproc():
 for output_step in OUTPUT_ORDER:
     if type(output_step) is str:
         title_text = output_step
         display(Markdown("## " + title_text))
     elif type(output_step) is list:
-        d
-        display_images(output_step)
+        paths = [get_unique_path(tag) for tag in output_step]
+        display_image_row(paths)
     else:
         raise Exception("Wrong OUTPUT_HEADERS contents")
