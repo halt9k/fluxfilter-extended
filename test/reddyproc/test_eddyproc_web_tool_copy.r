@@ -1,8 +1,10 @@
 rm(list = ls())
+ias_output_prefix = 'tv_fy4'
 
 
-eddyProcConfiguration <- list(
-    siteId = 'yourSiteID',
+eddyproc_config <- list(
+    # siteId = 'yourSiteID',
+    siteId = ias_output_prefix,
     
     isToApplyUStarFiltering = TRUE,
     # uStarSeasoning = "WithinYear", "Continuous" , ...
@@ -43,6 +45,7 @@ OUTPUT_PLOTS_MASK = "*.png"
 
 dir.create(OUTPUT_DIR, showWarnings = FALSE)
 unlink(file.path(OUTPUT_DIR, "*.png"))
+unlink(file.path(OUTPUT_DIR, "*.csv"))
 unlink(file.path(OUTPUT_DIR, "output.txt"))
 
 
@@ -59,24 +62,15 @@ install_if_missing("REddyProc", repos='http://cran.rstudio.com/')
 
 
 library(REddyProc)
-source("src/runEddyProcFunctions.R", chdir = T)
+source("src/reddyproc/eddyproc_web_tool_copy.r", chdir = T)
+
 
 options(max.print = 50)
 # fix of stderr output spammed under rpy2.ipython
 sink(stdout(), type = "message")
 
 ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-processEddyData(eddyProcConfiguration, dataFileName = INPUT_FILE, figureFormat = ext)
+df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE, figureFormat = ext)
 
-
-library(png)
-library(grid)
-plot_images <- function(path, pattern) {
-    image_files <- list.files(path = path, pattern = pattern, full.names = TRUE)
-    for (image in image_files) {
-        img <- readPNG(image, native = TRUE)
-        plot.new()
-        rasterImage(img, 0, 0, 1, 1, interpolate = FALSE)
-    }
-}
-plot_images(OUTPUT_DIR, OUTPUT_PLOTS_MASK)
+source("src/reddyproc/calc_averages.r", chdir = T)
+calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)
