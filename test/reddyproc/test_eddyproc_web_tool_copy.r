@@ -1,8 +1,10 @@
 rm(list = ls())
+ias_output_prefix = 'tv_fy4'
 
 
-eddyProcConfiguration <- list(
-    siteId = 'yourSiteID',
+ep_config <- list(
+    # siteId = 'yourSiteID',
+    siteId = ias_output_prefix,
     
     isToApplyUStarFiltering = TRUE,
     # uStarSeasoning = "WithinYear", "Continuous" , ...
@@ -59,24 +61,13 @@ install_if_missing("REddyProc", repos='http://cran.rstudio.com/')
 
 
 library(REddyProc)
-source("src/runEddyProcFunctions.R", chdir = T)
+source("src/reddyproc/eddyproc_web_tool_copy.r", chdir = T)
+source("src/reddyproc/calc_averages.r", chdir = T)
 
 options(max.print = 50)
 # fix of stderr output spammed under rpy2.ipython
 sink(stdout(), type = "message")
 
 ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-processEddyData(eddyProcConfiguration, dataFileName = INPUT_FILE, figureFormat = ext)
-
-
-library(png)
-library(grid)
-plot_images <- function(path, pattern) {
-    image_files <- list.files(path = path, pattern = pattern, full.names = TRUE)
-    for (image in image_files) {
-        img <- readPNG(image, native = TRUE)
-        plot.new()
-        rasterImage(img, 0, 0, 1, 1, interpolate = FALSE)
-    }
-}
-plot_images(OUTPUT_DIR, OUTPUT_PLOTS_MASK)
+df_output <- processEddyData(ep_config, dataFileName = INPUT_FILE, figureFormat = ext)
+calc_averages(df_output, ep_config.siteId)

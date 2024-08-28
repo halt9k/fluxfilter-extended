@@ -333,17 +333,19 @@ writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isInc
     }
 
     # colnames(FilledEddyData.F) prepend user input file
-    combinedData <- cbind(inputData, processedEddyData)
+    eddyProcOutputData <- cbind(inputData, processedEddyData)
 
     # fWriteDataframeToTextFile(outputFile = 'output.txt', Data.F = outDATA)
     if (output_format %in% c("onlinetool", "reddyproc12")) {
-        fWriteDataframeToFile(combinedData, FileName = outputFileName)
+        fWriteDataframeToFile(eddyProcOutputData, FileName = outputFileName)
     } else if (output_format == "fluxnet15") {
         df_fn15 <- extract_FN15(EProc)
 
         # avoid readr dependency
         write.csv(df_fn15, outputFileName, row.names = FALSE, na = "-9999")
     } else stop("unknown output_format: ", output_format)
+    
+    return(eddyProcOutputData)
 }
 
 
@@ -403,11 +405,13 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, ou
     }
 
 
-    writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName, output_format = eddyProcConfiguration$output_format)
+    df_output <- writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName, output_format = eddyProcConfiguration$output_format)
 
     ## value<< list of describe<< << string binary code 0/1 if UstarFiltering, GapFilling, FluxPartitioning was used <<
     ## string of size of the inputFile '<nrow>,<col>' << NULL or error object caught but not stopped << to end up in dump so
     ## that maybe debugged end<<
     list(mode = encodeEddyProcTasks(eddyProcConfiguration), inputSize = paste(dim(inputData), collapse = ","), err = caught_error,
         EProc = EProc)
+    
+    return(df_output)
 }
