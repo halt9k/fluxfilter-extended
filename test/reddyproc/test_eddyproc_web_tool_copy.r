@@ -62,7 +62,7 @@ install_if_missing("REddyProc", repos='http://cran.rstudio.com/')
 
 library(REddyProc)
 source("src/reddyproc/eddyproc_web_tool_copy.r", chdir = T)
-source("src/reddyproc/calc_averages.r", chdir = T)
+
 
 options(max.print = 50)
 # fix of stderr output spammed under rpy2.ipython
@@ -70,4 +70,6 @@ sink(stdout(), type = "message")
 
 ext = tools::file_ext(OUTPUT_PLOTS_MASK)
 df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE, figureFormat = ext)
+
+source("src/reddyproc/calc_averages.r", chdir = T)
 calc_averages(df_output, eddyproc_config$siteId)

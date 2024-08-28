@@ -60,8 +60,8 @@ calc_averages <- function(df_full, site_name){
     df_yearly <- combine_alternating(df_yearly_means, df_yearly_na, 'Year')
     
     
-    prefix = site_name + year
-    write.csv(df_daily, file = prefix +"daily.csv", row.names = FALSE)
-    write.csv(df_monthly, file = prefix + "monthly.csv", row.names = FALSE)
-    write.csv(df_yearly, file = prefix + "yearly.csv", row.names = FALSE)
+    prefix = paste0(site_name, "_", "year")
+    write.csv(df_daily, file = paste0(prefix, "_daily.csv"), row.names = FALSE)
+    write.csv(df_monthly, file = paste0(prefix, "_monthly.csv"), row.names = FALSE)
+    write.csv(df_yearly, file = paste0(prefix, "_yearly.csv"), row.names = FALSE)
 }
