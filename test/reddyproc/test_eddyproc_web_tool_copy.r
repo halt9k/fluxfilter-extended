@@ -2,7 +2,7 @@ rm(list = ls())
 ias_output_prefix = 'tv_fy4'
 
 
-ep_config <- list(
+eddyproc_config <- list(
     # siteId = 'yourSiteID',
     siteId = ias_output_prefix,
     
@@ -69,5 +69,5 @@ options(max.print = 50)
 sink(stdout(), type = "message")
 
 ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-df_output <- processEddyData(ep_config, dataFileName = INPUT_FILE, figureFormat = ext)
-calc_averages(df_output, ep_config.siteId)
+df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE, figureFormat = ext)
+calc_averages(df_output, eddyproc_config$siteId)

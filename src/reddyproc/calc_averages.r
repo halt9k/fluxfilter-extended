@@ -27,7 +27,7 @@ combine_alternating <- function(df_a, df_b, col_expected_dupe){
 }
 
 
-calc_averages <- function(df_ful, site_name){
+calc_averages <- function(df_full, site_name){
     df_to_average <- df_full %>%  select(ends_with("_f") | "Reco")
     df_full$Month <- month(df_full$DateTime)
     
