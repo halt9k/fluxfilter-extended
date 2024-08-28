@@ -45,6 +45,7 @@ OUTPUT_PLOTS_MASK = "*.png"
 
 dir.create(OUTPUT_DIR, showWarnings = FALSE)
 unlink(file.path(OUTPUT_DIR, "*.png"))
+unlink(file.path(OUTPUT_DIR, "*.csv"))
 unlink(file.path(OUTPUT_DIR, "output.txt"))
 
 
@@ -72,4 +73,4 @@ ext = tools::file_ext(OUTPUT_PLOTS_MASK)
 df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE, figureFormat = ext)
 
 source("src/reddyproc/calc_averages.r", chdir = T)
-calc_averages(df_output, eddyproc_config$siteId)
+calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)

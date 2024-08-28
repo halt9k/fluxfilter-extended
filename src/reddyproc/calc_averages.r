@@ -27,7 +27,7 @@ combine_alternating <- function(df_a, df_b, col_expected_dupe){
 }
 
 
-calc_averages <- function(df_full, site_name){
+calc_averages <- function(df_full, output_dir, site_name){
     df_to_average <- df_full %>%  select(ends_with("_f") | "Reco")
     df_full$Month <- month(df_full$DateTime)
     
@@ -59,9 +59,9 @@ calc_averages <- function(df_full, site_name){
     df_monthly <- combine_alternating(df_monthly_means, df_monthly_na, 'Month')
     df_yearly <- combine_alternating(df_yearly_means, df_yearly_na, 'Year')
     
-    
-    prefix = paste0(site_name, "_", "year")
-    write.csv(df_daily, file = paste0(prefix, "_daily.csv"), row.names = FALSE)
-    write.csv(df_monthly, file = paste0(prefix, "_monthly.csv"), row.names = FALSE)
-    write.csv(df_yearly, file = paste0(prefix, "_yearly.csv"), row.names = FALSE)
+    years <- paste(df_yearly$Year, collapse = '-')
+    prename = paste0(output_dir, '/', site_name, "_", years)
+    write.csv(df_daily, file = paste0(prename, "_daily.csv"), row.names = FALSE)
+    write.csv(df_monthly, file = paste0(prename, "_monthly.csv"), row.names = FALSE)
+    write.csv(df_yearly, file = paste0(prename, "_yearly.csv"), row.names = FALSE)
 }
