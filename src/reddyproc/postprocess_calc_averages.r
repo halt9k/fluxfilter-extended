@@ -59,7 +59,6 @@ calc_averages <- function(df_full, output_dir, site_name){
     df_monthly <- combine_alternating(df_monthly_means, df_monthly_na, 'Month')
     df_yearly <- combine_alternating(df_yearly_means, df_yearly_na, 'Year')
     
-    # TODO better work with paths?
     years <- paste(df_yearly$Year, collapse = '-')
     prename = paste0(output_dir, '/', site_name, "_", years)
     write.csv(df_daily, file = paste0(prename, "_daily.csv"), row.names = FALSE)

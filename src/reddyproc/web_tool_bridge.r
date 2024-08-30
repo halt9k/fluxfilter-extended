@@ -4,7 +4,7 @@ source("src/reddyproc/eddyproc_web_tool_copy.r", chdir = T)
 source("src/reddyproc/calc_averages.r", chdir = T)
 
 
-eddyproc_config <- list(
+eddyproc_config_default <- list(
     # siteId = 'yourSiteID',
     siteId = ias_output_prefix,
 
@@ -40,7 +40,7 @@ eddyproc_config <- list(
 
 
 # formatR::tidy_rstudio()
-# REddyProc global vars
+# REddyProc requires global vars
 INPUT_FILE = "REddyProc.txt"
 OUTPUT_DIR = "./output/REddyProc"
 OUTPUT_PLOTS_MASK = "*.png"
@@ -54,5 +54,5 @@ unlink(file.path(OUTPUT_DIR, "output.txt"))
 # options(max.print = 50)
 
 ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE, figureFormat = ext)
-calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)
+df_output <- processEddyData(eddyproc_config_default, dataFileName = INPUT_FILE, figureFormat = ext)
+calc_averages(df_output, OUTPUT_DIR, eddyproc_config_default$siteId)
