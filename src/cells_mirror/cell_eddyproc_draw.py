@@ -41,8 +41,6 @@ OUTPUT_ORDER = (
 )
 
 
-# %load_ext autoreload
-# %autoreload 2
-from src.reddyproc.draw_reddyproc_graphs import prepare_images, display_images  
+from src.reddyproc.postprocess_draw_graphs import prepare_images, display_images
 prepare_images(CROP, CROP_POSTFIX,  REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX)
 display_images(OUTPUT_ORDER)
