@@ -1,5 +1,11 @@
 rm(list = ls())
 
+cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
+project_dir <- dirname(dirname(cur_dir))
+setwd(project_dir)
+print(paste("Working dir is set to: ", project_dir))
+
+
 # duplicates cell code to run from pure R
 # avoiding R dupe here can be too complicated
 eddyproc_user_options <- list(
@@ -27,4 +33,4 @@ eddyproc_user_options <- list(
 )
 
 
-source("src/reddyproc/web_tool_bridge.r", chdir = T)
+source("src/reddyproc/web_tool_bridge.r")

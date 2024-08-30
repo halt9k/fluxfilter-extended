@@ -1,1 +1,1 @@
-# patch this file for missing globals during testing cells
+# patch this file during tests to introduce missing globals

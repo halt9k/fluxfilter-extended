@@ -1,18 +1,17 @@
 # formatR::tidy_rstudio()
 library(REddyProc)
 
-source("src/reddyproc/web_tool_sources_adapted.r", chdir = T)
-source("src/reddyproc/postprocess_calc_averages.r", chdir = T)
+source("src/reddyproc/web_tool_sources_adapted.r")
+source("src/reddyproc/postprocess_calc_averages.r")
 
 
-# correspond 06.2024 run
+# corresponds 06.2024 run
 eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
 
     isToApplyUStarFiltering = TRUE,
-    uStarSeasoning = "WithinYear", "Continuous" , ...
-    #  could be more levels somewhere around
-    uStarSeasoning =  factor("Continuous", levels = c("Continuous", "WithinYear"),
+    # TODO any more levels?
+    uStarSeasoning = factor("Continuous", levels = c("Continuous", "WithinYear")),
     uStarMethod = factor("RTw", levels = "RTw"),
 
     isBootstrapUStar = FALSE,
@@ -51,13 +50,14 @@ eddyproc_extra_options <- list(
     debugFlags = ""
 )
 
+
 merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
     eddyproc_config <- eddyproc_extra_options
 
     eddyproc_config$siteId <- eddyproc_user_options$siteId
 
     eddyproc_config$isToApplyUStarFiltering <- eddyproc_user_options$is_to_apply_u_star_filtering
-    eddyproc_config$uStarSeasoning <- factor(eddyproc_user_options$u_star_seasoning, levels = c("Continuous", "WithinYear")
+    eddyproc_config$uStarSeasoning <- factor(eddyproc_user_options$u_star_seasoning, levels = c("Continuous", "WithinYear"))
     eddyproc_config$uStarMethod <- factor(eddyproc_user_options$u_star_method)
 
     eddyproc_config$isBootstrapUStar <- eddyproc_user_options$is_bootstrap_u_star
@@ -76,8 +76,8 @@ merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
 
 
 eddyproc_config = merge_options(eddyproc_user_options, eddyproc_extra_options)
-assert eddyproc_config types are same as eddyproc_all_required_options
-# TODO check types
+
+# # TODO check types
 # u_star_seasoning="Continuous",
 # u_star_method="RTw",
 # partitioning_methods=["Reichstein05", "Lasslop10"],
