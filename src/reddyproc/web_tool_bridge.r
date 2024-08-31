@@ -115,5 +115,7 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     output_file = file.path(OUTPUT_DIR, "output.txt")
     df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
                                  outputFileName = output_file, figureFormat = ext)
+
+    # TODO what if days or months are entierly missing?
     calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)
 }
