@@ -1,6 +1,6 @@
 # formatR::tidy_rstudio()
 library(REddyProc)
-message(sprintf("REddyProc version %s", packageVersion('REddyProc')))
+cat("REddyProc version: ", paste(packageVersion('REddyProc')))
 
 source('src/reddyproc/web_tool_sources_adapted.r')
 source('src/reddyproc/postprocess_calc_averages.r')
@@ -13,7 +13,7 @@ INPUT_FILE <- NULL
 OUTPUT_DIR <- NULL
 
 
-message("WARNING: web tool uStarSeasoning factor type not verified")
+cat("WARNING: web tool uStarSeasoning factor type not verified")
 # corresponds 06.2024 run
 eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
@@ -94,10 +94,9 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     need_types <- sapply(eddyproc_all_required_options, class)
 
     if (any(got_types != need_types)){
-        print(data.frame(got_types, need_types))
-        stop("Incorrect options or options types. Check log for comparison.")
+        df_str = paste(capture.output(data.frame(got_types, need_types)), collapse = '\n')
+        stop("Incorrect options or options types: ", df_str)
     }
-
     
     INPUT_FILE <<- eddyproc_user_options$input_file
     OUTPUT_DIR <<- eddyproc_user_options$output_dir

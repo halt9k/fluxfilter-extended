@@ -14,7 +14,8 @@ options(error = browser)
 cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 project_dir <- dirname(dirname(cur_dir))
 setwd(project_dir)
-print(paste("Working dir is set to: ", project_dir))
+cat("Working dir is set to: ", project_dir)
+
 
 
 # duplicates cell code to run from pure R
@@ -39,8 +40,8 @@ eddyproc_user_options <- list(
 
     temperature_data_variable = "Tair",
     
-    input_file="REddyProc.txt",
-    output_dir="./output/REddyProc"    
+    input_file = "REddyProc.txt",
+    output_dir = "./output/REddyProc"    
 )
 
 options(max.print = 50)

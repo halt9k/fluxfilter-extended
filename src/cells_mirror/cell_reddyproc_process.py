@@ -1,7 +1,6 @@
 from types import SimpleNamespace
 from src.global_mocks import *  # noqa: F401
 
-
 eddyproc_options = SimpleNamespace(
     site_id=ias_output_prefix,
 
@@ -39,6 +38,5 @@ rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
 run_web_tool = robjects.globalenv['run_web_tool_bridge']
-eddyproc_options.partitioning_methods =  robjects.StrVector(eddyproc_options.partitioning_methods)
+eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
 run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
-
