@@ -32,13 +32,13 @@ eddyproc_options = SimpleNamespace(
 # also to be able to run R tests only using R files
 from rpy2 import robjects, rinterface_lib
 
-# don not omit stderr
+# do not omit stderr
 rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
 rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
 rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
-test_func = robjects.globalenv['run_web_tool_bridge']
+run_web_tool = robjects.globalenv['run_web_tool_bridge']
 eddyproc_options.partitioning_methods =  robjects.StrVector(eddyproc_options.partitioning_methods)
-test_func(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
+run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
 
