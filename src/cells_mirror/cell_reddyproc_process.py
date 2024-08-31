@@ -20,7 +20,7 @@ eddyproc_options = SimpleNamespace(
     partitioning_methods=["Reichstein05", "Lasslop10"],
     latitude=56.5,
     longitude=32.6,
-    timezone=+3,
+    timezone=+3.0,
 
     temperature_data_variable="Tair",
 
@@ -30,11 +30,15 @@ eddyproc_options = SimpleNamespace(
 
 # this is workaround to avoid %%R code, which supported badly anyway in multiple workflows
 # also to be able to run R tests only using R files
-import rpy2.robjects as robjects
+from rpy2 import robjects, rinterface_lib
 
-r = robjects.r
+# don not omit stderr
+rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
+rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
+rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
-robjects.globalenv['eddyproc_user_options'] = robjects.ListVector(vars(eddyproc_options))
-r.source('src/reddyproc/web_tool_bridge.r')
+robjects.r.source('src/reddyproc/web_tool_bridge.r')
 test_func = robjects.globalenv['run_web_tool_bridge']
-test_func(eddyproc_user_options='eddyproc_user_options')
+eddyproc_options.partitioning_methods =  robjects.StrVector(eddyproc_options.partitioning_methods)
+test_func(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
+
