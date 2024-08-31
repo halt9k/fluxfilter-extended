@@ -31,7 +31,9 @@ calc_averages <- function(df_full, output_dir, site_name){
     df_to_average <- df_full %>%  select(ends_with("_f") | "Reco")
     df_full$Month <- month(df_full$DateTime)
     
-    # TODO merge into one func or readable?
+    cat("Columns picked for averaging: \n", names(df_to_average))
+    
+    # merge into one func or keep readable?
     df_daily <- cbind(DoY = df_full$DoY, df_to_average)
     df_monthly <- cbind(Month = df_full$Month, df_to_average)
     df_yearly <- cbind(Year = df_full$Year, df_to_average)
@@ -39,14 +41,14 @@ calc_averages <- function(df_full, output_dir, site_name){
     df_daily_means <- aggregate_all_by(df_daily, 'DoY', mean, na.rm = TRUE)
     df_monthly_means <- aggregate_all_by(df_monthly, 'Month', mean, na.rm = TRUE)
     df_yearly_means <- aggregate_all_by(df_yearly, 'Year', mean, na.rm = TRUE)
-
     
     unfilled_columns <- gsub("_f", "", colnames(df_to_average))
-    print("WARNING: GPP column is missing for NA count")
     unfilled_columns <- setdiff(unfilled_columns, c("GPP", "Reco"))
     df_for_gaps <- df_full %>%  select(unfilled_columns)
-    names(df_for_gaps) <- paste(names(df_for_gaps), '_sqc')
     
+    cat("Columns picked for NA counts: \n", names(df_for_gaps))
+    names(df_for_gaps) <- paste(names(df_for_gaps), '_sqc')
+
     df_daily <- cbind(DoY = df_full$DoY, df_for_gaps)
     df_monthly <- cbind(Month = df_full$Month, df_for_gaps)
     df_yearly <- cbind(Year = df_full$Year, df_for_gaps)
