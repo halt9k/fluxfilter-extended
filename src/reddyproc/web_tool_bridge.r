@@ -63,12 +63,12 @@ eddyproc_extra_options <- list(
 
 
 merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
-    eddyproc_config <- eddyproc_extra_options
+    eddyproc_config <- list()
 
     eddyproc_config$siteId <- eddyproc_user_options$site_id
 
     eddyproc_config$isToApplyUStarFiltering <- eddyproc_user_options$is_to_apply_u_star_filtering
-    eddyproc_config$uStarSeasoning <- factor(eddyproc_user_options$u_star_seasoning, levels = c("Continuous", "WithinYear"))
+    eddyproc_config$uStarSeasoning <- factor(eddyproc_user_options$u_star_seasoning)
     eddyproc_config$uStarMethod <- factor(eddyproc_user_options$u_star_method)
 
     eddyproc_config$isBootstrapUStar <- eddyproc_user_options$is_bootstrap_u_star
@@ -82,17 +82,22 @@ merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
     eddyproc_config$timezone <- eddyproc_user_options$timezone
 
     eddyproc_config$temperatureDataVariable <- eddyproc_user_options$temperature_data_variable
-    return(eddyproc_config)
+    
+    return(c(eddyproc_config, eddyproc_extra_options))
 }
 
 
 run_web_tool_bridge <- function(eddyproc_user_options){
     eddyproc_config = merge_options(eddyproc_user_options, eddyproc_extra_options)
     
-    # ensure lists of  same type
-    if (any(sort(sapply(eddyproc_config, class)) != 
-            sort(sapply(eddyproc_all_required_options, class))))
-        stop("error message")
+    got_types <- sapply(eddyproc_config, class)
+    need_types <- sapply(eddyproc_all_required_options, class)
+
+    if (any(got_types != need_types)){
+        print(data.frame(got_types, need_types))
+        stop("Incorrect options or options types. Check log for comparison.")
+    }
+
     
     INPUT_FILE <<- eddyproc_user_options$input_file
     OUTPUT_DIR <<- eddyproc_user_options$output_dir
