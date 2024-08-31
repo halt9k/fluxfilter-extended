@@ -102,7 +102,7 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     INPUT_FILE <<- eddyproc_user_options$input_file
     OUTPUT_DIR <<- eddyproc_user_options$output_dir
 
-    dir.create(OUTPUT_DIR, showWarnings = FALSE)
+    dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
     unlink(file.path(OUTPUT_DIR, "*.png"))
     unlink(file.path(OUTPUT_DIR, "*.csv"))
     unlink(file.path(OUTPUT_DIR, "output.txt"))
