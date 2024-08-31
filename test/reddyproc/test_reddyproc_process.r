@@ -41,10 +41,13 @@ eddyproc_user_options <- list(
     temperature_data_variable = "Tair",
     
     input_file = "REddyProc.txt",
-    output_dir = "./output/REddyProc"    
+    output_dir = "./output/REddyProc"
 )
 
 options(max.print = 50)
 
-source('src/reddyproc/web_tool_bridge.r')
+
+debugSource('src/reddyproc/postprocess_calc_averages.r')
+debugSource('src/reddyproc/web_tool_sources_adapted.r')
+debugSource('src/reddyproc/web_tool_bridge.r')
 run_web_tool_bridge(eddyproc_user_options)

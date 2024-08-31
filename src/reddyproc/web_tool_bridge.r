@@ -87,6 +87,15 @@ merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
 }
 
 
+
+first_and_last <- function(vec){
+    if (length(vec) > 2)
+        return( c(vec[1], vec[length(vec)]) )
+    else
+        return(vec)
+}
+
+
 run_web_tool_bridge <- function(eddyproc_user_options){
     eddyproc_config = merge_options(eddyproc_user_options, eddyproc_extra_options)
     
@@ -94,8 +103,9 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     need_types <- sapply(eddyproc_all_required_options, class)
 
     if (any(got_types != need_types)){
-        df_str = paste(capture.output(data.frame(got_types, need_types)), collapse = '\n')
-        stop("Incorrect options or options types: ", df_str)
+        df_cmp = data.frame(got_types, need_types)
+        cmp_str = paste(capture.output(df_cmp), collapse = '\n')
+        stop("Incorrect options or options types: ", cmp_str)
     }
     
     INPUT_FILE <<- eddyproc_user_options$input_file
@@ -104,17 +114,22 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
     unlink(file.path(OUTPUT_DIR, "*.png"))
     unlink(file.path(OUTPUT_DIR, "*.csv"))
-    unlink(file.path(OUTPUT_DIR, "output.txt"))
+    unlink(file.path(OUTPUT_DIR, "output*.txt"))
     
     # necessary and used only in Colab cell
     # options(max.print = 50)    
     
-
     ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-    output_file = file.path(OUTPUT_DIR, "output.txt")
+    output_file = file.path(OUTPUT_DIR, paste0(ouptut_preix, "output.txt"))
     df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
                                  outputFileName = output_file, figureFormat = ext)
 
+    years_num = first_and_last(df_output$Year)
+    years_str <- paste(years_num, collapse = '-')
+    ouptut_preix <- paste(eddyproc_config$siteId, years_str)
+    
+    file.rename(output_file, add_file_prefix(output_file))
+    
     # TODO what if days or months are entierly missing?
-    calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)
+    calc_averages(df_output, OUTPUT_DIR, ouptut_preix)
 }
