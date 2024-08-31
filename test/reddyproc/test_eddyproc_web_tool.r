@@ -1,4 +1,15 @@
 rm(list = ls())
+rm(list = ls(), envir = .GlobalEnv)
+
+# update RStudi UI
+gc()
+Sys.sleep(0.1)
+
+# clear RStudio output
+cat("\014")
+
+# break into debug on error
+options(error = browser)
 
 cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 project_dir <- dirname(dirname(cur_dir))
@@ -32,5 +43,7 @@ eddyproc_user_options <- list(
     output_dir="./output/REddyProc"    
 )
 
+options(max.print = 50)
 
-source("src/reddyproc/web_tool_bridge.r")
+source('src/reddyproc/web_tool_bridge.r')
+run_web_tool_bridge(eddyproc_user_options)
