@@ -1,9 +1,9 @@
+# this file allows running cell_reddyproc_process directly without rpy2
+# which enables RStudio interactive debug
+
 rm(list = ls())
 rm(list = ls(), envir = .GlobalEnv)
-
-# update RStudi UI
 gc()
-Sys.sleep(0.1)
 
 # clear RStudio output
 cat("\014")

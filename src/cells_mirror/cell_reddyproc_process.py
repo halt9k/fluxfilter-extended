@@ -35,6 +35,6 @@ import rpy2.robjects as robjects
 r = robjects.r
 
 robjects.globalenv['eddyproc_user_options'] = robjects.ListVector(vars(eddyproc_options))
-r['source']('src/reddyproc/web_tool_bridge.r')
-# test_func = robjects.globalenv['filter_country']
-# rtn_val = test_func.fn(param1 = "str_param1", a_b_param2 = None, param3 = 7, param4 = False)
+r.source('src/reddyproc/web_tool_bridge.r')
+test_func = robjects.globalenv['run_web_tool_bridge']
+test_func(eddyproc_user_options='eddyproc_user_options')
