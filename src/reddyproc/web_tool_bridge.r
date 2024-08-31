@@ -89,11 +89,19 @@ merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
 
 
 first_and_last <- function(vec){
+    ret <- vec
     if (length(vec) > 2)
-        return( c(vec[1], vec[length(vec)]) )
-    else
-        return(vec)
+        ret <- c(vec[1], vec[length(vec)])
+    
+    return(ret)
 }
+
+
+
+add_file_prefix <- function(fpath, prefix){
+    return(file.path(dirname(fpath), paste0(prefix, basename(fpath))))
+}
+
 
 
 run_web_tool_bridge <- function(eddyproc_user_options){
@@ -120,16 +128,16 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     # options(max.print = 50)    
     
     ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-    output_file = file.path(OUTPUT_DIR, paste0(ouptut_preix, "output.txt"))
+    output_file = file.path(OUTPUT_DIR, "output.txt")
     df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
                                  outputFileName = output_file, figureFormat = ext)
 
     years_num = first_and_last(df_output$Year)
     years_str <- paste(years_num, collapse = '-')
-    ouptut_preix <- paste(eddyproc_config$siteId, years_str)
+    prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
     
-    file.rename(output_file, add_file_prefix(output_file))
+    file.rename(output_file, add_file_prefix(prefix, output_file))
     
     # TODO what if days or months are entierly missing?
-    calc_averages(df_output, OUTPUT_DIR, ouptut_preix)
+    calc_averages(df_output, OUTPUT_DIR, prefix)
 }

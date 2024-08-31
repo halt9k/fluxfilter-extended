@@ -31,7 +31,7 @@ calc_averages <- function(df_full, output_dir, output_prefix){
     df_to_average <- df_full %>%  select(ends_with("_f") | "Reco")
     df_full$Month <- month(df_full$DateTime)
     
-    cat("Columns picked for averaging: \n", names(df_to_average))
+    cat('Columns picked for averaging: \n', names(df_to_average), '\n')
     
     # merge into one func or keep readable?
     df_daily <- cbind(DoY = df_full$DoY, df_to_average)
@@ -46,7 +46,7 @@ calc_averages <- function(df_full, output_dir, output_prefix){
     unfilled_columns <- setdiff(unfilled_columns, c("GPP", "Reco"))
     df_for_gaps <- df_full %>%  select(unfilled_columns)
     
-    cat("Columns picked for NA counts: \n", names(df_for_gaps))
+    cat('Columns picked for NA counts: \n', names(df_for_gaps), '\n')
     names(df_for_gaps) <- paste(names(df_for_gaps), '_sqc')
 
     df_daily <- cbind(DoY = df_full$DoY, df_for_gaps)
