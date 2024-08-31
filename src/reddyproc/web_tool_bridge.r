@@ -1,17 +1,28 @@
 # formatR::tidy_rstudio()
 library(REddyProc)
+message(sprintf("REddyProc version %s", packageVersion('REddyProc')))
 
-source("src/reddyproc/web_tool_sources_adapted.r")
-source("src/reddyproc/postprocess_calc_averages.r")
+source('src/reddyproc/web_tool_sources_adapted.r')
+source('src/reddyproc/postprocess_calc_averages.r')
 
 
+OUTPUT_PLOTS_MASK <- "*.png"
+
+# REddyProc library may rely on these global vars
+INPUT_FILE <- NULL
+OUTPUT_DIR <- NULL
+
+
+message("WARNING: web tool uStarSeasoning factor type not verified")
 # corresponds 06.2024 run
 eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
 
     isToApplyUStarFiltering = TRUE,
-    # TODO any more levels?
-    uStarSeasoning = factor("Continuous", levels = c("Continuous", "WithinYear")),
+    
+    # TODO "Continuous" level have only 1 level for factor,
+    # but not verified for other opts
+    uStarSeasoning = factor("Continuous", levels = c("Continuous")),
     uStarMethod = factor("RTw", levels = "RTw"),
 
     isBootstrapUStar = FALSE,
@@ -54,7 +65,7 @@ eddyproc_extra_options <- list(
 merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
     eddyproc_config <- eddyproc_extra_options
 
-    eddyproc_config$siteId <- eddyproc_user_options$siteId
+    eddyproc_config$siteId <- eddyproc_user_options$site_id
 
     eddyproc_config$isToApplyUStarFiltering <- eddyproc_user_options$is_to_apply_u_star_filtering
     eddyproc_config$uStarSeasoning <- factor(eddyproc_user_options$u_star_seasoning, levels = c("Continuous", "WithinYear"))
@@ -75,27 +86,29 @@ merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
 }
 
 
-eddyproc_config = merge_options(eddyproc_user_options, eddyproc_extra_options)
+run_web_tool_bridge <- function(eddyproc_user_options){
+    eddyproc_config = merge_options(eddyproc_user_options, eddyproc_extra_options)
+    
+    # ensure lists of  same type
+    if (any(sort(sapply(eddyproc_config, class)) != 
+            sort(sapply(eddyproc_all_required_options, class))))
+        stop("error message")
+    
+    INPUT_FILE <<- eddyproc_user_options$input_file
+    OUTPUT_DIR <<- eddyproc_user_options$output_dir
 
-# # TODO check types
-# u_star_seasoning="Continuous",
-# u_star_method="RTw",
-# partitioning_methods=["Reichstein05", "Lasslop10"],
+    dir.create(OUTPUT_DIR, showWarnings = FALSE)
+    unlink(file.path(OUTPUT_DIR, "*.png"))
+    unlink(file.path(OUTPUT_DIR, "*.csv"))
+    unlink(file.path(OUTPUT_DIR, "output.txt"))
+    
+    # necessary and used only in Colab cell
+    # options(max.print = 50)    
+    
 
-
-# REddyProc library relies on these global vars
-INPUT_FILE = eddyproc_user_options$input_file
-OUTPUT_DIR = eddyproc_user_options$output_dir
-OUTPUT_PLOTS_MASK = "*.png"
-
-dir.create(OUTPUT_DIR, showWarnings = FALSE)
-unlink(file.path(OUTPUT_DIR, "*.png"))
-unlink(file.path(OUTPUT_DIR, "*.csv"))
-unlink(file.path(OUTPUT_DIR, "output.txt"))
-
-# necessary and used only in Colab cell
-# options(max.print = 50)
-
-ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE, figureFormat = ext)
-calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)
+    ext = tools::file_ext(OUTPUT_PLOTS_MASK)
+    output_file = file.path(OUTPUT_DIR, "output.txt")
+    df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
+                                 outputFileName = output_file, figureFormat = ext)
+    calc_averages(df_output, OUTPUT_DIR, eddyproc_config$siteId)
+}
