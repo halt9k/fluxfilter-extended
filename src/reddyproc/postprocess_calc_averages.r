@@ -3,8 +3,11 @@ library(lubridate)
 library(tibble)
 
 
-percent_na <- function(vals){
-    sum(is.na(vals)) / length(vals)
+percent_non_na <- function(vals){
+    if (length(vals) > 0)
+        1.0 - sum(is.na(vals)) / length(vals)
+    else
+        0.0
 }
 
 
@@ -53,9 +56,9 @@ calc_averages <- function(df_full, output_dir, output_prefix){
     df_monthly <- cbind(Month = df_full$Month, df_for_gaps)
     df_yearly <- cbind(Year = df_full$Year, df_for_gaps)
         
-    df_daily_na <- aggregate_all_by(df_daily, 'DoY', percent_na)
-    df_monthly_na <- aggregate_all_by(df_monthly, 'Month', percent_na)
-    df_yearly_na <- aggregate_all_by(df_yearly, 'Year', percent_na)
+    df_daily_na <- aggregate_all_by(df_daily, 'DoY', percent_non_na)
+    df_monthly_na <- aggregate_all_by(df_monthly, 'Month', percent_non_na)
+    df_yearly_na <- aggregate_all_by(df_yearly, 'Year', percent_non_na)
     
     df_daily <- combine_alternating(df_daily_means, df_daily_na, 'DoY')
     df_monthly <- combine_alternating(df_monthly_means, df_monthly_na, 'Month')
