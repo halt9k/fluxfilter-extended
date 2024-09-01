@@ -99,7 +99,7 @@ first_and_last <- function(vec){
 
 
 add_file_prefix <- function(fpath, prefix){
-    return(file.path(dirname(fpath), paste0(prefix, basename(fpath))))
+    return(file.path(dirname(fpath), paste0(prefix, '_', basename(fpath))))
 }
 
 
@@ -110,7 +110,7 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     got_types <- sapply(eddyproc_config, class)
     need_types <- sapply(eddyproc_all_required_options, class)
 
-    if (any(got_types != need_types)){
+    if (any(got_types != need_types)) {
         df_cmp = data.frame(got_types, need_types)
         cmp_str = paste(capture.output(df_cmp), collapse = '\n')
         stop("Incorrect options or options types: ", cmp_str)
@@ -122,21 +122,21 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
     unlink(file.path(OUTPUT_DIR, "*.png"))
     unlink(file.path(OUTPUT_DIR, "*.csv"))
-    unlink(file.path(OUTPUT_DIR, "output*.txt"))
+    unlink(file.path(OUTPUT_DIR, "*filled.txt"))
     
     # necessary and used only in Colab cell
-    # options(max.print = 50)    
+    # options(max.print = 50)
     
-    ext = tools::file_ext(OUTPUT_PLOTS_MASK)
-    output_file = file.path(OUTPUT_DIR, "output.txt")
+    ext <- tools::file_ext(OUTPUT_PLOTS_MASK)
+    output_file <- file.path(OUTPUT_DIR, "filled.txt")
     df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
                                  outputFileName = output_file, figureFormat = ext)
 
-    years_num = first_and_last(df_output$Year)
+    years_num <- first_and_last(df_output$Year)
     years_str <- paste(years_num, collapse = '-')
     prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
     
-    file.rename(output_file, add_file_prefix(prefix, output_file))
+    file.rename(output_file, add_file_prefix(output_file, prefix))
     
     # TODO what if days or months are entierly missing?
     calc_averages(df_output, OUTPUT_DIR, prefix)
