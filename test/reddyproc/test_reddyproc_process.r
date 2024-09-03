@@ -19,8 +19,11 @@ debugSource('src/reddyproc/web_tool_bridge.r')
 cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 project_dir <- dirname(dirname(cur_dir))
 setwd(project_dir)
-cat("Working dir is set to: ", project_dir)
+cat("Working dir is set to: ", project_dir, '\n')
 
+
+options(max.print = 100)
+test_dir = tempdir()
 
 
 # duplicates cell code to run from pure R
@@ -45,11 +48,9 @@ eddyproc_user_options <- list(
 
     temperature_data_variable = "Tair",
 
-    input_file = "REddyProc.txt",
-    output_dir = "./output/REddyProc"
+    input_file = "test/reddyproc/test_reddyproc_process/3mon_swap_years.txt",
+    output_dir = test_dir
 )
-
-options(max.print = 50)
 
 
 
