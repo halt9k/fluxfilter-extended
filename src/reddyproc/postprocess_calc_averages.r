@@ -3,7 +3,7 @@ library(lubridate)
 library(tibble)
 
 
-percent_non_na <- function(vals){
+percent_nna <- function(vals){
     if (length(vals) > 0)
         1.0 - sum(is.na(vals)) / length(vals)
     else
@@ -11,15 +11,14 @@ percent_non_na <- function(vals){
 }
 
 
-aggregate_all_by <- function(df, col_name, FUN, ...){
-    res <- aggregate(x = df, by = list(df[[col_name]]), FUN, ...)
-    res[[col_name]] <- res$'Group.1'
-    res$'Group.1' <- NULL
+aggregate_df_by_cols <- function(df, cols, del_cols, FUN, ...){
+    df_without_cols = df %>% select(-all_of(cols))
+    res <- aggregate(x = df_without_cols, by = df[cols], FUN, ...)
     return(res)
 }
 
 
-combine_alternating <- function(df_a, df_b, col_expected_dupe){
+combine_cols_alternating <- function(df_a, df_b, col_expected_dupe){
     neworder <- order(c(2*(seq_along(df_a) - 1) + 1,
                         2*seq_along(df_b)))
 
@@ -33,38 +32,44 @@ combine_alternating <- function(df_a, df_b, col_expected_dupe){
 calc_averages <- function(df_full){
     # write.csv(df_full, file = '_test.txt', row.names = FALSE, quote=FALSE)
 
-    df_to_average <- df_full %>%  select(ends_with("_f") | "Reco")
     df_full$Month <- month(df_full$DateTime)
 
-    cat('Columns picked for averaging: \n', names(df_to_average), '\n')
+    doy = c('Year', 'Month', 'DoY')
+    df_for_means <- df_full %>% select(matches(doy) | ends_with("_f") | "Reco")
 
-    # merge into one func or keep readable?
-    df_daily <- cbind(DoY = df_full$DoY, df_to_average)
-    df_monthly <- cbind(Month = df_full$Month, df_to_average)
-    df_yearly <- cbind(Year = df_full$Year, df_to_average)
+    cat('Columns picked for averaging: \n', setdiff(names(df_for_means), doy), '\n')
 
-    df_daily_means <- aggregate_all_by(df_daily, 'DoY', mean, na.rm = TRUE)
-    df_monthly_means <- aggregate_all_by(df_monthly, 'Month', mean, na.rm = TRUE)
-    df_yearly_means <- aggregate_all_by(df_yearly, 'Year', mean, na.rm = TRUE)
+    cols_list = list(c('Year', 'Month', 'DoY'), c('Year', 'Month'), c('Year'))
+    del_cols_list = list(c(''), c('DoY'), c('Month', 'DoY'))
 
-    unfilled_columns <- gsub("_f", "", colnames(df_to_average))
+    aggregate_df_by_cols(df = df_for_means, cols_list[[1]], del_cols_list[[1]], FUN = mean, na.rm = TRUE)
+    df_means <- mapply(
+        aggregate_df_by_cols(df = df_for_means, cols, del_cols, FUN = mean, na.rm = TRUE),
+        cols = cols_list, del_cols = del_cols_list)
+
+    unfilled_columns <- gsub("_f", "", colnames(df_avg))
     unfilled_columns <- setdiff(unfilled_columns, c("GPP", "Reco"))
     df_for_gaps <- df_full %>%  select(unfilled_columns)
 
     cat('Columns picked for NA counts: \n', names(df_for_gaps), '\n')
     names(df_for_gaps) <- paste0(names(df_for_gaps), '_sqc')
 
-    df_daily <- cbind(DoY = df_full$DoY, df_for_gaps)
-    df_monthly <- cbind(Month = df_full$Month, df_for_gaps)
-    df_yearly <- cbind(Year = df_full$Year, df_for_gaps)
+    df <- cbind(Year = df_full$Year,
+                DoY = df_full$DoY,
+                Month = df_full$Month,
+                df_for_gaps)
 
-    df_daily_na <- aggregate_all_by(df_daily, 'DoY', percent_non_na)
-    df_monthly_na <- aggregate_all_by(df_monthly, 'Month', percent_non_na)
-    df_yearly_na <- aggregate_all_by(df_yearly, 'Year', percent_non_na)
+    df_daily_na <- aggregate_df_by_cols(df_daily, 'DoY', percent_nna)
+    df_monthly_na <- aggregate_df_by_cols(df_monthly, 'Month', percent_nna)
+    df_yearly_na <- aggregate_df_by_cols(df_yearly, 'Year', percent_nna)
 
-    df_daily <- combine_alternating(df_daily_means, df_daily_na, 'DoY')
-    df_monthly <- combine_alternating(df_monthly_means, df_monthly_na, 'Month')
-    df_yearly <- combine_alternating(df_yearly_means, df_yearly_na, 'Year')
+    df_nna <- mapply(
+        aggregate_df_by_cols(df = df, col, del_col, FUN = percent_nna, na.rm = TRUE),
+        col = cols, del_col = del_cols)
+
+    df_daily <- combine_cols_alternating(df_daily_means, df_daily_na, 'DoY')
+    df_monthly <- combine_cols_alternating(df_monthly_means, df_monthly_na, 'Month')
+    df_yearly <- combine_cols_alternating(df_yearly_means, df_yearly_na, 'Year')
 
     return(list(df_daily, df_monthly, df_yearly))
 }
