@@ -2,15 +2,19 @@
 # which enables RStudio interactive debug
 
 rm(list = ls())
-# rm(list = ls(), envir = .GlobalEnv)
 rm(list = ls(environment(), all.names = TRUE))
-# gc()
+gc()
 
 # clear RStudio output
 cat("\014")
 
 # break into debug on error
 options(error = browser)
+
+debugSource('src/reddyproc/postprocess_calc_averages.r')
+debugSource('src/reddyproc/web_tool_sources_adapted.r')
+debugSource('src/reddyproc/web_tool_bridge.r')
+
 
 cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 project_dir <- dirname(dirname(cur_dir))
@@ -48,7 +52,5 @@ eddyproc_user_options <- list(
 options(max.print = 50)
 
 
-debugSource('src/reddyproc/postprocess_calc_averages.r')
-debugSource('src/reddyproc/web_tool_sources_adapted.r')
-debugSource('src/reddyproc/web_tool_bridge.r')
+
 run_web_tool_bridge(eddyproc_user_options)
