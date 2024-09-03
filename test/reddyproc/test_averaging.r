@@ -7,9 +7,10 @@ gc()
 # clear RStudio output
 cat("\014")
 
-# break into debug on error
+# interactive() ?
 options(error = browser)
 options(max.print = 100)
+
 
 cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 project_dir <- dirname(dirname(cur_dir))
