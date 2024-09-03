@@ -2,8 +2,9 @@
 # which enables RStudio interactive debug
 
 rm(list = ls())
-rm(list = ls(), envir = .GlobalEnv)
-gc()
+# rm(list = ls(), envir = .GlobalEnv)
+rm(list = ls(environment(), all.names = TRUE))
+# gc()
 
 # clear RStudio output
 cat("\014")
@@ -27,9 +28,9 @@ eddyproc_user_options <- list(
 
     u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear")),
     u_star_method = factor("RTw", levels = "RTw"),
-    
+
     is_bootstrap_u_star = FALSE,
-    
+
     is_to_apply_gap_filling = TRUE,
     is_to_apply_partitioning = TRUE,
 
@@ -39,7 +40,7 @@ eddyproc_user_options <- list(
     timezone = +3,
 
     temperature_data_variable = "Tair",
-    
+
     input_file = "REddyProc.txt",
     output_dir = "./output/REddyProc"
 )
