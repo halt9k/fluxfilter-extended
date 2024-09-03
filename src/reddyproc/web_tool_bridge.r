@@ -1,6 +1,6 @@
 # formatR::tidy_rstudio()
 library(REddyProc)
-cat('REddyProc version:', paste(packageVersion('REddyProc')))
+cat('REddyProc version: ', paste(packageVersion('REddyProc')), '\n')
 
 source('src/reddyproc/web_tool_sources_adapted.r')
 source('src/reddyproc/postprocess_calc_averages.r')
@@ -13,7 +13,7 @@ INPUT_FILE <- NULL
 OUTPUT_DIR <- NULL
 
 
-cat("WARNING: web tool uStarSeasoning factor type not verified")
+cat("WARNING: web tool uStarSeasoning factor type not verified \n")
 # corresponds 06.2024 run
 eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
@@ -138,6 +138,7 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 
     file.rename(output_file, add_file_prefix(output_file, prefix))
 
-    # TODO what if days or months are entierly missing?
-    calc_averages(df_output, OUTPUT_DIR, prefix)
+    # processEddyData guaranteed to output equi-time-distant series
+    dfs = calc_averages(df_output)
+    save_averages(dfs, OUTPUT_DIR, prefix)
 }
