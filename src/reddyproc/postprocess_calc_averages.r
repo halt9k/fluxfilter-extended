@@ -25,7 +25,7 @@ combine_cols_alternating <- function(df_a, df_b, col_expected_dupes){
 
 
 aggregate_df <- function(df_data, df_by, FUN) {
-    # usually simply df = cbind(df_data, df_by)
+    # usually simply df = cbind(df_data, df_by), i.e. just df split
     aggregate(df_data, df_by, FUN)
 }
 
@@ -38,26 +38,22 @@ calc_averages <- function(df_full){
     df_to_mean <- df_full %>% select(ends_with("_f") | "Reco")
     cat('Columns picked for averaging: \n', names(df_to_mean), '\n')
 
-    # i.e. mean will be calculated between rows for which unique_cols are unique
+    # i.e. mean and NA percent will be calculated between rows
+    # for which unique_cols values are matching
     unique_cols_sets = list(c('Year', 'Month', 'DoY'), c('Year', 'Month'), c('Year'))
-    df_aggregate_by = df_full[c('Year', 'Month', 'DoY')]
+    unique_dfs = lapply(unique_cols_sets, function(set) df_full[set])
 
     f_mean_any <- function(x) mean(x, na.rm = TRUE)
-    aggregate_df_bind <- function(cols_pick)
-        aggregate_df(df_to_mean, df_aggregate_by[cols_pick], FUN = f_mean_any)
-    df_means <- lapply(unique_cols_sets, aggregate_df_bind)
-    # TODO lappy supports d=d?
-
+    df_means <- lapply(unique_dfs, aggregate_df,
+                       df_data = df_to_mean, FUN = f_mean_any)
 
     df_to_nna <- df_full %>% select(ends_with("_f") & !starts_with(c("GPP", "Reco")))
     cat('Columns picked for NA counts: \n', names(df_to_nna), '\n')
 
     names(df_to_nna) <- names(df_to_nna) %>% gsub('_f', '_sqc', .)
 
-    aggregate_df_bind <- function(cols_pick)
-        aggregate_df(df_to_nna, df_aggregate_by[cols_pick], FUN = percent_nna)
-    df_nna <- lapply(unique_cols_sets, aggregate_df_bind)
-
+    df_nna <- lapply(unique_dfs, aggregate_df,
+                     df_data = df_to_nna, FUN = percent_nna)
 
     f_combine <- function(means, nna, col_by)
         combine_cols_alternating(means, nna, col_by)
