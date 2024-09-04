@@ -24,9 +24,10 @@ combine_cols_alternating <- function(df_a, df_b, col_expected_dupes){
 }
 
 
-aggregate_df <- function(df_data, df_by, FUN) {
-    # usually simply df = cbind(df_data, df_by), i.e. just df split
-    aggregate(df_data, df_by, FUN)
+aggregate_df <- function(data, by_col, agg_FUN) {
+    # applies agg_FUN to unique sets of values in by_col
+    # usually original dataframe is simply df = cbind(by_col, data)
+    aggregate(data, by_col, agg_FUN)
 }
 
 
@@ -44,16 +45,17 @@ calc_averages <- function(df_full){
     unique_dfs = lapply(unique_cols_sets, function(set) df_full[set])
 
     f_mean_any <- function(x) mean(x, na.rm = TRUE)
-    df_means <- lapply(unique_dfs, aggregate_df,
-                       df_data = df_to_mean, FUN = f_mean_any)
+    df_means <- lapply(unique_dfs, FUN = aggregate_df,
+                       data = df_to_mean, agg_FUN = f_mean_any)
 
     df_to_nna <- df_full %>% select(ends_with("_f") & !starts_with(c("GPP", "Reco")))
     cat('Columns picked for NA counts: \n', names(df_to_nna), '\n')
 
-    names(df_to_nna) <- names(df_to_nna) %>% gsub('_f', '_sqc', .)
+    df_nna <- lapply(unique_dfs, FUN = aggregate_df,
+                     data = df_to_nna, agg_FUN = percent_nna)
 
-    df_nna <- lapply(unique_dfs, aggregate_df,
-                     df_data = df_to_nna, FUN = percent_nna)
+    # H_f -> H_sqc, ...
+    names(df_nna) <- names(df_nna) %>% gsub('_f', '_sqc', .)
 
     f_combine <- function(means, nna, col_by)
         combine_cols_alternating(means, nna, col_by)
