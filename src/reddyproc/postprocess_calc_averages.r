@@ -2,7 +2,6 @@ library(dplyr)
 library(lubridate)
 library(tibble)
 
-
 percent_nna <- function(vals){
     if (length(vals) > 0)
         1.0 - sum(is.na(vals)) / length(vals)
@@ -11,21 +10,23 @@ percent_nna <- function(vals){
 }
 
 
-aggregate_df_by_cols <- function(df, cols, del_cols, FUN, ...){
-    df_without_cols = df %>% select(-all_of(cols))
-    res <- aggregate(x = df_without_cols, by = df[cols], FUN, ...)
-    return(res)
+combine_cols_alternating <- function(df_a, df_b, col_expected_dupes){
+    stopifnot(all(df_a[col_expected_dupes] == df_b[col_expected_dupes]))
+
+    df_ma <- df_a %>% select(!any_of(col_expected_dupes))
+    df_mb <- df_b %>% select(!any_of(col_expected_dupes))
+
+    neworder <- order(c(2 * (seq_along(df_ma) - 1) + 1,
+                        2 * seq_along(df_mb)))
+
+    merged_alternating <- cbind(df_ma, df_mb)[,neworder]
+    cbind(df_a[col_expected_dupes], merged_alternating)
 }
 
 
-combine_cols_alternating <- function(df_a, df_b, col_expected_dupe){
-    neworder <- order(c(2*(seq_along(df_a) - 1) + 1,
-                        2*seq_along(df_b)))
-
-    stopifnot(df_a$col_expected_dupe == df_b$col_expected_dupe)
-    neworder = neworder[-1]
-
-    cbind(df_a, df_b)[,neworder]
+aggregate_df <- function(df_data, df_by, FUN) {
+    # usually simply df = cbind(df_data, df_by)
+    aggregate(df_data, df_by, FUN)
 }
 
 
@@ -34,44 +35,35 @@ calc_averages <- function(df_full){
 
     df_full$Month <- month(df_full$DateTime)
 
-    doy = c('Year', 'Month', 'DoY')
-    df_for_means <- df_full %>% select(matches(doy) | ends_with("_f") | "Reco")
+    df_to_mean <- df_full %>% select(ends_with("_f") | "Reco")
+    cat('Columns picked for averaging: \n', names(df_to_mean), '\n')
 
-    cat('Columns picked for averaging: \n', setdiff(names(df_for_means), doy), '\n')
+    # i.e. mean will be calculated between rows for which unique_cols are unique
+    unique_cols_sets = list(c('Year', 'Month', 'DoY'), c('Year', 'Month'), c('Year'))
+    df_aggregate_by = df_full[c('Year', 'Month', 'DoY')]
 
-    cols_list = list(c('Year', 'Month', 'DoY'), c('Year', 'Month'), c('Year'))
-    del_cols_list = list(c(''), c('DoY'), c('Month', 'DoY'))
+    f_mean_any <- function(x) mean(x, na.rm = TRUE)
+    aggregate_df_bind <- function(cols_pick)
+        aggregate_df(df_to_mean, df_aggregate_by[cols_pick], FUN = f_mean_any)
+    df_means <- lapply(unique_cols_sets, aggregate_df_bind)
+    # TODO lappy supports d=d?
 
-    aggregate_df_by_cols(df = df_for_means, cols_list[[1]], del_cols_list[[1]], FUN = mean, na.rm = TRUE)
-    df_means <- mapply(
-        aggregate_df_by_cols(df = df_for_means, cols, del_cols, FUN = mean, na.rm = TRUE),
-        cols = cols_list, del_cols = del_cols_list)
 
-    unfilled_columns <- gsub("_f", "", colnames(df_avg))
-    unfilled_columns <- setdiff(unfilled_columns, c("GPP", "Reco"))
-    df_for_gaps <- df_full %>%  select(unfilled_columns)
+    df_to_nna <- df_full %>% select(ends_with("_f") & !starts_with(c("GPP", "Reco")))
+    cat('Columns picked for NA counts: \n', names(df_to_nna), '\n')
 
-    cat('Columns picked for NA counts: \n', names(df_for_gaps), '\n')
-    names(df_for_gaps) <- paste0(names(df_for_gaps), '_sqc')
+    names(df_to_nna) <- names(df_to_nna) %>% gsub('_f', '_sqc', .)
 
-    df <- cbind(Year = df_full$Year,
-                DoY = df_full$DoY,
-                Month = df_full$Month,
-                df_for_gaps)
+    aggregate_df_bind <- function(cols_pick)
+        aggregate_df(df_to_nna, df_aggregate_by[cols_pick], FUN = percent_nna)
+    df_nna <- lapply(unique_cols_sets, aggregate_df_bind)
 
-    df_daily_na <- aggregate_df_by_cols(df_daily, 'DoY', percent_nna)
-    df_monthly_na <- aggregate_df_by_cols(df_monthly, 'Month', percent_nna)
-    df_yearly_na <- aggregate_df_by_cols(df_yearly, 'Year', percent_nna)
 
-    df_nna <- mapply(
-        aggregate_df_by_cols(df = df, col, del_col, FUN = percent_nna, na.rm = TRUE),
-        col = cols, del_col = del_cols)
+    f_combine <- function(means, nna, col_by)
+        combine_cols_alternating(means, nna, col_by)
+    df_combined <- mapply(f_combine, df_means, df_nna, unique_cols_sets)
 
-    df_daily <- combine_cols_alternating(df_daily_means, df_daily_na, 'DoY')
-    df_monthly <- combine_cols_alternating(df_monthly_means, df_monthly_na, 'Month')
-    df_yearly <- combine_cols_alternating(df_yearly_means, df_yearly_na, 'Year')
-
-    return(list(df_daily, df_monthly, df_yearly))
+    return(df_combined)
 }
 
 

@@ -1,4 +1,4 @@
-# File is kindly provided by REddyProc authors
+# This specific file is kindly provided by REddyProc authors
 # Original file name is runEddyProcFunctions.R
 # Contains minimal changes and is similar to online tool https://www.bgc-jena.mpg.de/REddyProc/ui/REddyProc.php
 
