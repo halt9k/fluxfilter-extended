@@ -7,22 +7,21 @@ gc()
 # clear RStudio output
 cat("\014")
 
-
 options(error = browser)
 options(max.print = 100)
 # interactive() ?
 # on_debug = function() {	cat("\014")	browser()}
 # options(debugger = on_debug)
 
-
 cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 project_dir <- dirname(dirname(cur_dir))
 setwd(project_dir)
 cat("Working dir is set to: ", project_dir, '\n')
 
-test_averaging <- function(){
-	debugSource('src/reddyproc/postprocess_calc_averages.r')
+debugSource('src/reddyproc/postprocess_calc_averages.r')
 
+
+test_averaging <- function(){
 	df = read.csv('test/reddyproc/test_averaging/3_months_long.txt', quote = NULL,  row.names = NULL)
 	df$Reco = NA
 

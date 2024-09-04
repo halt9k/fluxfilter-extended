@@ -1,6 +1,3 @@
-BUG !!! DoY MUST be combined with year when aggregating
-
-
 df_daily_na
 	rename to mean Aa
 
