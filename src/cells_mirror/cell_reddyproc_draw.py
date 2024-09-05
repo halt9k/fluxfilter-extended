@@ -1,5 +1,3 @@
-from IPython.extensions import autoreload
-
 # Full list of outputs (not all are included in OUTPUT_ORDER):
 # 'DC_H_f', 'DC_LE_f', 'DC_NEE_uStar_f', 'DC_Rg_f', 'DC_rH_f', 'DC_Tair_f', 'DC_VPD_f',
 # 'DSum_Rg_f', 'DSum_rH_f', 'DSum_Tair_f', 'DSum_VPD_f', 'DSumU_H_f', 'DSumU_LE_f', 'DSumU_NEE_uStar_f',
@@ -9,14 +7,10 @@ from IPython.extensions import autoreload
 # 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f'
 
-
-# TODO what if 2023 is not only year or REddyProc output for images?
-# TODO HEAT_MAPS 'FP_NEE_uStar_f' or 'FP_NEE' ?
 CROP_POSTFIX = '_crop'
 CROP = ['FP_NEE', 'FP_NEE_uStar_f',
         'FP_LE', 'FP_LE_f',
         'FP_H', 'FP_H_f',]
-
 
 REMOVED_LEGEND_POSTFIX = '_bare'
 REMOVE_LEGENDS = ['FP_NEE_crop',
@@ -24,7 +18,7 @@ REMOVE_LEGENDS = ['FP_NEE_crop',
                   'FP_H_crop']
 
 
-# just for the record: unicode in code is not great
+# just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
     "Тепловые карты", 
     ['FP_NEE_crop_bare', 'FP_NEE_uStar_f_crop'],
@@ -40,6 +34,9 @@ OUTPUT_ORDER = (
     ['Flux_H', 'Flux_H_f']
 )
 
+# fixes autoscroll to bottom, but keeps scrollbar
+from src.colab_routines import stop_scroll_workaround
+stop_scroll_workaround()
 
 from src.reddyproc.postprocess_draw_graphs import prepare_images, display_images
 prepare_images(CROP, CROP_POSTFIX,  REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX)
