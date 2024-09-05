@@ -34,6 +34,10 @@ OUTPUT_ORDER = (
     ['Flux_H', 'Flux_H_f']
 )
 
+# fixes autoscroll to bottom, but keeps scrollbar
+from src.colab_routines import stop_scroll_workaround
+stop_scroll_workaround()
+
 from src.reddyproc.postprocess_draw_graphs import prepare_images, display_images
 prepare_images(CROP, CROP_POSTFIX,  REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX)
 display_images(OUTPUT_ORDER)
