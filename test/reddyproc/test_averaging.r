@@ -25,10 +25,13 @@ test_averaging <- function(){
 	df = read.csv('test/reddyproc/test_averaging/3_months_long.txt', quote = NULL,  row.names = NULL)
 	df$Reco = NA
 
-	# ensure years are processed separately
+	# ensure order and years are processed separately
 	df[df$Year == 2022 & df$DoY == 354 & df$Hour > 10,]$Year = 2023
 	df[df$Year == 2022 & df$DoY == 354,]$LE_f = 17
 	df[df$Year == 2023 & df$DoY == 354,]$LE_f = 11
+
+	# ensure average
+	df[df$Year == 2022 & between(df$DoY, 325, 356),]$VPD_f = df[df$Year == 2022 & between(df$DoY, 325, 356),]$DoY
 
 	# ensure NA calculated correctly
 	df[df$Year == 2023 & between(df$DoY, 1, 31),]$H_f = NA
@@ -46,6 +49,12 @@ test_averaging <- function(){
 	stopifnot(is.na.data.frame(dm[dm$Year == 2023 & dm$Month == 1,]$H_f))
 	stopifnot(dm[dm$Year == 2023 & dm$Month == 1,]$H_sqc == 0.0)
 	stopifnot(dm[dm$Year == 2022 & dm$Month == 12,]$H_sqc == 1.0)
+
+	# ensure order
+	stopifnot(dm$Year[1] == 2022 & dm$Year[length(dm$Year)] == 2023)
+
+	#  ensure average
+	stopifnot(between(dm[dm$Year == 2022 & dm$Month == 12,]$VPD_f, 31*11, 31*12))
 
 	cat('Test ok \n')
 }
