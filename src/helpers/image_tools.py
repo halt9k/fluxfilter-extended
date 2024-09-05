@@ -1,3 +1,6 @@
+from enum import Enum, auto
+
+import numpy as np
 from PIL import Image, ImageChops
 
 
@@ -21,3 +24,15 @@ def split_image_vertical(img):
     w, h = img.size
     return img.crop((0, 0, w/2, h)), img.crop((w/2, 0, w, h))
 
+
+class Direction(Enum):
+    VERTICAL, HORIZONTAL = 1, 2
+
+
+def remove_white_strip(img: np.array, direction: Direction, percent_from, percent_to):
+    img = Image.open('image.jpg').convert('RGB')
+
+    crop = img.crop((x1, y1, x2, y2))
+    pixels = np.array(crop)
+
+    is_white = np.all(pixels == [255, 255, 255])
