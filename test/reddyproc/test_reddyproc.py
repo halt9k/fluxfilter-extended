@@ -13,6 +13,10 @@ def use_r_from_python_env():
     os.environ['R_HOME'] = r_folder
 
 
+import src.colab_routines as cr
+cr.stop_scroll_workaround = lambda: None
+
+
 def test_process(use_r_from_python_env):
     import src.global_mocks as mocks
     mocks.ias_output_prefix = 'tv_fy4'
