@@ -2,7 +2,7 @@
 
 def stop_scroll_workaround():
     from google.colab.output import eval_js
-    eval_js('google.colab.output.setIframeHeight("100")')
+    eval_js('google.colab.output.setIframeHeight("10000")')
 
     # from IPython.display import HTML, display, Javascript, display_javascript
     # js1 = Javascript('''
