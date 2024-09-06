@@ -9,7 +9,7 @@ from ipywidgets import HBox, widgets
 
 import glob
 import src.helpers.os_helpers  # noqa: F401
-from src.helpers.image_tools import crop_borders, split_image_vertical
+from src.helpers.image_tools import crop_borders, split_image, Direction
 
 BKP_IMG_DIR: Path
 MAIN_IMG_DIR: Path
@@ -42,18 +42,22 @@ def get_tag_path(tag, dir, ext='.png', warn_if_missing=True):
     return paths[0] if len(paths) == 1 else None
 
 
-def replace_fname_end(fname, tag, new_tag):
-    return fname.replace(tag + '.', new_tag + '.')
+def replace_fname_end(fname: Path, tag: str, new_tag: str):
+    return Path(str(fname).replace(tag + '.', new_tag + '.'))
 
 
 def extract_heatmap_legends(img_tags: [str], tags_omit_legend: [str], legend_fname_postfix: str):
     hmaps = get_tag_paths(img_tags + tags_omit_legend, MAIN_IMG_DIR)
 
-    for tag, path in hmaps:
+    for tag, path in hmaps.items():
         img = Image.open(path)
-        cropped = crop_borders(img)
-        map, legend = remove_white_strip(cropped, Direction.VERTICAL, at_percent=0.1, split=True)
-        cropped.save(new_path)
+
+        # cropped = crop_borders(img)
+        map, legend, _ = split_image(img, Direction.HORIZONTAL, 3)
+
+        fname_legend = replace_fname_end(path, tag, tag + legend_fname_postfix)
+        Path(path).rename(BKP_IMG_DIR / Path(path).name)
+        move
 
         if tag in tags_omit_legend:
             File.move()

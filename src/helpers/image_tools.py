@@ -4,7 +4,11 @@ import numpy as np
 from PIL import Image, ImageChops
 
 
-def crop_borders(img, margin=5):
+class Direction(Enum):
+    VERTICAL, HORIZONTAL = 1, 2
+
+
+def crop_borders(img, margin=10):
     img_rgb = img.convert("RGB")
     bg = Image.new("RGB", img_rgb.size, img_rgb.getpixel((0, 0)))
     diff = ImageChops.difference(img_rgb, bg)
@@ -20,13 +24,18 @@ def crop_borders(img, margin=5):
         return img
 
 
-def split_image_vertical(img):
+def split_image(img: Image, direction: Direction, n):
+    assert n > 0
     w, h = img.size
-    return img.crop((0, 0, w/2, h)), img.crop((w/2, 0, w, h))
 
+    # crop: left, upper, right, lower
+    imgs = []
+    if direction == Direction.HORIZONTAL:
+        imgs = [img.crop((w * i / n, 0, w * (i + 1) / n, h)) for i in range(n)]
+    elif direction == Direction.VERTICAL:
+        imgs = [img.crop((0, h * i / n, w, h * (i + 1) / n)) for i in range(n)]
 
-class Direction(Enum):
-    VERTICAL, HORIZONTAL = 1, 2
+    return imgs
 
 
 def remove_white_strip(img: np.array, direction: Direction, percent_from, percent_to):
