@@ -14,7 +14,7 @@ def use_r_from_python_env():
 
 
 import src.colab_routines as cr
-cr.stop_scroll_workaround = lambda: None
+cr.workaround_stop_scroll = lambda: None
 
 
 def test_process(use_r_from_python_env):

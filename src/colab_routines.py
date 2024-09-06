@@ -1,6 +1,6 @@
 # all functions here are to be mocked or cancelled during non-colab runs
 
-def stop_scroll_workaround():
+def workaround_stop_scroll():
     from google.colab.output import eval_js
     eval_js('google.colab.output.setIframeHeight("10000")')
 
