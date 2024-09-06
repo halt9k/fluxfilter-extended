@@ -26,3 +26,7 @@ def test_process(use_r_from_python_env):
 
 def test_draw():
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
+
+
+if __name__ == '__main__':
+    test_draw()
