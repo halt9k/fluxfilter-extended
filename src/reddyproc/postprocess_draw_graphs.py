@@ -8,7 +8,7 @@ from PIL import Image
 from ipywidgets import HBox, widgets
 
 import src.helpers.os_helpers  # noqa: F401
-from src.helpers.image_tools import crop_borders, split_image, Direction
+from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction
 
 
 def get_tag_paths(tags: List[str], dir, ext='.png', warn_if_missing=True):
@@ -59,6 +59,8 @@ class PolishImages():
 
             # cropped = crop_borders(img)
             map, legend, _ = split_image(img, Direction.HORIZONTAL, 3)
+            map = crop_monocolor_borders(map, sides='LR')
+            legend = crop_monocolor_borders(legend, sides='LR')
 
             fname_legend = replace_fname_end(path, tag, tag + legend_fname_postfix)
             path.replace(self.bkp_path / path.name)
@@ -67,7 +69,6 @@ class PolishImages():
             legend_fname = replace_fname_end(path.name, tag, tag + legend_fname_postfix)
             legend_dir = self.bkp_path if not tag in tags_omit_legend else self.main_path
             legend.save(legend_dir / legend_fname)
-
 
     def prepare_images(self, tags_crop: List[str], crop_postfix,
                        remove_legends: List[str], removed_legend_postfix):
