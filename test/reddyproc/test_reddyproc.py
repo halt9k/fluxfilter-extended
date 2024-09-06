@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 import os, sys
 import pytest
@@ -25,6 +26,7 @@ def test_process(use_r_from_python_env):
 
 
 def test_draw():
+    shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
