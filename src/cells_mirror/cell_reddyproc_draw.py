@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import src.reddyproc.postprocess_draw_graphs as dg
-polish_imgs = dg.PolishImages(main_path='output/REddyProc', bkp_path='output/REddyProc/raw')
+polish_imgs = dg.PrepareImages(main_path='output/REddyProc', bkp_path='output/REddyProc/raw')
 
 # Full list of outputs (not all are included in OUTPUT_ORDER):
 # 'DC_H_f', 'DC_LE_f', 'DC_NEE_uStar_f', 'DC_Rg_f', 'DC_rH_f', 'DC_Tair_f', 'DC_VPD_f',
