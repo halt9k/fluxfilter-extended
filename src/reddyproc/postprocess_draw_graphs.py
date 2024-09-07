@@ -36,21 +36,17 @@ def get_tag_path(tag, dir, ext='.png', warn_if_missing=True):
     return paths[0] if len(paths) == 1 else None
 
 
-def replace_fname_end(fname: Path, tag: str, new_tag: str):
-    return Path(str(fname).replace(tag + '.', new_tag + '.'))
+def replace_fname_end(path: Path, tag: str, new_tag: str):
+    return path.parent / path.name.replace(tag + '.', new_tag + '.')
 
 
-class PrepareImages():
+class EddyImgPostProcess():
     def __init__(self, main_path, bkp_path):
-        self.bkp_path = Path(bkp_path)
         self.main_path = Path(main_path)
 
-        self.bkp_path.mkdir(exist_ok=True)
-        for path in self.bkp_path.iterdir():
-            path.unlink()
-
-    def process_heatmaps(self, img_tags: List[str], tags_omit_legend: List[str], legend_fname_postfix: str):
-        tp = get_tag_paths(img_tags + tags_omit_legend, self.main_path)
+    def process_heatmaps(self, img_tags: List[str], tags_skip_legend: List[str],
+                         map_postfix: str, legend_postfix: str):
+        tp = get_tag_paths(img_tags + tags_skip_legend, self.main_path)
 
         for tag, path in tp.items():
             img = Image.open(path)
@@ -59,14 +55,29 @@ class PrepareImages():
             map = crop_monocolor_borders(map, sides='LR')
             legend = crop_monocolor_borders(legend, sides='LR')
 
-            path.replace(self.bkp_path / path.name)
-            map.save(path)
+            fname = replace_fname_end(path, tag, tag + map_postfix)
+            map.save(fname)
 
-            legend_fname = replace_fname_end(path.name, tag, tag + legend_fname_postfix)
-            legend_dir = self.bkp_path if tag in tags_omit_legend else self.main_path
-            legend.save(legend_dir / legend_fname)
+            if tag not in tags_skip_legend:
+                fname = replace_fname_end(path, tag, tag + legend_postfix)
+                legend.save(fname)
 
-    def process_fluxes(self, img_tags: List[str]):
+    def merge_heatmaps(self, merges, del_postfix, postfix):
+        for merge in merges:
+            tp = get_tag_paths(merge, self.main_path)
+            if len(tp) != 3:
+                print(f"WARNING: cannot merge {merge}, files missing")
+                continue
+
+            imgs = [Image.open(path) for path in list(tp.values())]
+            merged = grid_images(imgs, 3)
+
+            path = tp[merge[1]]
+            tag = merge[1]
+            fname = replace_fname_end(path, tag, tag.replace(del_postfix, '') + postfix)
+            merged.save(fname)
+
+    def process_fluxes(self, img_tags: List[str], postfix):
         tp = get_tag_paths(img_tags, self.main_path)
         for tag, path in tp.items():
             img = Image.open(path)
@@ -75,8 +86,8 @@ class PrepareImages():
             c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
             fixed = grid_images([c_title, c_graph], 1)
 
-            path.replace(self.bkp_path / path.name)
-            fixed.save(path)
+            fname = replace_fname_end(path, tag, tag + postfix)
+            fixed.save(fname)
 
 
 def display_image_row(paths):

@@ -1,6 +1,7 @@
 from os import chdir
 from pathlib import Path
 from sys import path
+from typing import Union
 
 """
  This module is intended to be imported before all other modules.
@@ -44,3 +45,12 @@ def ch_project_root_dir():
 
 
 ch_project_root_dir()
+
+
+def ensure_empty_dir(folder: Union[str, Path]):
+    if type(folder) is str:
+        folder = Path(folder)
+    folder.mkdir(exist_ok=True)
+    for path in folder.iterdir():
+        if path.is_file():
+            path.unlink()

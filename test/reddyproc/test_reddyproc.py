@@ -4,6 +4,7 @@ import os, sys
 import pytest
 
 import src.helpers.os_helpers  # noqa: F401
+from src.helpers.os_helpers import ensure_empty_dir
 
 
 @pytest.fixture
@@ -26,8 +27,7 @@ def test_process(use_r_from_python_env):
 
 
 def test_draw():
-    Path('output/REddyProc').unlink(missing_ok=True)
-    Path('output/REddyProc').mkdir()
+    ensure_empty_dir('output/REddyProc')
     shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
