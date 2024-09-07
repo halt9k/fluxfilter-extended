@@ -68,15 +68,19 @@ def grid_images(images, max_horiz=np.iinfo(int).max):
     return im_grid
 
 
-def remove_strip(img: np.array, strip_axis: Direction, percent_at):
+def remove_strip(img: np.array, strip_axis: Direction, percent_at, margin=10):
     w, h = img.size
     assert 0 <= percent_at <= 1
 
     if strip_axis == Direction.VERTICAL:
         imgs = [img.crop((0, 0, w * percent_at, h)),
                 img.crop((w * percent_at, 0, w, h))]
+        imgs = [crop_monocolor_borders(imgs[0], sides='R', margin=margin),
+                crop_monocolor_borders(imgs[1], sides='L', margin=margin)]
         return grid_images(imgs, 2)
     elif strip_axis == Direction.HORIZONTAL:
         imgs = [img.crop((0, 0, w, h * percent_at)),
                 img.crop((0, h * percent_at, w, h))]
+        imgs = [crop_monocolor_borders(imgs[0], sides='B', margin=margin),
+                crop_monocolor_borders(imgs[1], sides='T', margin=margin)]
         return grid_images(imgs, 1)
