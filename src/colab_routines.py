@@ -26,7 +26,7 @@ def colab_only(func):
 
 class StopExecution(Exception):
     def _render_traceback_(self):
-        return ['Colab env not detected. Cell canceled.']
+        return ['Colab env not detected. Current cell is only for Colab.']
 
 
 def colab_only_cell():

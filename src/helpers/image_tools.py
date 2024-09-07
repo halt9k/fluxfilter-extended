@@ -53,6 +53,8 @@ def split_image(img: Image, direction: Direction, n):
 
 
 def grid_images(images, max_horiz=np.iinfo(int).max):
+    # combines images in row or column depending on max_horiz arg
+
     n_images = len(images)
     n_horiz = min(n_images, max_horiz)
     h_sizes, v_sizes = [0] * n_horiz, [0] * (n_images // n_horiz)
@@ -69,6 +71,8 @@ def grid_images(images, max_horiz=np.iinfo(int).max):
 
 
 def remove_strip(img: np.array, strip_axis: Direction, percent_at, margin=10):
+    # cuts an image on two and crops space from cut side on both
+
     w, h = img.size
     assert 0 <= percent_at <= 1
 
