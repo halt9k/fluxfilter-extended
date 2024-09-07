@@ -37,7 +37,7 @@ OUTPUT_ORDER = (
     ['Flux_H_compact', 'Flux_H_f_compact']
 )
 
-from src.colab_routines import workaround_stop_scroll
-workaround_stop_scroll()
+from src.colab_routines import no_scroll
+no_scroll()
 
 dg.display_images(OUTPUT_ORDER, main_path='output/REddyProc')
