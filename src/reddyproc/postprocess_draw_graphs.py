@@ -40,7 +40,7 @@ def replace_fname_end(fname: Path, tag: str, new_tag: str):
     return Path(str(fname).replace(tag + '.', new_tag + '.'))
 
 
-class PolishImages():
+class PrepareImages():
     def __init__(self, main_path, bkp_path):
         self.bkp_path = Path(bkp_path)
         self.main_path = Path(main_path)
