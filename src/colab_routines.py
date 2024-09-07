@@ -24,8 +24,23 @@ def colab_only(func):
     return wrapper
 
 
+class StopExecution(Exception):
+    def _render_traceback_(self):
+        return ['Colab env not detected. Cell canceled.']
+
+
+def colab_only_cell():
+    # reminder: cannot be used before this file is downloaded
+    try:
+        import google.colab
+    except ImportError:
+        raise StopExecution()
+
+
 @colab_only
 def workaround_stop_scroll():
+    # fixes autoscroll to bottom, but keeps scrollbar
+
     from google.colab.output import eval_js
     eval_js('google.colab.output.setIframeHeight("10000")')
 

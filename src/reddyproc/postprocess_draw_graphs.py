@@ -45,9 +45,9 @@ class PrepareImages():
         self.bkp_path = Path(bkp_path)
         self.main_path = Path(main_path)
 
+        self.bkp_path.mkdir(exist_ok=True)
         for path in self.bkp_path.iterdir():
             path.unlink()
-        self.bkp_path.mkdir(exist_ok=True)
 
     def process_heatmaps(self, img_tags: List[str], tags_omit_legend: List[str], legend_fname_postfix: str):
         tp = get_tag_paths(img_tags + tags_omit_legend, self.main_path)
@@ -78,6 +78,7 @@ class PrepareImages():
             path.replace(self.bkp_path / path.name)
             fixed.save(path)
 
+
 def display_image_row(paths):
     img_widgets = []
     for path in paths:
@@ -89,13 +90,13 @@ def display_image_row(paths):
     display(hbox)
 
 
-def display_images(output_order):
+def display_images(output_order, main_path):
     for output_step in output_order:
         if type(output_step) is str:
             title_text = output_step
             display(Markdown(title_text))
         elif type(output_step) is list:
-            paths = [get_tag_paths(tag, MAIN_IMG_DIR) for tag in output_step]
-            display_image_row(paths)
+            paths = get_tag_paths(output_step, main_path)
+            display_image_row(list(paths.values()))
         else:
             raise Exception("Wrong OUTPUT_HEADERS contents")
