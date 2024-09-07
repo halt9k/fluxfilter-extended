@@ -93,7 +93,7 @@ def display_images(output_order):
     for output_step in output_order:
         if type(output_step) is str:
             title_text = output_step
-            display(Markdown("## " + title_text))
+            display(Markdown(title_text))
         elif type(output_step) is list:
             paths = [get_tag_paths(tag, MAIN_IMG_DIR) for tag in output_step]
             display_image_row(paths)

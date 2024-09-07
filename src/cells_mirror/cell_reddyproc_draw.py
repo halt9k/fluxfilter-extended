@@ -19,15 +19,15 @@ polish_imgs.process_fluxes(img_tags=['Flux_NEE', 'Flux_NEE_uStar_f', 'Flux_LE', 
 
 # just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
-    "Тепловые карты",
+    "## Тепловые карты",
     ['FP_NEE_crop_bare', 'FP_NEE_uStar_f_crop'],
     ['FP_LE_crop_bare', 'FP_LE_f_crop'],
     ['FP_H_crop_bare', 'FP_H_f_crop'],
-    "Суточный ход",
+    "## Суточный ход",
     ['DC_NEE_uStar_f'],
     ['DC_LE_f'],
     ['DC_H_f'],
-    "30-минутные потоки",
+    "## 30-минутные потоки",
     ['Flux_NEE', 'Flux_NEE_uStar_f'],
     ['Flux_LE', 'Flux_LE_f'],
     ['Flux_H', 'Flux_H_f']
@@ -35,10 +35,8 @@ OUTPUT_ORDER = (
 
 # fixes autoscroll to bottom, but keeps scrollbar
 from src.colab_routines import workaround_stop_scroll
-
 workaround_stop_scroll()
 
 from src.reddyproc.postprocess_draw_graphs import prepare_images, display_images
-
-prepare_images(CROP, CROP_POSTFIX, REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX)
+prepare_images(CROP, CROP_POSTFIX,  REMOVE_LEGENDS, REMOVED_LEGEND_POSTFIX)
 display_images(OUTPUT_ORDER)
