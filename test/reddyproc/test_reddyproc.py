@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 import os, sys
 import pytest
@@ -14,7 +15,7 @@ def use_r_from_python_env():
 
 
 import src.colab_routines as cr
-cr.stop_scroll_workaround = lambda: None
+cr.workaround_stop_scroll = lambda: None
 
 
 def test_process(use_r_from_python_env):
@@ -25,4 +26,9 @@ def test_process(use_r_from_python_env):
 
 
 def test_draw():
+    shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
+
+
+if __name__ == '__main__':
+    test_draw()
