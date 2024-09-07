@@ -7,6 +7,7 @@
 # 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f'
 
+from src.colab_routines import no_scroll, add_download
 import src.reddyproc.postprocess_draw_graphs as dg
 eipp = dg.EddyImgPostProcess(main_path='output/REddyProc', bkp_path='output/REddyProc/raw')
 
@@ -21,7 +22,7 @@ eipp.process_fluxes(img_tags=['Flux_NEE', 'Flux_NEE_uStar_f', 'Flux_LE', 'Flux_L
                     postfix='_compact')
 eipp.process_diurnal_cycles(img_tags=['DC_NEE_uStar_f', 'DC_LE_f', 'DC_H_f'],
                             postfix='_compact')
-
+arc_name = dg.create_archive(mask='output/REddyProc/*.png', exclude=eipp.paths_exclude_from_arc)
 
 # just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
@@ -39,7 +40,6 @@ OUTPUT_ORDER = (
     ['Flux_H_compact', 'Flux_H_f_compact']
 )
 
-from src.colab_routines import no_scroll
 no_scroll()
-
 dg.display_images(OUTPUT_ORDER, main_path='output/REddyProc')
+add_download(arc_name, 'Download all images')

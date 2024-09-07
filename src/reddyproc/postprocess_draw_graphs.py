@@ -1,6 +1,8 @@
 import io
+import zipfile
 from pathlib import Path
 from typing import List
+from zipfile import ZipFile
 
 from IPython.core.display import Markdown
 from IPython.display import display
@@ -43,6 +45,7 @@ def replace_fname_end(path: Path, tag: str, new_tag: str):
 class EddyImgPostProcess():
     def __init__(self, main_path, bkp_path):
         self.main_path = Path(main_path)
+        self.paths_exclude_from_arc = []
 
     def process_heatmaps(self, img_tags: List[str], tags_skip_legend: List[str],
                          map_postfix: str, legend_postfix: str):
@@ -62,6 +65,8 @@ class EddyImgPostProcess():
                 fname = replace_fname_end(path, tag, tag + legend_postfix)
                 legend.save(fname)
 
+            self.paths_exclude_from_arc += [path]
+
     def merge_heatmaps(self, merges, del_postfix, postfix):
         for merge in merges:
             tp = get_tag_paths(merge, self.main_path)
@@ -77,6 +82,8 @@ class EddyImgPostProcess():
             fname = replace_fname_end(path, tag, tag.replace(del_postfix, '') + postfix)
             merged.save(fname)
 
+            self.paths_exclude_from_arc += list(tp.values())
+
     def process_fluxes(self, img_tags: List[str], postfix):
         tp = get_tag_paths(img_tags, self.main_path)
         for tag, path in tp.items():
@@ -88,6 +95,8 @@ class EddyImgPostProcess():
 
             fname = replace_fname_end(path, tag, tag + postfix)
             fixed.save(fname)
+
+            self.paths_exclude_from_arc += [path]
 
     def process_diurnal_cycles(self, img_tags: List[str], postfix):
         tp = get_tag_paths(img_tags, self.main_path)
@@ -101,6 +110,23 @@ class EddyImgPostProcess():
 
             fname = replace_fname_end(path, tag, tag + postfix)
             fixed.save(fname)
+
+            self.paths_exclude_from_arc += [path]
+
+
+def create_archive(mask, exclude: List[str]):
+    folder = Path(mask).parent
+    name_mask = Path(mask).name
+    imgs = [path for path in folder.glob(name_mask) if path not in exclude]
+
+    arc_fname = folder / list(folder.glob('*.txt'))[0].name.replace('.txt', '.zip')
+
+    with ZipFile(arc_fname, 'w', zipfile.ZIP_DEFLATED) as myzip:
+        for path in imgs:
+            myzip.write(path, path.name)
+
+    return arc_fname
+
 
 
 def display_image_row(paths):
