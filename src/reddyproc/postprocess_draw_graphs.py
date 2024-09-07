@@ -8,7 +8,7 @@ from PIL import Image
 from ipywidgets import HBox, widgets
 
 import src.helpers.os_helpers  # noqa: F401
-from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images
+from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images, remove_strip
 
 
 def get_tag_paths(tags: List[str], dir, ext='.png', warn_if_missing=True):
@@ -85,6 +85,19 @@ class EddyImgPostProcess():
             title, graph = split_image(img, Direction.VERTICAL, 2)
             c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
             fixed = grid_images([c_title, c_graph], 1)
+
+            fname = replace_fname_end(path, tag, tag + postfix)
+            fixed.save(fname)
+
+    def process_diurnal_cycles(self, img_tags: List[str], postfix):
+        tp = get_tag_paths(img_tags, self.main_path)
+        for tag, path in tp.items():
+            img = Image.open(path)
+
+            title, g1, g2, g3, g4 = split_image(img, Direction.VERTICAL, 5)
+            c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
+            c_title = crop_monocolor_borders(c_title, sides='TB')
+            fixed = grid_images([c_title, g1, g2, g3, g4], 1)
 
             fname = replace_fname_end(path, tag, tag + postfix)
             fixed.save(fname)

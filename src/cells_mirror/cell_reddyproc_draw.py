@@ -19,6 +19,8 @@ eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_uStar_f_map', 'FP_NEE_uStar_f_legend
                     del_postfix='_map', postfix='_all')
 eipp.process_fluxes(img_tags=['Flux_NEE', 'Flux_NEE_uStar_f', 'Flux_LE', 'Flux_LE_f', 'Flux_H', 'Flux_H_f'],
                     postfix='_compact')
+eipp.process_diurnal_cycles(img_tags=['DC_NEE_uStar_f', 'DC_LE_f', 'DC_H_f'],
+                            postfix='_compact')
 
 
 # just for the record: unicode in code is mediocre practice
@@ -28,9 +30,9 @@ OUTPUT_ORDER = (
     ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
     ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend'],
     "## Суточный ход",
-    ['DC_NEE_uStar_f'],
-    ['DC_LE_f'],
-    ['DC_H_f'],
+    ['DC_NEE_uStar_f_compact'],
+    ['DC_LE_f_compact'],
+    ['DC_H_f_compact'],
     "## 30-минутные потоки",
     ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
     ['Flux_LE_compact', 'Flux_LE_f_compact'],
