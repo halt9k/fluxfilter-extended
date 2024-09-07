@@ -12,10 +12,8 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
     img_rgb = img.convert("RGB")
     w, h = img_rgb.size
 
-    consistent_borders = (img_rgb.getpixel((0, 0)) == img_rgb.getpixel((w-1, h-1)) ==
-                          img_rgb.getpixel((w-1, 0)) == img_rgb.getpixel((0, h-1)))
-
-    if not consistent_borders:
+    edge_cols = list(map(img_rgb.getpixel, [(0, 0), (w - 1, h - 1), (w - 1, 0), (0, h - 1)]))
+    if len(set(edge_cols)) > 1:
         print('WARNING: Cannot crop image, border color inconsistent')
         return img
 
@@ -35,9 +33,9 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
 
     bbox_crop_mg = (max(bbox_crop[0] - margin, 0),  max(bbox_crop[1] - margin, 0),
                     min(bbox_crop[2] + margin, bbox[2]),min(bbox_crop[3] + margin, bbox[3]))
-    mask = np.array(['L' in sides, 'T' in sides, 'R' in sides, 'B' in sides]).astype(int)
-    bbox_final = bbox * (1 - mask) + bbox_crop_mg * mask
-    return img.crop(tuple(bbox_final))
+    mask = np.array(['L' in sides, 'T' in sides, 'R' in sides, 'B' in sides])
+    bbox_final = tuple(np.where(mask, bbox_crop_mg, bbox))
+    return img.crop(bbox_final)
 
 
 def split_image(img: Image, direction: Direction, n):
