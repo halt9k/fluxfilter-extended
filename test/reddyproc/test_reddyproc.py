@@ -23,6 +23,12 @@ def test_process(use_r_from_python_env):
     import src.global_mocks as mocks
     mocks.ias_output_prefix = 'tv_fy4'
 
+    # do not omit stderr
+    from rpy2 import robjects, rinterface_lib
+    rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
+    rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
+    rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
+
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
 
 
