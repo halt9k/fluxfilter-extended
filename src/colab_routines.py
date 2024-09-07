@@ -43,6 +43,20 @@ def no_scroll():
     output.no_vertical_scroll()
 
 
+@colab_only
+def add_download(fname, caption):
+    def clicked(arg):
+        from google.colab import files
+        files.download(fname)
+
+    from IPython.display import display
+    import ipywidgets as widgets
+
+    button_download = widgets.Button(description=caption)
+    button_download.on_click(clicked)
+    display(button_download)
+
+
 """ examples:
 from google.colab.output import eval_js
 eval_js('''
