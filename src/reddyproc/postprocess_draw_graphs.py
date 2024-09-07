@@ -8,13 +8,12 @@ from PIL import Image
 from ipywidgets import HBox, widgets
 
 import src.helpers.os_helpers  # noqa: F401
-from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction
+from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images
 
 
 def get_tag_paths(tags: List[str], dir, ext='.png', warn_if_missing=True):
     # tags are same as unique file name endings
     # file must exist
-
     all_img_paths = list(Path(dir).glob('*' + ext))
 
     result = {}
@@ -26,7 +25,6 @@ def get_tag_paths(tags: List[str], dir, ext='.png', warn_if_missing=True):
             raise Exception(f"Unexpected file duplicate: {matches}")
         elif len(matches) == 0 and warn_if_missing:
             print(f"WARNING: image is missing: {fname_end}")
-            result[tag] = None
         else:
             result[tag] = Path(matches[0])
 
@@ -51,44 +49,34 @@ class PolishImages():
             path.unlink()
         self.bkp_path.mkdir(exist_ok=True)
 
-    def extract_heatmap_legends(self, img_tags: [str], tags_omit_legend: [str], legend_fname_postfix: str):
-        hmaps = get_tag_paths(img_tags + tags_omit_legend, self.main_path)
+    def process_heatmaps(self, img_tags: List[str], tags_omit_legend: List[str], legend_fname_postfix: str):
+        tp = get_tag_paths(img_tags + tags_omit_legend, self.main_path)
 
-        for tag, path in hmaps.items():
+        for tag, path in tp.items():
             img = Image.open(path)
 
-            # cropped = crop_borders(img)
             map, legend, _ = split_image(img, Direction.HORIZONTAL, 3)
             map = crop_monocolor_borders(map, sides='LR')
             legend = crop_monocolor_borders(legend, sides='LR')
 
-            fname_legend = replace_fname_end(path, tag, tag + legend_fname_postfix)
             path.replace(self.bkp_path / path.name)
             map.save(path)
 
             legend_fname = replace_fname_end(path.name, tag, tag + legend_fname_postfix)
-            legend_dir = self.bkp_path if not tag in tags_omit_legend else self.main_path
+            legend_dir = self.bkp_path if tag in tags_omit_legend else self.main_path
             legend.save(legend_dir / legend_fname)
 
-    def prepare_images(self, tags_crop: List[str], crop_postfix,
-                       remove_legends: List[str], removed_legend_postfix):
-        tp = get_tag_paths(tags_crop, self.main_path)
-        for tag, path in tp:
-            new_path = replace_fname_end(path, tag, tag + crop_postfix)
-
+    def process_fluxes(self, img_tags: List[str]):
+        tp = get_tag_paths(img_tags, self.main_path)
+        for tag, path in tp.items():
             img = Image.open(path)
-            cropped = crop_borders(img)
-            cropped.save(new_path)
 
-        tp = get_tag_paths(remove_legends, self.main_path)
-        for tag, path in tp:
-            new_path = replace_fname_end(path, tag, tag + removed_legend_postfix)
+            title, graph = split_image(img, Direction.VERTICAL, 2)
+            c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
+            fixed = grid_images([c_title, c_graph], 1)
 
-            img = Image.open(path)
-            cropped = crop_borders(img)
-            left, _ = split_image_vertical(cropped)
-            left.save(new_path)
-
+            path.replace(self.bkp_path / path.name)
+            fixed.save(path)
 
 def display_image_row(paths):
     img_widgets = []

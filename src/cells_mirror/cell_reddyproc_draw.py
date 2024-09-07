@@ -12,9 +12,10 @@ polish_imgs = dg.PolishImages(main_path='output/REddyProc', bkp_path='output/REd
 # 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f'
 
-polish_imgs.extract_heatmap_legends(img_tags=['FP_NEE', 'FP_NEE_uStar_f', 'FP_LE', 'FP_LE_f', 'FP_H', 'FP_H_f'],
-                                    tags_omit_legend=['FP_NEE', 'FP_LE', 'FP_H'],
-                                    legend_fname_postfix='_legend')
+polish_imgs.process_heatmaps(img_tags=['FP_NEE', 'FP_NEE_uStar_f', 'FP_LE', 'FP_LE_f', 'FP_H', 'FP_H_f'],
+                             tags_omit_legend=['FP_NEE', 'FP_LE', 'FP_H'],
+                             legend_fname_postfix='_legend')
+polish_imgs.process_fluxes(img_tags=['Flux_NEE', 'Flux_NEE_uStar_f', 'Flux_LE', 'Flux_LE_f', 'Flux_H', 'Flux_H_f'])
 
 # just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
