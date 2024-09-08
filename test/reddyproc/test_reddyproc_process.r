@@ -55,5 +55,4 @@ eddyproc_user_options <- list(
 )
 
 
-
 run_web_tool_bridge(eddyproc_user_options)
