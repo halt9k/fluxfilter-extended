@@ -38,4 +38,4 @@ ensure_empty_dir(eddyproc_options.output_dir)
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
 run_web_tool = robjects.globalenv['run_web_tool_bridge']
 eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
-out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
+out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]

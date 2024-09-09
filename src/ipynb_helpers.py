@@ -1,8 +1,7 @@
 import io
 from pathlib import Path
 
-from IPython.core.display import Markdown
-from IPython.core.display_functions import display
+from IPython.display import Markdown, display
 from PIL import Image
 from ipywidgets import widgets, HBox
 
