@@ -13,7 +13,7 @@ INPUT_FILE <- NULL
 OUTPUT_DIR <- NULL
 
 
-cat("WARNING: web tool uStarSeasoning factor type not verified \n")
+warning("\nWeb tool uStarSeasoning factor type not verified \n\n")
 # corresponds 06.2024 run
 eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
@@ -87,7 +87,6 @@ merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
 }
 
 
-
 first_and_last <- function(vec){
     ret <- vec
     if (length(vec) > 2)
@@ -97,11 +96,9 @@ first_and_last <- function(vec){
 }
 
 
-
 add_file_prefix <- function(fpath, prefix){
     return(file.path(dirname(fpath), paste0(prefix, '_', basename(fpath))))
 }
-
 
 
 run_web_tool_bridge <- function(eddyproc_user_options){
@@ -129,16 +126,23 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 
     ext <- tools::file_ext(OUTPUT_PLOTS_MASK)
     output_file <- file.path(OUTPUT_DIR, "filled.txt")
-    df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
-                                 outputFileName = output_file, figureFormat = ext)
+    res <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
+                           outputFileName = output_file, figureFormat = ext)
 
-    years_num <- first_and_last(df_output$Year)
-    years_str <- paste(years_num, collapse = '-')
-    prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
+    df_output <- res[[1]]
+    years_str <- res[[2]]
 
-    file.rename(output_file, add_file_prefix(output_file, prefix))
+    # workaround, what if real name form?
+    # years_num <- first_and_last(df_output$Year - c(1, length(df_output)))
+    # years_str <- paste(sprintf("%02d", years_num %% 100), collapse = '-')
+
+    out_prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
+
+    file.rename(output_file, add_file_prefix(output_file, out_prefix))
 
     # processEddyData guaranteed to output equi-time-distant series
     dfs = calc_averages(df_output)
-    save_averages(dfs, OUTPUT_DIR, prefix)
+    save_averages(dfs, OUTPUT_DIR, out_prefix)
+
+	return(out_prefix)
 }

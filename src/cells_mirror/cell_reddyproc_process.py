@@ -1,5 +1,9 @@
 from types import SimpleNamespace
+from rpy2 import robjects
+
 from src.global_mocks import *  # noqa: F401
+from src.helpers.io_helpers import ensure_empty_dir
+
 
 eddyproc_options = SimpleNamespace(
     site_id=ias_output_prefix,
@@ -24,19 +28,14 @@ eddyproc_options = SimpleNamespace(
     temperature_data_variable="Tair",
 
     input_file="REddyProc.txt",
-    output_dir="./output/REddyProc"
+    output_dir="output/REddyProc"
 )
+
+ensure_empty_dir(eddyproc_options.output_dir)
 
 # this is workaround to avoid %%R code, which supported badly anyway in multiple workflows
 # also to be able to run R tests only using R files
-from rpy2 import robjects, rinterface_lib
-
-# do not omit stderr
-rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
-rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
-rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
-
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
 run_web_tool = robjects.globalenv['run_web_tool_bridge']
 eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
-run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
+out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]

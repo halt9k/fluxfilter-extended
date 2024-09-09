@@ -1,42 +1,40 @@
-# just some tests
+# tests specifically for calc_averages
 
-rm(list = ls())
-rm(list = ls(environment(), all.names = TRUE))
-gc()
-
-# clear RStudio output
-cat("\014")
-
-options(error = browser)
-options(max.print = 100)
-# interactive() ?
-# on_debug = function() {	cat("\014")	browser()}
-# options(debugger = on_debug)
-
-cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-project_dir <- dirname(dirname(cur_dir))
-setwd(project_dir)
-cat("Working dir is set to: ", project_dir, '\n')
-
+setwd(dirname(dirname(dirname(rstudioapi::getSourceEditorContext()$path))))
+debugSource('test/reddyproc/helpers/init_test_env.r')
 debugSource('src/reddyproc/postprocess_calc_averages.r')
 
 
-test_averaging <- function(){
+ensure_correct_names <- function(nd, nm, ny){
+	stopifnot(!duplicated(nd), !duplicated(nm), !duplicated(ny))
+	stopifnot(setdiff(nd, 'DoY') == nm, setdiff(nm, 'Month') == ny)
+
+	# no with .1 in name
+	stopifnot(!any(contains(match = '.1', vars = c(nd, nm, ny))))
+}
+
+
+test_model_3_month <- function(){
 	df = read.csv('test/reddyproc/test_averaging/3_months_long.txt', quote = NULL,  row.names = NULL)
-	df$Reco = NA
+	stopifnot(!'Reco' %in% colnames(df))
 
 	# ensure order and years are processed separately
 	df[df$Year == 2022 & df$DoY == 354 & df$Hour > 10,]$Year = 2023
 	df[df$Year == 2022 & df$DoY == 354,]$LE_f = 17
 	df[df$Year == 2023 & df$DoY == 354,]$LE_f = 11
 
+	# ensure missing columns won't break
+	df$NEE_f = NULL
+
 	# ensure average
-	df[df$Year == 2022 & between(df$DoY, 350, 365),]$VPD_f = df[df$Year == 2022 & between(df$DoY, 325, 356),]$DoY
+	stopifnot(df[df$Year == 2023 & between(df$DoY, 32, 59),]$Rg_f %>%
+			  	mean %>% between(46.6980, 46.6981))
 
 	# ensure NA calculated correctly
-	df[df$Year == 2023 & between(df$DoY, 1, 31),]$H_f = NA
+	df[df$Year == 2023 & between(df$DoY, 1, 31),]$H = NA
 
 	dfs <- calc_averages(df)
+	df <- NULL
 	dd <- df_daily <- dfs[[1]]
 	dm <- df_monthly <- dfs[[2]]
 	dy <- df_yearly <- dfs[[3]]
@@ -45,18 +43,82 @@ test_averaging <- function(){
 	stopifnot(dd[dd$Year == 2022 & dd$DoY == 354,]$LE_f == 17)
 	stopifnot(dd[dd$Year == 2023 & dd$DoY == 354,]$LE_f == 11)
 
-	# ensure NA calculated correctly
-	stopifnot(is.na.data.frame(dm[dm$Year == 2023 & dm$Month == 1,]$H_f))
-	stopifnot(dm[dm$Year == 2023 & dm$Month == 1,]$H_sqc == 0.0)
-	stopifnot(dm[dm$Year == 2022 & dm$Month == 12,]$H_sqc == 1.0)
-
 	# ensure order
 	stopifnot(dm$Year[1] == 2022 & dm$Year[length(dm$Year)] == 2023)
 
-	#  ensure average
-	# stopifnot(between(dm[dm$Year == 2022 & dm$Month == 12,]$VPD_f, 31*11, 31*12))
+	# ensure missing columns won't break
+	stopifnot(!'NEE_f' %in% colnames(dm), !'NEE' %in% colnames(dd))
 
-	cat('Test ok \n')
+	#  ensure average
+	stopifnot(dm[dm$Year == 2023 & dm$Month == 2,]$Rg_f %>%
+			  	between(46.6980, 46.6981))
+
+	# ensure NA calculated correctly
+	stopifnot(dm[dm$Year == 2023 & dm$Month == 1,]$H_sqc == 0.0)
+
+	ensure_correct_names(names(dd), names(dm), names(dy))
+	cat('Test test_model_3_month ok \n\n')
 }
 
-test_averaging()
+
+test_real_year <- function(){
+	df = read.csv('test/reddyproc/test_averaging/real_data_test_05.09.24.txt', quote = NULL,  row.names = NULL)
+
+	# ensure order and years are processed separately
+	df[df$Year == 2023 & df$DoY == 354 & df$Hour > 10,]$Year = 2022
+	df[df$Year == 2023 & df$DoY == 354,]$LE_f = 17
+	df[df$Year == 2022 & df$DoY == 354,]$LE_f = 11
+
+	# ensure average
+	row_mask = df$Year == 2023 & between(df$DoY, 325, 365)
+	df[row_mask,]$VPD_f = df[row_mask,]$DoY
+
+	# ensure no interference from similar columns
+	df$VPD_ff = df$DoY
+	df$VVPD_ff = df$DoY
+
+	# ensure NA calculated correctly
+	nna_prc <- df[df$Year == 2022 & df$DoY == 354,]$LE %>%
+		{sum(!is.na(.)) / length(.)}
+	df[df$Year == 2023 & between(df$DoY, 1, 31),]$H_f <- NA
+	stopifnot(df[df$Year == 2022 & between(df$DoY, 1, 31),]$H %>% is.na)
+	df[df$Year == 2023 & between(df$DoY, 335, 365),]$H <- -5
+
+	# ensure single row val
+	df[df$Year == 2024,]$VPD = NA
+	df[df$Year == 2024,]$VPD_f = NA
+
+	dfs <- calc_averages(df)
+	df <- NULL
+	dd <- df_daily <- dfs[[1]]
+	dm <- df_monthly <- dfs[[2]]
+	dy <- df_yearly <- dfs[[3]]
+
+	# ensure years are processed separately
+	stopifnot(dd[dd$Year == 2023 & dd$DoY == 354,]$LE_f == 17)
+	stopifnot(dd[dd$Year == 2022 & dd$DoY == 354,]$LE_f == 11)
+
+	# ensure NA calculated correctly
+	stopifnot(dm[dm$Year == 2022 & dm$Month == 12,]$LE_sqc %>%
+			  	between(nna_prc - 0.1, nna_prc + 0.1))
+	stopifnot(dm[dm$Year == 2023 & dm$Month == 1,]$H_f %>% is.na)
+	stopifnot(dm[dm$Year == 2022 & dm$Month == 1,]$H_sqc == 0.0)
+	stopifnot(dm[dm$Year == 2023 & dm$Month == 12,]$H_sqc == 1.0)
+
+	# ensure order
+	stopifnot(dm$Year[1] == 2022 & dm$Year[length(dm$Year)] == 2024)
+
+	#  ensure average
+	stopifnot(dm[dm$Year == 2023 & dm$Month == 12,]$VPD_f %>% between(31*11, 31*12))
+
+	# ensure one val
+	stopifnot(dd[dd$Year == 2024,]$VPD_sqc == 0)
+	stopifnot(dy[dy$Year == 2024,]$VPD_f %>% is.na)
+
+	ensure_correct_names(names(dd), names(dm), names(dy))
+	cat('Test test_real_year ok \n\n')
+}
+
+
+test_real_year()
+test_model_3_month()

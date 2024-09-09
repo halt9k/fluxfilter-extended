@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from warnings import warn
 
 import numpy as np
 from PIL import Image, ImageChops, ImageColor
@@ -14,7 +15,7 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
 
     edge_cols = list(map(img_rgb.getpixel, [(0, 0), (w - 1, h - 1), (w - 1, 0), (0, h - 1)]))
     if len(set(edge_cols)) > 1:
-        print('WARNING: Cannot crop image, border color inconsistent')
+        warn('Cannot crop image, border color inconsistent')
         return img
 
     if not col:
@@ -28,7 +29,7 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
     bbox = img_rgb.getbbox()
 
     if not bbox_crop:
-        print('WARNING: Cannot crop image, border color inconsistent')
+        warn('Cannot crop image, border color inconsistent')
         return img
 
     bbox_crop_mg = (max(bbox_crop[0] - margin, 0),  max(bbox_crop[1] - margin, 0),
@@ -53,6 +54,8 @@ def split_image(img: Image, direction: Direction, n):
 
 
 def grid_images(images, max_horiz=np.iinfo(int).max):
+    # combines images in row or column depending on max_horiz arg
+
     n_images = len(images)
     n_horiz = min(n_images, max_horiz)
     h_sizes, v_sizes = [0] * n_horiz, [0] * (n_images // n_horiz)
@@ -68,15 +71,21 @@ def grid_images(images, max_horiz=np.iinfo(int).max):
     return im_grid
 
 
-def remove_strip(img: np.array, strip_axis: Direction, percent_at):
+def remove_strip(img: np.array, strip_axis: Direction, percent_at, margin=10):
+    # cuts an image on two and crops space from cut side on both
+
     w, h = img.size
     assert 0 <= percent_at <= 1
 
     if strip_axis == Direction.VERTICAL:
         imgs = [img.crop((0, 0, w * percent_at, h)),
                 img.crop((w * percent_at, 0, w, h))]
+        imgs = [crop_monocolor_borders(imgs[0], sides='R', margin=margin),
+                crop_monocolor_borders(imgs[1], sides='L', margin=margin)]
         return grid_images(imgs, 2)
     elif strip_axis == Direction.HORIZONTAL:
         imgs = [img.crop((0, 0, w, h * percent_at)),
                 img.crop((0, h * percent_at, w, h))]
+        imgs = [crop_monocolor_borders(imgs[0], sides='B', margin=margin),
+                crop_monocolor_borders(imgs[1], sides='T', margin=margin)]
         return grid_images(imgs, 1)

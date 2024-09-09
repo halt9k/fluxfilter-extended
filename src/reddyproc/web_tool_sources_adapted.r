@@ -264,7 +264,7 @@ gapFillAndPlotDataVariablesOrError <- function(eddyProcConfiguration, ...) {
             EProc$sPlotFingerprint(varname, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat, valueLimits = quantile(EProc$sTEMP[[varname]],
                 prob = c(0, 0.99), na.rm = TRUE))
         } else {
-            warning("Column '", varname, "' not found. Aborting fingerprint plot.")
+            warning("\nColumn '", varname, "' not found. Aborting fingerprint plot.\n\n")
         }
     }
 
@@ -344,7 +344,7 @@ writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isInc
         # avoid readr dependency
         write.csv(df_fn15, outputFileName, row.names = FALSE, na = "-9999")
     } else stop("unknown output_format: ", output_format)
-    
+
     return(eddyProcOutputData)
 }
 
@@ -412,6 +412,6 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, ou
     ## that maybe debugged end<<
     list(mode = encodeEddyProcTasks(eddyProcConfiguration), inputSize = paste(dim(inputData), collapse = ","), err = caught_error,
         EProc = EProc)
-    
-    return(df_output)
+
+    return(list(df_output,  EProc$sINFO$Y.NAME))
 }

@@ -4,6 +4,8 @@ import os, sys
 import pytest
 
 import src.helpers.os_helpers  # noqa: F401
+from src.helpers.io_helpers import ensure_empty_dir
+import src.global_mocks as mocks
 
 
 @pytest.fixture
@@ -19,14 +21,22 @@ cr.workaround_stop_scroll = lambda: None
 
 
 def test_process(use_r_from_python_env):
-    import src.global_mocks as mocks
-    mocks.ias_output_prefix = 'tv_fy4'
+    mocks.ias_output_prefix = 'tv_fy4_22-14'
+
+    # do not omit stderr
+    from rpy2 import robjects, rinterface_lib
+    rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
+    rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
+    rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
+    import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
 def test_draw():
-    shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
+    mocks.out_prefix = 'tv_fy4_2023'
+    # ensure_empty_dir('output/REddyProc')
+    # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
