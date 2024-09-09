@@ -21,7 +21,7 @@ cr.workaround_stop_scroll = lambda: None
 
 
 def test_process(use_r_from_python_env):
-    mocks.ias_output_prefix = 'tv_fy4'
+    mocks.ias_output_prefix = 'tv_fy4_22-14'
 
     # do not omit stderr
     from rpy2 import robjects, rinterface_lib
@@ -30,12 +30,11 @@ def test_process(use_r_from_python_env):
     rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
-    src.cells_mirror.cell_reddyproc_draw.out_prefix = src.cells_mirror.cell_reddyproc_process.out_prefix
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
 def test_draw():
-    mocks.out_prefix = 'TestSiteID_22-23'
+    mocks.out_prefix = 'tv_fy4_2023'
     # ensure_empty_dir('output/REddyProc')
     # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
