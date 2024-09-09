@@ -18,7 +18,7 @@ REddyProc в некоторых случаях сбоит на ustarFiltering, �
 
 - настроить сравнивалку для блокнотов exe, SO answer, другим
 
-- Commit to RProc fixes?
+- Commit to RProc fixes? or share notebook
 
 --- LATER
 

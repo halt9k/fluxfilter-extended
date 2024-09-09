@@ -10,64 +10,48 @@ nna_percent <- function(vals){
 }
 
 
-combine_cols_alternating <- function(df, df_merge, col_expected_dupes){
-    stopifnot(all(df[col_expected_dupes] == df_merge[col_expected_dupes]))
+combine_cols_alternating <- function(df, df_merge, expected_col_dupes){
+    # not tested
+
+    stopifnot(all(df[expected_col_dupes] == df_merge[expected_col_dupes]))
     stopifnot(length(df) == length(df_merge))
 
-    df_ma <- df %>% select(!any_of(col_expected_dupes))
-    df_mb <- df_merge %>% select(!any_of(col_expected_dupes))
+    df_ma <- df %>% select(-any_of(expected_col_dupes))
+    df_mb <- df_merge %>% select(-any_of(expected_col_dupes))
 
     neworder <- order(c(2 * (seq_along(df_ma) - 1) + 1,
                         2 * seq_along(df_mb)))
 
     merged_alternating <- cbind(df_ma, df_mb)[,neworder]
-    cbind(df[col_expected_dupes], merged_alternating)
+    cbind(df[expected_col_dupes], merged_alternating)
 }
 
 
-merge_cols_aligning <- function(df, df_merge, col_expected_dupes, align_pair){
+merge_cols_aligning <- function(df, df_merge, expected_col_dupes, align_pair){
     # H_f LE_f U_f , H_sqc LE_sqc U_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
     # supports regex for align_pair '*_f$', '*_sqc$'
-    # supports missing columns with only WARNING
+    # supports missing columns TODO with only WARNING
 
-    stopifnot(all(df[col_expected_dupes] == df_merge[col_expected_dupes]))
-    df_unique_merge = df_merge %>% select(!matches(col_expected_dupes))
+    stopifnot(df[expected_col_dupes] == df_merge[expected_col_dupes])
+    df_unique_merge = df_merge %>% select(-matches(expected_col_dupes))
 
     mask_a <- align_pair[[1]]
     mask_b <- align_pair[[2]]
+    df_unmasks <- sub(mask_a, '', colnames(df))
+    merge_unmasks <- sub(mask_b, '', colnames(df_unique_merge))
 
-    df_prefix <- sub(mask_a, '', colnames(df))
-    merge_prefix <- sub(mask_b, '', colnames(df_unique_merge))
-
-    # ensure pattern if fine
-    if (any(duplicated(merge_prefix)) ||
-        any(duplicated(df_prefix)))
+    if (anyDuplicated(merge_unmasks) || anyDuplicated(df_unmasks))
         stop('ERROR: cannot merge columns due to duplicate names for align pattenrs')
 
-    df_res <- df
-    df_res['matches', ] <- df_prefix
-    df_unique_merge['matches', ] = merge_prefix
+    names = c(colnames(df), colnames(df_unique_merge))
+    unmasks = c(df_unmasks, merge_unmasks)
 
-    names = c(colnames(df_res), colnames(df_unique_merge))
-    prefixes = c(df_prefix, merge_prefix)
+    unique_unmasks = unique(unmasks)
+    reordered_cols = unlist(Map(function(.) {names[unmasks == .]}, unique_unmasks))
+    stopifnot(length(reordered_cols) == ncol(merge))
+    stopifnot(!duplicated(reordered_cols))
 
-    unique_prefixes = unique(prefixes)
-    dupes = prefixes[duplicated(prefixes)]
-
-    ordered_cols = c()
-    for (prefix in unique_prefixes) {
-        if (length(grep(prefix, dupes)) > 0){
-            ids <- grep(prefix, prefixes)
-            ordered_cols = c(ordered_cols, names[ids[[1]]])
-            ordered_cols = c(ordered_cols, names[ids[[2]]])
-        } else {
-            id = grep(prefix, dupes)
-            ordered_cols = c(ordered_cols, names[id])
-        }
-    }
-
-    merge = cbind(df_res, df_unique_merge)
-    return (merge[ordered_cols,])
+    return(cbind(df, df_unique_merge)[reordered_cols])
 }
 
 
@@ -92,13 +76,19 @@ calc_averages <- function(df_full){
 
     # indeed, R have no default list(str) better than %>% select
     cols_f <- colnames(df_full %>% select(ends_with("_f")))
-    cols_to_mean <- c(cols_f, 'Reco')
-    cat('Columns picked for averaging (Reco added): \n', cols_to_mean, '\n')
+    cols_to_mean <- c(cols_f)
+    if ('Reco' %in% colnames(df_full))
+        cols_to_mean <- c(cols_to_mean, 'Reco')
+    cat('Columns picked for averaging (Reco added if possible): \n', cols_to_mean, '\n')
 
     cols_nna_sqc <- gsub("_f", "_sqc", setdiff(cols_f, 'GPP_f'))
     cols_to_nna <- gsub("_sqc", "", cols_nna_sqc)
     stopifnot(length(cols_nna_sqc) == length(cols_to_nna))
     cat('Columns picked for NA counts (GPP_f omitted): \n',cols_to_nna, '\n')
+
+    missing = setdiff(cols_to_nna, colnames(df_full))
+    if (length(missing) > 0)
+        stop(msg = paste('Expected columns are missing: \n', missing, '\n'))
 
     df_to_mean <- df_full[cols_to_mean]
     df_to_mean_mon = cbind(Month = df_full$Month, df_to_mean)
@@ -117,7 +107,7 @@ calc_averages <- function(df_full){
     df_means_y <- aggregate_df(df_to_mean, by_col = df_full[unique_cols_y], mean_nna)
 
     # renaming is easier before the actual calc
-    stopifnot(ncol(df_to_nna) == length(cols_nna_sqc))
+    stopifnot(ncol(df_to_nna) == length(cols_nna_sqc) - length(missing))
     names(df_to_nna) <- cols_nna_sqc
     df_nna_d <- aggregate_df(df_to_nna, by_col = df_full[unique_cols_d], nna_percent)
     df_nna_m <- aggregate_df(df_to_nna, by_col = df_full[unique_cols_m], nna_percent)
@@ -133,8 +123,8 @@ calc_averages <- function(df_full){
 }
 
 
-save_averages <- function(dfs, output_dir, output_prefix) {
-    prename = file.path(output_dir, output_prefix)
+save_averages <- function(dfs, output_dir, output_unmask) {
+    prename = file.path(output_dir, output_unmask)
     write.csv(dfs[[1]], file = paste0(prename, "_daily.csv"), row.names = FALSE)
     write.csv(dfs[[2]], file = paste0(prename, "_monthly.csv"), row.names = FALSE)
     write.csv(dfs[[3]], file = paste0(prename, "_yearly.csv"), row.names = FALSE)
