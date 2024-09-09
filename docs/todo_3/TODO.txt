@@ -1,5 +1,7 @@
 - log
 - all files to arc
+- fix years 1 day of new year
+- incorrect out prefix
 
 - Telegram QA
 

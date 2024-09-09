@@ -27,7 +27,8 @@ def replace_fname_end(path: Path, tag: str, new_tag: str):
 def ensure_empty_dir(folder: Union[str, Path]):
     if type(folder) is str:
         folder = Path(folder)
-    folder.mkdir(exist_ok=True)
+
+    folder.mkdir(parents=True, exist_ok=True)
     for path in folder.iterdir():
         if path.is_file():
             path.unlink()
