@@ -4,11 +4,12 @@ from typing import List
 from zipfile import ZipFile
 
 
-def create_archive(dir, arc_fname, include_fmask, exclude_files: List[str]):
+def create_archive(dir, arc_fname, include_fmasks, exclude_files: List[Path]):
     # move out of draw_graphs later
 
     folder = Path(dir)
-    files = [path for path in folder.glob(include_fmask) if path not in exclude_files]
+    files = [path for mask in include_fmasks for path in list(folder.glob(mask))]
+    files = set(files) - set(exclude_files)
 
     arc_path = folder / arc_fname
     with ZipFile(arc_path, 'w', zipfile.ZIP_DEFLATED) as myzip:

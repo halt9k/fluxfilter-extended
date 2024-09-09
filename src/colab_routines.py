@@ -19,7 +19,7 @@ def colab_only(func):
         if RUN_MODE == RunMode.COLAB:
             return func(*args, **kwargs)
         else:
-            print(f"Skipping {func.__name__}, not in Colab mode.")
+            print(f"Colab env not detected. {func.__name__} is skipped by design.")
             return None
     return wrapper
 

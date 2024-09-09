@@ -1,19 +1,21 @@
 from pathlib import Path
 from typing import List, Union
+import warnings
 
 
 def tag_to_fname(dir: Path, prefix, tag, ext):
-    return dir / (prefix + tag + ext)
+    return dir / (prefix + '_' + tag + ext)
 
 
 def tags_to_files(dir, prefix, tags, ext, exclude_missing=True, warn_if_missing=True):
     res = {}
     for tag in tags:
         fname = Path(tag_to_fname(dir, prefix, tag, ext))
-        if warn_if_missing:
-            print(f"WARNING: image is missing: {fname}")
-        if exclude_missing and not fname.exists():
-            continue
+        if not fname.exists():
+            if warn_if_missing:
+                warnings.warn(f"Image is missing: {fname}")
+            if exclude_missing:
+                continue
         res[tag] = fname
     return res
 

@@ -1,10 +1,12 @@
+
 from pathlib import Path
 from typing import List
+from warnings import warn
 
 from PIL import Image
 
 import src.helpers.os_helpers  # noqa: F401
-from helpers.io_helpers import replace_fname_end
+from src.helpers.io_helpers import replace_fname_end
 from src.helpers.io_helpers import tags_to_files, tag_to_fname
 from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images, remove_strip
 
@@ -12,9 +14,10 @@ from src.helpers.image_tools import crop_monocolor_borders, split_image, Directi
 class EddyImgPostProcess():
     def __init__(self, main_path, out_prefix, img_ext='.png'):
         self.main_path = Path(main_path)
-        self.paths_exclude_from_arc = []
         self.out_prefix = out_prefix
         self.img_ext = img_ext
+
+        self.paths_exclude_from_arc: List[Path] = []
 
     def tag_to_img_fname(self, tag):
         return tag_to_fname(self.main_path, self.out_prefix, tag, self.img_ext)
@@ -47,7 +50,7 @@ class EddyImgPostProcess():
         for merge in merges:
             tp = self.tags_to_img_fnames(merge)
             if len(tp) != 3:
-                print(f"WARNING: cannot merge {merge}, files missing")
+                warn(f"Cannot merge {merge}, files missing")
                 continue
 
             imgs = [Image.open(path) for path in list(tp.values())]

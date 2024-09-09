@@ -33,9 +33,9 @@ def test_process(use_r_from_python_env):
 
 
 def test_draw():
-    mocks.out_prefix = 'TestSiteID_2023-2024_'
-    ensure_empty_dir('output/REddyProc')
-    shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
+    mocks.out_prefix = 'TestSiteID_22-23'
+    # ensure_empty_dir('output/REddyProc')
+    # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
