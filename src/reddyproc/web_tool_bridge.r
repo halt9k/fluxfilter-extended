@@ -129,7 +129,10 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
                                  outputFileName = output_file, figureFormat = ext)
 
-    years_num <- first_and_last(df_output$Year)
+    # years_num <- first_and_last(df_output$Year)
+    # TODO workaround, what if real name form?
+    years_num <- first_and_last(df_output$Year - c(1, length(df_output)))
+
     years_str <- paste(sprintf("%02d", years_num %% 100), collapse = '-')
     out_prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
 
@@ -138,6 +141,6 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     # processEddyData guaranteed to output equi-time-distant series
     dfs = calc_averages(df_output)
     save_averages(dfs, OUTPUT_DIR, out_prefix)
-	
+
 	return(out_prefix)
 }

@@ -30,6 +30,8 @@ def test_process(use_r_from_python_env):
     rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
+    src.cells_mirror.cell_reddyproc_draw.out_prefix = src.cells_mirror.cell_reddyproc_process.out_prefix
+    import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
 def test_draw():
