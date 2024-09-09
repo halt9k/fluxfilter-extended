@@ -126,14 +126,16 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 
     ext <- tools::file_ext(OUTPUT_PLOTS_MASK)
     output_file <- file.path(OUTPUT_DIR, "filled.txt")
-    df_output <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
-                                 outputFileName = output_file, figureFormat = ext)
+    res <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
+                           outputFileName = output_file, figureFormat = ext)
 
-    # years_num <- first_and_last(df_output$Year)
-    # TODO workaround, what if real name form?
-    years_num <- first_and_last(df_output$Year - c(1, length(df_output)))
+    df_output <- res[[1]]
+    years_str <- res[[2]]
 
-    years_str <- paste(sprintf("%02d", years_num %% 100), collapse = '-')
+    # workaround, what if real name form?
+    # years_num <- first_and_last(df_output$Year - c(1, length(df_output)))
+    # years_str <- paste(sprintf("%02d", years_num %% 100), collapse = '-')
+
     out_prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
 
     file.rename(output_file, add_file_prefix(output_file, out_prefix))
