@@ -30,7 +30,7 @@ combine_cols_alternating <- function(df, df_merge, expected_col_dupes){
 merge_cols_aligning <- function(df, df_merge, expected_col_dupes, align_pair){
     # H_f LE_f U_f , H_sqc LE_sqc U_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
     # supports regex for align_pair '*_f$', '*_sqc$'
-    # supports missing columns TODO with only WARNING
+    # supports missing align_pair[[2]] columns
 
     stopifnot(df[expected_col_dupes] == df_merge[expected_col_dupes])
     df_unique_merge = df_merge %>% select(-matches(expected_col_dupes))
@@ -41,7 +41,7 @@ merge_cols_aligning <- function(df, df_merge, expected_col_dupes, align_pair){
     merge_unmasks <- sub(mask_b, '', colnames(df_unique_merge))
 
     if (anyDuplicated(merge_unmasks) || anyDuplicated(df_unmasks))
-        stop('ERROR: cannot merge columns due to duplicate names for align pattenrs')
+        stop('\n Cannot merge columns due to duplicate names for align patterns \n')
 
     names = c(colnames(df), colnames(df_unique_merge))
     unmasks = c(df_unmasks, merge_unmasks)

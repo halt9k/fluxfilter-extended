@@ -264,7 +264,7 @@ gapFillAndPlotDataVariablesOrError <- function(eddyProcConfiguration, ...) {
             EProc$sPlotFingerprint(varname, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat, valueLimits = quantile(EProc$sTEMP[[varname]],
                 prob = c(0, 0.99), na.rm = TRUE))
         } else {
-            warning("Column '", varname, "' not found. Aborting fingerprint plot.")
+            warning("\nColumn '", varname, "' not found. Aborting fingerprint plot.\n\n")
         }
     }
 

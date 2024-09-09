@@ -1,4 +1,6 @@
 from types import SimpleNamespace
+
+from src.helpers.io_helpers import ensure_empty_dir
 from src.global_mocks import *  # noqa: F401
 
 eddyproc_options = SimpleNamespace(
@@ -27,10 +29,12 @@ eddyproc_options = SimpleNamespace(
     output_dir="./output/REddyProc"
 )
 
+ensure_empty_dir(eddyproc_options.output_dir)
+
 # this is workaround to avoid %%R code, which supported badly anyway in multiple workflows
 # also to be able to run R tests only using R files
 from rpy2 import robjects
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
 run_web_tool = robjects.globalenv['run_web_tool_bridge']
 eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
-run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
+out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))
