@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from warnings import warn
 
 import numpy as np
 from PIL import Image, ImageChops, ImageColor
@@ -14,7 +15,7 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
 
     edge_cols = list(map(img_rgb.getpixel, [(0, 0), (w - 1, h - 1), (w - 1, 0), (0, h - 1)]))
     if len(set(edge_cols)) > 1:
-        print('WARNING: Cannot crop image, border color inconsistent')
+        warn('Cannot crop image, border color inconsistent')
         return img
 
     if not col:
@@ -28,7 +29,7 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
     bbox = img_rgb.getbbox()
 
     if not bbox_crop:
-        print('WARNING: Cannot crop image, border color inconsistent')
+        warn('Cannot crop image, border color inconsistent')
         return img
 
     bbox_crop_mg = (max(bbox_crop[0] - margin, 0),  max(bbox_crop[1] - margin, 0),

@@ -1,3 +1,5 @@
+import logging
+import warnings
 from os import chdir
 from pathlib import Path
 from sys import path
@@ -48,3 +50,10 @@ def ch_project_root_dir():
 ch_project_root_dir()
 
 
+def custom_show_warning(message, category, filename, lineno, file=None, line=None):
+    # print(f'{filename}: {lineno} \n WARNING: {message}')
+    print(f'WARNING: {message}')
+
+
+# logging.captureWarnings(True)
+warnings.showwarning = custom_show_warning

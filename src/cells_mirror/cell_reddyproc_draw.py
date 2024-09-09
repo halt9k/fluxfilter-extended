@@ -1,3 +1,9 @@
+from src.global_mocks import *  # noqa: F401
+from src.reddyproc.postprocess import create_archive
+from src.reddyproc.postprocess_graphs import EddyImgPostProcess
+from src.colab_routines import add_download, no_scroll
+from src.ipynb_helpers import display_images
+
 # Full list of outputs (not all are included in OUTPUT_ORDER):
 # 'DC_H_f', 'DC_LE_f', 'DC_NEE_uStar_f', 'DC_Rg_f', 'DC_rH_f', 'DC_Tair_f', 'DC_VPD_f',
 # 'DSum_Rg_f', 'DSum_rH_f', 'DSum_Tair_f', 'DSum_VPD_f', 'DSumU_H_f', 'DSumU_LE_f', 'DSumU_NEE_uStar_f',
@@ -6,12 +12,8 @@
 # 'FP_GPP_DT_uStar', 'FP_GPP_uStar_f', 'FP_H', 'FP_H_f', 'FP_LE', 'FP_LE_f', 'FP_NEE',
 # 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f'
-from src.global_mocks import *  # noqa: F401
-import src.colab_routines as cr
-import src.ipynb_helpers as ih
-import src.reddyproc.postprocess as pp
-import src.reddyproc.postprocess_graphs as dg
-eipp = dg.EddyImgPostProcess(main_path='output/REddyProc', out_prefix=out_prefix)
+
+eipp = EddyImgPostProcess(main_path='output/REddyProc', out_prefix=out_prefix)
 
 eipp.process_heatmaps(img_tags=['FP_NEE', 'FP_NEE_uStar_f', 'FP_LE', 'FP_LE_f', 'FP_H', 'FP_H_f'],
                       tags_skip_legend=['FP_NEE', 'FP_LE', 'FP_H'],
@@ -25,8 +27,8 @@ eipp.process_fluxes(img_tags=['Flux_NEE', 'Flux_NEE_uStar_f', 'Flux_LE', 'Flux_L
 eipp.process_diurnal_cycles(img_tags=['DC_NEE_uStar_f', 'DC_LE_f', 'DC_H_f'],
                             postfix='_compact')
 
-arc_path = pp.create_archive(dir='output/REddyProc', arc_fname=f'{out_prefix}.zip',
-                                                include_fmask=f'{out_prefix}*.*', exclude_files=eipp.paths_exclude_from_arc)
+arc_path = create_archive(dir='output/REddyProc', arc_fname=f'{out_prefix}.zip',
+                             include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eipp.paths_exclude_from_arc)
 
 # just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
@@ -44,6 +46,6 @@ OUTPUT_ORDER = (
     ['Flux_H_compact', 'Flux_H_f_compact']
 )
 
-cr.no_scroll()
-ih.display_images(OUTPUT_ORDER, main_path='output/REddyProc', prefix=out_prefix)
-cr.add_download(arc_path, 'Download all images')
+no_scroll()
+display_images(OUTPUT_ORDER, main_path='output/REddyProc', prefix=out_prefix)
+add_download(arc_path, 'Download all images')
