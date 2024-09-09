@@ -1,23 +1,7 @@
-# just some tests
+# tests specifically for calc_averages
 
-rm(list = ls())
-rm(list = ls(environment(), all.names = TRUE))
-gc()
-
-# clear RStudio output
-cat("\014")
-
-# options(error = browser)
-options(max.print = 100)
-# interactive() ?
-# on_debug = function() {	cat("\014")	browser()}
-# options(debugger = on_debug)
-
-cur_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-project_dir <- dirname(dirname(cur_dir))
-setwd(project_dir)
-cat("Working dir is set to: ", project_dir, '\n')
-
+setwd(dirname(dirname(dirname(rstudioapi::getSourceEditorContext()$path))))
+debugSource('test/reddyproc/helpers/init_test_env.r')
 debugSource('src/reddyproc/postprocess_calc_averages.r')
 
 

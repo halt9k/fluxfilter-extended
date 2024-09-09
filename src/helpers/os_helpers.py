@@ -1,15 +1,15 @@
 from os import chdir
 from pathlib import Path
 from sys import path
-from typing import Union
 
 """
- This module is intended to be imported before all other modules.
- Allows to keep working dir consistent both when start from ./run.bat and ./src/main.py
-  For example, surces are organized with working dir . as root:
+ This module is intended to be imported before all other user modules.
+ Allows to keep imports consistent both when command line start, tests start, etc
+  For example, if sources are organized with working dir . as root:
  ./README.md
  ./run.bat
  ./src/*.py
+ ./test/test_main.py
  ./src/helpers/os_helpers.py
  ./data/*
 
@@ -28,8 +28,6 @@ def ch_project_root_dir():
     project_dir = str(src_dir.parent)
     src_dir = str(src_dir)
 
-    chdir(project_dir)
-
     if src_dir in path:
         # ambigious imports can be broken
         path.remove(src_dir)
@@ -41,16 +39,12 @@ def ch_project_root_dir():
     if project_dir not in path:
         path.append(project_dir)
 
+    # Shortfix for R scripts consistency, consider removing later for dynamic tests
+    chdir(project_dir)
     print(f'Working path is changed to {project_dir} \n')
 
 
+# autorun to make imports more readable
 ch_project_root_dir()
 
 
-def ensure_empty_dir(folder: Union[str, Path]):
-    if type(folder) is str:
-        folder = Path(folder)
-    folder.mkdir(exist_ok=True)
-    for path in folder.iterdir():
-        if path.is_file():
-            path.unlink()

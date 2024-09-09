@@ -1,3 +1,6 @@
+- log
+- all files to arc
+
 - Telegram QA
 
 - u_star_seasoning проверить опцию
