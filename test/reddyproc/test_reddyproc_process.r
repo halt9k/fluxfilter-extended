@@ -5,7 +5,7 @@ setwd(dirname(dirname(dirname(rstudioapi::getSourceEditorContext()$path))))
 debugSource('test/reddyproc/helpers/init_test_env.r')
 debugSource('src/reddyproc/postprocess_calc_averages.r')
 debugSource('src/reddyproc/web_tool_sources_adapted.r')
-debugSource('src/reddyproc/web_tool_bridge.r')
+debugSource('src/reddyproc/reddyproc_wrapper.r')
 
 
 # possibly copy all used files into temp dir and work only from it
@@ -41,4 +41,4 @@ eddyproc_user_options <- list(
 )
 
 
-run_web_tool_bridge_logged(eddyproc_user_options)
+run_eddyproc_wrapper(eddyproc_user_options)

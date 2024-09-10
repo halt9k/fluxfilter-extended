@@ -5,7 +5,6 @@ from src.ipynb_globals import *
 import src.ipynb_globals as ig
 from src.helpers.io_helpers import ensure_empty_dir
 
-
 eddyproc_options = SimpleNamespace(
     site_id=ias_output_prefix,
 
