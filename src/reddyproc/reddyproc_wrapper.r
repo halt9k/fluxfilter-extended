@@ -116,12 +116,10 @@ add_file_prefix <- function(fpath, prefix){
 }
 
 
-run_eddyproc <- function(eddyproc_config){
+reddyproc_tool_wrapper <- function(eddyproc_config){
     # more specifically, still calls processEddyData wrapper from web tool,
     # which finally calls REddyProc library
-
-    INPUT_FILE <<- eddyproc_config$input_file
-    OUTPUT_DIR <<- eddyproc_config$output_dir
+    # returns: [df_output, years_str, out_prefix]
 
     dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
@@ -136,27 +134,24 @@ run_eddyproc <- function(eddyproc_config){
                            outputFileName = output_file,
                            figureFormat = tools::file_ext(EDDY_IMAGES_EXT))
 
-    df_output <- res[[1]]
-    years_str <- res[[2]]
-    out_prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
-
+    # res: [df_output, years_str]
+    out_prefix <<- paste0(eddyproc_config$siteId, '_' , res[[2]])
     file.rename(output_file, add_file_prefix(output_file, out_prefix))
 
-    # processEddyData guaranteed to output equi-time-distant series
-    dfs = calc_averages(df_output)
-    save_averages(dfs, OUTPUT_DIR, out_prefix, STATS_FNAME_EXT)
-
-	return(out_prefix)
+	return(append(res, out_prefix))
 }
 
 
-run_eddyproc_wrapper <- function(user_options){
-    # helps under iptnb or Colab cell
-    options(max.print = 80)
+reddyproc_and_postprocess <- function(user_options){
+    # combined function to avoid converting output or using global env
 
+    # helps under iptyb or Colab cell
+    options(max.print = 80)
     sink(stdout(), type = "message")
     message("Info: output of R is redirected to stdout and truncated.")
 
+    INPUT_FILE <<- user_options$input_file
+    OUTPUT_DIR <<- user_options$output_dir
     eddyproc_config <- merge_options(user_options, eddyproc_extra_options)
 
     got_types <- sapply(eddyproc_config, class)
@@ -168,6 +163,14 @@ run_eddyproc_wrapper <- function(user_options){
         stop("Incorrect options or options types: ", cmp_str)
     }
 
-    res <- run_eddyproc(eddyproc_config)
-    return(res)
+
+    res <- reddyproc_tool_wrapper(eddyproc_config)
+    # res: [df_output, years_str, out_prefix]
+    out_prefix <- res[[3]]
+
+    # processEddyData guaranteed to output equi-time-distant series
+    dfs = calc_averages(res[[1]])
+    save_averages(dfs, OUTPUT_DIR, out_prefix, STATS_FNAME_EXT)
+
+    return(out_prefix)
 }

@@ -41,4 +41,4 @@ eddyproc_user_options <- list(
 )
 
 
-run_eddyproc_wrapper(eddyproc_user_options)
+reddyproc_and_postprocess(eddyproc_user_options)
