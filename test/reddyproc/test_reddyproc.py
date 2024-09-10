@@ -5,7 +5,7 @@ import pytest
 
 import src.helpers.os_helpers  # noqa: F401
 from src.helpers.io_helpers import ensure_empty_dir
-import src.globals as globals
+import src.ipynb_globals as globals
 
 
 @pytest.fixture
