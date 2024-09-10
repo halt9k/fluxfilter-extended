@@ -45,7 +45,6 @@ def colab_only_cell():
 
 @colab_only
 def no_scroll():
-
     output.no_vertical_scroll()
 
 

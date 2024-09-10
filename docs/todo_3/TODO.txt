@@ -2,7 +2,12 @@
 - all files to arc
 - fix years 1 day of new year
 - incorrect out prefix
-- check TODO
+
+- check TODO everywhere
+- print in R output when saving
+Saved plot to: output/reddyproc/TestSiteID_22-23_FP_Reco_DT_uStar.png
+ensure debug R works now, not later
+
 - Telegram QA
 
 - u_star_seasoning проверить опцию
