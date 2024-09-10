@@ -2,7 +2,7 @@
 - all files to arc
 - fix years 1 day of new year
 - incorrect out prefix
-
+- check TODO
 - Telegram QA
 
 - u_star_seasoning проверить опцию

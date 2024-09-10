@@ -36,6 +36,6 @@ ensure_empty_dir(eddyproc_options.output_dir)
 # this is workaround to avoid %%R code, which supported badly anyway in multiple workflows
 # also to be able to run R tests only using R files
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
-run_web_tool = robjects.globalenv['run_web_tool_bridge']
+run_web_tool = robjects.globalenv['run_web_tool_bridge_logged']
 eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
 ig.eddy_out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]
