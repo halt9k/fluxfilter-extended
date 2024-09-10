@@ -1,4 +1,4 @@
-from src.ipynb_globals import eddy_out_prefix
+from src.ipynb_globals import *
 from src.reddyproc.postprocess import create_archive
 from src.reddyproc.postprocess_graphs import EddyImgPostProcess
 from src.colab_routines import add_download_button, no_scroll
