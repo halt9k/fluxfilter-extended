@@ -171,15 +171,19 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 run_web_tool_bridge_logged <- function(eddyproc_user_options){
     result <- NULL
 
-    f <- function(out_result)
-        out_result <- run_web_tool_bridge(eddyproc_user_options)
+    options(max.print = 80)
+    sink(stdout(), type = "message")
+    message("Output of R is redirected to stdout and truncated.")
 
-    captured_log <- capture.output(f(result))
+    f <- function(out_result)
+        result <- run_web_tool_bridge(eddyproc_user_options)
+
+    captured_log <- capture.output(f())
 
     years_str <- result[[2]]
-    dir <<- eddyproc_user_options$output_dir
+    folder <<- eddyproc_user_options$output_dir
     base <- paste0(years_str, '_', 'eddy_log.txt')
-    write(captured_log, file.path(dir, base))
+    write(captured_log, file.path(folder, base))
 
     return(result)
 }

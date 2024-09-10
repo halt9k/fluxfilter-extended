@@ -16,18 +16,8 @@ def use_r_from_python_env():
     os.environ['R_HOME'] = r_folder
 
 
-import src.colab_routines as cr
-cr.workaround_stop_scroll = lambda: None
-
-
 def test_process(use_r_from_python_env):
     ig.ias_output_prefix = 'tv_fy4_22-14'
-
-    # do not omit stderr
-    from rpy2 import robjects, rinterface_lib
-    rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
-    rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
-    rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
 
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
