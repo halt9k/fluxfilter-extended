@@ -129,10 +129,11 @@ save_averages <- function(dfs, output_dir, output_unmask, ext){
     m_name <- paste0(prename, '_monthly', ext)
     y_name <- paste0(prename, '_yearly', ext)
 
-    cat(sprintf('Saving summary stats to : \n %s \n %s \n %s \n'),
-        d_name, m_name, y_name)
-
     write.csv(dfs[[1]], file = d_name, row.names = FALSE)
     write.csv(dfs[[2]], file = m_name, row.names = FALSE)
     write.csv(dfs[[3]], file = y_name, row.names = FALSE)
+
+        cat(sprintf('Saved summary stats to : \n %s \n %s \n %s \n',
+                d_name, m_name, y_name))
+
 }
