@@ -5,7 +5,7 @@ import pytest
 
 import src.helpers.os_helpers  # noqa: F401
 from src.helpers.io_helpers import ensure_empty_dir
-import src.global_mocks as mocks
+import src.globals as globals
 
 
 @pytest.fixture
@@ -21,7 +21,8 @@ cr.workaround_stop_scroll = lambda: None
 
 
 def test_process(use_r_from_python_env):
-    mocks.ias_output_prefix = 'tv_fy4_22-14'
+    globals.ias_output_prefix = 'tv_fy4_22-14'
+    globals.eddy_out_prefix = 'tv_fy4_22-14_2023'
 
     # do not omit stderr
     from rpy2 import robjects, rinterface_lib
@@ -34,9 +35,9 @@ def test_process(use_r_from_python_env):
 
 
 def test_draw():
-    mocks.out_prefix = 'tv_fy4_2023'
-    # ensure_empty_dir('output/REddyProc')
-    # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
+    globals.eddy_out_prefix = 'tv_fy4_22-14_2023'
+    # ensure_empty_dir('output/reddyproc')
+    # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/reddyproc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 

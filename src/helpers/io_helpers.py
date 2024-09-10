@@ -8,6 +8,9 @@ def tag_to_fname(dir: Path, prefix, tag, ext):
 
 
 def tags_to_files(dir, prefix, tags, ext, exclude_missing=True, warn_if_missing=True):
+    # meaning of tags here is unique file name endings
+    # Test_site_2024_Hd_f.png -> tag is Hd_f
+
     res = {}
     for tag in tags:
         fname = Path(tag_to_fname(dir, prefix, tag, ext))

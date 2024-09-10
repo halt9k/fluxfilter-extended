@@ -1,6 +1,8 @@
-# all functions here are to be mocked or cancelled during non-colab runs
+"""
+Module specifically for Google Colab.
+During local runs, all functions here are to be mocked or cancelled.
+"""
 from enum import Enum, auto
-from decorator import decorator
 
 
 class RunMode(Enum):
@@ -12,6 +14,10 @@ except ImportError:
     RUN_MODE = RunMode.LOCAL
 else:
     RUN_MODE = RunMode.COLAB
+
+    from google.colab import output
+    from google.colab import files
+    from IPython.display import display
 
 
 def colab_only(func):
@@ -39,17 +45,14 @@ def colab_only_cell():
 
 @colab_only
 def no_scroll():
-    from google.colab import output
+
     output.no_vertical_scroll()
 
 
 @colab_only
-def add_download(fname, caption):
+def add_download_button(fname, caption):
     def clicked(arg):
-        from google.colab import files
         files.download(fname)
-
-    from IPython.display import display
     import ipywidgets as widgets
 
     button_download = widgets.Button(description=caption)
