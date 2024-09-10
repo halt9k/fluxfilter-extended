@@ -8,7 +8,6 @@ source('src/reddyproc/postprocess_calc_averages.r')
 
 EDDY_IMAGES_EXT <- '.png'
 STATS_FNAME_EXT <- '.csv'
-LOG_FNAME_END <- 'eddy_log.txt'
 DATA_FNAME_END <- 'filled.txt'
 
 # REddyProc library may rely on these global vars
@@ -65,28 +64,28 @@ eddyproc_extra_options <- list(
 )
 
 
-merge_options <- function(eddyproc_user_options, eddyproc_extra_options){
-    eddyproc_config <- list()
+merge_options <- function(user_opts, extra_opts){
+    merge <- list()
 
-    eddyproc_config$siteId <- eddyproc_user_options$site_id
+    merge$siteId <- user_opts$site_id
 
-    eddyproc_config$isToApplyUStarFiltering <- eddyproc_user_options$is_to_apply_u_star_filtering
-    eddyproc_config$uStarSeasoning <- factor(eddyproc_user_options$u_star_seasoning)
-    eddyproc_config$uStarMethod <- factor(eddyproc_user_options$u_star_method)
+    merge$isToApplyUStarFiltering <- user_opts$is_to_apply_u_star_filtering
+    merge$uStarSeasoning <- factor(user_opts$u_star_seasoning)
+    merge$uStarMethod <- factor(user_opts$u_star_method)
 
-    eddyproc_config$isBootstrapUStar <- eddyproc_user_options$is_bootstrap_u_star
+    merge$isBootstrapUStar <- user_opts$is_bootstrap_u_star
 
-    eddyproc_config$isToApplyGapFilling <- eddyproc_user_options$is_to_apply_gap_filling
-    eddyproc_config$isToApplyPartitioning <- eddyproc_user_options$is_to_apply_partitioning
+    merge$isToApplyGapFilling <- user_opts$is_to_apply_gap_filling
+    merge$isToApplyPartitioning <- user_opts$is_to_apply_partitioning
 
-    eddyproc_config$partitioningMethods <- eddyproc_user_options$partitioning_methods
-    eddyproc_config$latitude <- eddyproc_user_options$latitude
-    eddyproc_config$longitude <- eddyproc_user_options$longitude
-    eddyproc_config$timezone <- eddyproc_user_options$timezone
+    merge$partitioningMethods <- user_opts$partitioning_methods
+    merge$latitude <- user_opts$latitude
+    merge$longitude <- user_opts$longitude
+    merge$timezone <- user_opts$timezone
 
-    eddyproc_config$temperatureDataVariable <- eddyproc_user_options$temperature_data_variable
+    merge$temperatureDataVariable <- user_opts$temperature_data_variable
 
-    return(c(eddyproc_config, eddyproc_extra_options))
+    return(c(merge, extra_opts))
 }
 
 
@@ -99,12 +98,12 @@ first_and_last <- function(vec){
 }
 
 
-right = function (string, char) {
+right = function(string, char) {
     substr(string,nchar(string)-(char-1),nchar(string))
 }
 
 
-left = function (string,char) {
+left = function(string,char) {
     substr(string,1,char)
 }
 
@@ -117,32 +116,20 @@ add_file_prefix <- function(fpath, prefix){
 }
 
 
-run_web_tool_bridge <- function(eddyproc_user_options){
-    eddyproc_config = merge_options(eddyproc_user_options, eddyproc_extra_options)
+run_eddyproc <- function(eddyproc_config){
+    # more specifically, still calls processEddyData wrapper from web tool,
+    # which finally calls REddyProc library
 
-    got_types <- sapply(eddyproc_config, class)
-    need_types <- sapply(eddyproc_all_required_options, class)
-
-    if (any(got_types != need_types)) {
-        df_cmp = data.frame(got_types, need_types)
-        cmp_str = paste(capture.output(df_cmp), collapse = '\n')
-        stop("Incorrect options or options types: ", cmp_str)
-    }
-
-    INPUT_FILE <<- eddyproc_user_options$input_file
-    OUTPUT_DIR <<- eddyproc_user_options$output_dir
+    INPUT_FILE <<- eddyproc_config$input_file
+    OUTPUT_DIR <<- eddyproc_config$output_dir
 
     dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
+
     clean_out_files <- function(fname_end)
         unlink(file.path(OUTPUT_DIR, paste0('*', fname_end)))
-
     clean_out_files(EDDY_IMAGES_EXT)
     clean_out_files(STATS_FNAME_EXT)
-    clean_out_files(LOG_FNAME_END)
     clean_out_files(DATA_FNAME_END)
-
-    # necessary and used only in Colab cell
-    # options(max.print = 50)
 
     output_file <- file.path(OUTPUT_DIR, DATA_FNAME_END)
     res <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
@@ -151,11 +138,6 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 
     df_output <- res[[1]]
     years_str <- res[[2]]
-
-    # workaround, what if real name form?
-    # years_num <- first_and_last(df_output$Year - c(1, length(df_output)))
-    # years_str <- paste(sprintf("%02d", years_num %% 100), collapse = '-')
-
     out_prefix <- paste0(eddyproc_config$siteId, '_' , years_str)
 
     file.rename(output_file, add_file_prefix(output_file, out_prefix))
@@ -168,22 +150,24 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 }
 
 
-run_web_tool_bridge_logged <- function(eddyproc_user_options){
-    result <- NULL
-
+run_eddyproc_wrapper <- function(user_options){
+    # helps under iptnb or Colab cell
     options(max.print = 80)
+
     sink(stdout(), type = "message")
-    message("Output of R is redirected to stdout and truncated.")
+    message("Info: output of R is redirected to stdout and truncated.")
 
-    f <- function(out_result)
-        result <- run_web_tool_bridge(eddyproc_user_options)
+    eddyproc_config <- merge_options(user_options, eddyproc_extra_options)
 
-    captured_log <- capture.output(f())
+    got_types <- sapply(eddyproc_config, class)
+    need_types <- sapply(eddyproc_all_required_options, class)
 
-    years_str <- result[[2]]
-    folder <<- eddyproc_user_options$output_dir
-    base <- paste0(years_str, '_', 'eddy_log.txt')
-    write(captured_log, file.path(folder, base))
+    if (any(got_types != need_types)) {
+        df_cmp = data.frame(got_types, need_types)
+        cmp_str = paste(capture.output(df_cmp), collapse = '\n')
+        stop("Incorrect options or options types: ", cmp_str)
+    }
 
-    return(result)
+    res <- run_eddyproc(eddyproc_config)
+    return(res)
 }

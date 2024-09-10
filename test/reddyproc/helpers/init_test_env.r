@@ -6,9 +6,8 @@ gc()
 cat("\014")
 
 # break into debug on error
-# options(error = browser)
+options(error = browser)
 
-options(max.print = 100)
 # interactive() ?
 # on_debug = function() {	cat("\014")	browser()}
 # options(debugger = on_debug)
