@@ -6,7 +6,10 @@ source('src/reddyproc/web_tool_sources_adapted.r')
 source('src/reddyproc/postprocess_calc_averages.r')
 
 
-OUTPUT_PLOTS_MASK <- '*.png'
+EDDY_IMAGES_EXT <- '.png'
+STATS_FNAME_EXT <- '.csv'
+LOG_FNAME_END <- 'eddy_log.txt'
+DATA_FNAME_END <- 'filled.txt'
 
 # REddyProc library may rely on these global vars
 INPUT_FILE <- NULL
@@ -96,8 +99,21 @@ first_and_last <- function(vec){
 }
 
 
+right = function (string, char) {
+    substr(string,nchar(string)-(char-1),nchar(string))
+}
+
+
+left = function (string,char) {
+    substr(string,1,char)
+}
+
+
 add_file_prefix <- function(fpath, prefix){
-    return(file.path(dirname(fpath), paste0(prefix, '_', basename(fpath))))
+    dir <- dirname(fpath)
+    base <- basename(fpath)
+    stopifnot(right(prefix, 1) != '_' && left(base, 1) != '_')
+    return(file.path(dir, paste0(prefix, '_', base)))
 }
 
 
@@ -117,17 +133,21 @@ run_web_tool_bridge <- function(eddyproc_user_options){
     OUTPUT_DIR <<- eddyproc_user_options$output_dir
 
     dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
-    unlink(file.path(OUTPUT_DIR, "*.png"))
-    unlink(file.path(OUTPUT_DIR, "*.csv"))
-    unlink(file.path(OUTPUT_DIR, "*filled.txt"))
+    clean_out_files <- function(fname_end)
+        unlink(file.path(OUTPUT_DIR, paste0('*', fname_end)))
+
+    clean_out_files(EDDY_IMAGES_EXT)
+    clean_out_files(STATS_FNAME_EXT)
+    clean_out_files(LOG_FNAME_END)
+    clean_out_files(DATA_FNAME_END)
 
     # necessary and used only in Colab cell
     # options(max.print = 50)
 
-    ext <- tools::file_ext(OUTPUT_PLOTS_MASK)
-    output_file <- file.path(OUTPUT_DIR, "filled.txt")
+    output_file <- file.path(OUTPUT_DIR, DATA_FNAME_END)
     res <- processEddyData(eddyproc_config, dataFileName = INPUT_FILE,
-                           outputFileName = output_file, figureFormat = ext)
+                           outputFileName = output_file,
+                           figureFormat = tools::file_ext(EDDY_IMAGES_EXT))
 
     df_output <- res[[1]]
     years_str <- res[[2]]
@@ -142,7 +162,24 @@ run_web_tool_bridge <- function(eddyproc_user_options){
 
     # processEddyData guaranteed to output equi-time-distant series
     dfs = calc_averages(df_output)
-    save_averages(dfs, OUTPUT_DIR, out_prefix)
+    save_averages(dfs, OUTPUT_DIR, out_prefix, STATS_FNAME_EXT)
 
 	return(out_prefix)
+}
+
+
+run_web_tool_bridge_logged <- function(eddyproc_user_options){
+    result <- NULL
+
+    f <- function(out_result)
+        out_result <- run_web_tool_bridge(eddyproc_user_options)
+
+    captured_log <- capture.output(f(result))
+
+    years_str <- result[[2]]
+    dir <<- eddyproc_user_options$output_dir
+    base <- paste0(years_str, '_', 'eddy_log.txt')
+    write(captured_log, file.path(dir, base))
+
+    return(result)
 }

@@ -123,9 +123,9 @@ calc_averages <- function(df_full){
 }
 
 
-save_averages <- function(dfs, output_dir, output_unmask) {
+save_averages <- function(dfs, output_dir, output_unmask, ext){
     prename = file.path(output_dir, output_unmask)
-    write.csv(dfs[[1]], file = paste0(prename, "_daily.csv"), row.names = FALSE)
-    write.csv(dfs[[2]], file = paste0(prename, "_monthly.csv"), row.names = FALSE)
-    write.csv(dfs[[3]], file = paste0(prename, "_yearly.csv"), row.names = FALSE)
+    write.csv(dfs[[1]], file = paste0(prename, '_daily', ext), row.names = FALSE)
+    write.csv(dfs[[2]], file = paste0(prename, '_monthly', ext), row.names = FALSE)
+    write.csv(dfs[[3]], file = paste0(prename, '_yearly', ext), row.names = FALSE)
 }
