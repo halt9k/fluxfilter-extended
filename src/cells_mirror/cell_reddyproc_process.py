@@ -1,11 +1,11 @@
 from types import SimpleNamespace
 from rpy2 import robjects
-import ipynb_globals
+import src.ipynb_globals as ig
 from src.helpers.io_helpers import ensure_empty_dir
 
 
 eddyproc_options = SimpleNamespace(
-    site_id=ipynb_globals.ias_output_prefix,
+    site_id=ig.ias_output_prefix,
 
     is_to_apply_u_star_filtering=True,
 
@@ -37,4 +37,4 @@ ensure_empty_dir(eddyproc_options.output_dir)
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
 run_web_tool = robjects.globalenv['run_web_tool_bridge']
 eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
-ipynb_globals.eddy_out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]
+ig.eddy_out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]
