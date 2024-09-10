@@ -1,7 +1,7 @@
-from src.global_mocks import *  # noqa: F401
+from src.globals import eddy_out_prefix
 from src.reddyproc.postprocess import create_archive
 from src.reddyproc.postprocess_graphs import EddyImgPostProcess
-from src.colab_routines import add_download, no_scroll
+from src.colab_routines import add_download_button, no_scroll
 from src.ipynb_helpers import display_images
 
 # Full list of outputs (not all are included in OUTPUT_ORDER):
@@ -13,7 +13,7 @@ from src.ipynb_helpers import display_images
 # 'FP_NEE_uStar_f', 'FP_Reco_DT_uStar', 'FP_Reco_uStar',
 # 'FP_Rg', 'FP_Rg_f', 'FP_rH', 'FP_rH_f', 'FP_Tair', 'FP_Tair_f', 'FP_VPD', 'FP_VPD_f'
 
-eipp = EddyImgPostProcess(main_path='output/REddyProc', out_prefix=out_prefix)
+eipp = EddyImgPostProcess(main_path='output/reddyproc', out_prefix=eddy_out_prefix)
 
 eipp.process_heatmaps(img_tags=['FP_NEE', 'FP_NEE_uStar_f', 'FP_LE', 'FP_LE_f', 'FP_H', 'FP_H_f'],
                       tags_skip_legend=['FP_NEE', 'FP_LE', 'FP_H'],
@@ -27,8 +27,8 @@ eipp.process_fluxes(img_tags=['Flux_NEE', 'Flux_NEE_uStar_f', 'Flux_LE', 'Flux_L
 eipp.process_diurnal_cycles(img_tags=['DC_NEE_uStar_f', 'DC_LE_f', 'DC_H_f'],
                             postfix='_compact')
 
-arc_path = create_archive(dir='output/REddyProc', arc_fname=f'{out_prefix}.zip',
-                             include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eipp.paths_exclude_from_arc)
+arc_path = create_archive(dir='output/reddyproc', arc_fname=f'{eddy_out_prefix}.zip',
+                          include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eipp.paths_exclude_from_arc)
 
 # just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
@@ -47,5 +47,5 @@ OUTPUT_ORDER = (
 )
 
 no_scroll()
-display_images(OUTPUT_ORDER, main_path='output/REddyProc', prefix=out_prefix)
-add_download(arc_path, 'Download all images')
+display_images(OUTPUT_ORDER, main_path='output/reddyproc', prefix=eddy_out_prefix)
+add_download_button(arc_path, 'Download all images')

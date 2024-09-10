@@ -1,7 +1,6 @@
 from types import SimpleNamespace
 from rpy2 import robjects
-
-from src.global_mocks import *  # noqa: F401
+from src.globals import ias_output_prefix, eddy_out_prefix
 from src.helpers.io_helpers import ensure_empty_dir
 
 
@@ -28,7 +27,7 @@ eddyproc_options = SimpleNamespace(
     temperature_data_variable="Tair",
 
     input_file="REddyProc.txt",
-    output_dir="output/REddyProc"
+    output_dir="output/reddyproc"
 )
 
 ensure_empty_dir(eddyproc_options.output_dir)
@@ -38,4 +37,4 @@ ensure_empty_dir(eddyproc_options.output_dir)
 robjects.r.source('src/reddyproc/web_tool_bridge.r')
 run_web_tool = robjects.globalenv['run_web_tool_bridge']
 eddyproc_options.partitioning_methods = robjects.StrVector(eddyproc_options.partitioning_methods)
-out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]
+eddy_out_prefix = run_web_tool(eddyproc_user_options=robjects.ListVector(vars(eddyproc_options)))[0]
