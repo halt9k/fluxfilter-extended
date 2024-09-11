@@ -13,9 +13,9 @@ def run_reddyproc(reddyproc_py_options):
 
     # do not omit stderr+
     # TODO capture output here, not under r
-    rl.callbacks.consolewrite_print = print_sink
-    rl.callbacks.consolewrite_warnerror = print_sink
-    rl.callbacks.showmessage = print_sink
+    # rl.callbacks.consolewrite_print = print_sink
+    # rl.callbacks.consolewrite_warnerror = print_sink
+    # rl.callbacks.showmessage = print_sink
 
     reddyproc_py_options_fix = reddyproc_py_options
     reddyproc_py_options_fix.partitioning_methods = ro.StrVector(reddyproc_py_options.partitioning_methods)
