@@ -54,4 +54,8 @@
 	оказалось, что REddyProc сам слетит в этом случае до постобработки, можно не беспокоиться
 
 
+4) +log to arc
+all files to arc
++ fix years 1 day of new year
++ incorrect out prefix
 
