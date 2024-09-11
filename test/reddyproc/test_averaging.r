@@ -15,7 +15,7 @@ ensure_correct_names <- function(nd, nm, ny){
 
 
 test_model_3_month <- function(){
-	df = read.csv('test/reddyproc/test_averaging/3_months_long.txt', quote = NULL,  row.names = NULL)
+	df = read.csv('test/reddyproc/test_averaging_fixtures/3_months_long.txt', quote = NULL,  row.names = NULL)
 	stopifnot(!'Reco' %in% colnames(df))
 
 	# ensure order and years are processed separately
@@ -62,7 +62,7 @@ test_model_3_month <- function(){
 
 
 test_real_year <- function(){
-	df = read.csv('test/reddyproc/test_averaging/real_data_test_05.09.24.txt', quote = NULL,  row.names = NULL)
+	df = read.csv('test/reddyproc/test_averaging_fixtures/real_data_test_05.09.24.txt', quote = NULL,  row.names = NULL)
 
 	# ensure order and years are processed separately
 	df[df$Year == 2023 & df$DoY == 354 & df$Hour > 10,]$Year = 2022

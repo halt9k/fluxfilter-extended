@@ -5,7 +5,7 @@ import pytest
 
 import src.helpers.os_helpers  # noqa: F401
 from src.helpers.io_helpers import ensure_empty_dir
-import src.global_mocks as mocks
+import src.ipynb_globals as ig
 
 
 @pytest.fixture
@@ -16,29 +16,15 @@ def use_r_from_python_env():
     os.environ['R_HOME'] = r_folder
 
 
-import src.colab_routines as cr
-cr.workaround_stop_scroll = lambda: None
-
-
 def test_process(use_r_from_python_env):
-    mocks.ias_output_prefix = 'tv_fy4_22-14'
-
-    # do not omit stderr
-    from rpy2 import robjects, rinterface_lib
-    rinterface_lib.callbacks.consolewrite_print = lambda msg: print(msg, end='')
-    rinterface_lib.callbacks.consolewrite_warnerror = lambda msg: print(msg, end='')
-    rinterface_lib.callbacks.showmessage = lambda msg: print(msg, end='')
+    ig.ias_output_prefix = 'tv_fy4_22-14'
 
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
-    import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
+    # import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
 
 
 def test_draw():
-    mocks.out_prefix = 'tv_fy4_2023'
-    # ensure_empty_dir('output/REddyProc')
-    # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/REddyProc', dirs_exist_ok=True)
+    ig.eddy_out_prefix = 'tv_fy4_22-14_2023'
+    # ensure_empty_dir('output/reddyproc')
+    # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/reddyproc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
-
-
-if __name__ == '__main__':
-    test_draw()

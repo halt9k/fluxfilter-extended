@@ -1,3 +1,7 @@
+"""
+Unlike colab_routines.py, this file is expected to be used under local runs too.
+However, output may be auto replaced with text.
+"""
 import io
 from pathlib import Path
 
