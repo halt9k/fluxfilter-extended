@@ -1,12 +1,8 @@
-- log
-- all files to arc
-- fix years 1 day of new year
-- incorrect out prefix
-
 - check TODO everywhere
-- print in R output when saving
+
 Saved plot to: output/reddyproc/TestSiteID_22-23_FP_Reco_DT_uStar.png
 ensure debug R works now, not later
+
 
 - Telegram QA
 
@@ -29,6 +25,7 @@ REddyProc в некоторых случаях сбоит на ustarFiltering, �
 - настроить сравнивалку для блокнотов exe, SO answer, другим
 
 - Commit to RProc fixes? or share notebook
+- random 2 last column output 1.3.3?!
 
 --- LATER
 
