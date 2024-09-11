@@ -6,14 +6,8 @@ from sys import path
 
 """
  This module is intended to be imported before all other user modules.
- Allows to keep imports consistent both when command line start, tests start, etc
-  For example, if sources are organized with working dir . as root:
- ./README.md
- ./run.bat
- ./src/*.py
- ./test/test_main.py
- ./src/helpers/os_helpers.py
- ./data/*
+ Allows to keep consistent imports root src.* when runnning from different dirs. 
+ I.e. cmd */run_main.bat, ./main.py, tests start ./test/test_main.py, etc
 
  Import without warning:
  from src.helpers import os_helpers  # noqa: F401
@@ -41,9 +35,8 @@ def ch_project_root_dir():
     if project_dir not in path:
         path.append(project_dir)
 
-    # Shortfix for R scripts consistency, consider removing later for dynamic tests
     chdir(project_dir)
-    print(f'Working path is changed to {project_dir} \n')
+    print(f'Workaround for R lang "source" command: current dir is changed to {project_dir}.\n')
 
 
 # autorun to make imports more readable
