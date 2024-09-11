@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from src.reddyproc.reddyproc_bridge import run_reddyproc
+from src.reddyproc.reddyproc_bridge import reddyproc_and_postprocess
 from src.ipynb_globals import *
 import src.ipynb_globals as ig
 from src.helpers.io_helpers import ensure_empty_dir
@@ -28,8 +28,9 @@ eddyproc_options = SimpleNamespace(
     temperature_data_variable="Tair",
 
     input_file="REddyProc.txt",
-    output_dir="output/reddyproc"
+    output_dir="output/reddyproc",
+    log_fname_end='_log.txt'
 )
 
 ensure_empty_dir(eddyproc_options.output_dir)
-ig.eddy_out_prefix = run_reddyproc(eddyproc_options)
+ig.eddy_out_prefix = reddyproc_and_postprocess(eddyproc_options)
