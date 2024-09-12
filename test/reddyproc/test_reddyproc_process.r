@@ -17,9 +17,9 @@ test_dir = tempdir()
 eddyproc_user_options <- list(
     site_id = 'TestSiteID',
 
-    is_to_apply_u_star_filtering = TRUE,
+    is_to_apply_u_star_filtering = FALSE,
 
-    u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear")),
+    u_star_seasoning =  factor("WithinYear", levels = c("Continuous", "WithinYear")),
     u_star_method = factor("RTw", levels = "RTw"),
 
     is_bootstrap_u_star = FALSE,
@@ -34,9 +34,10 @@ eddyproc_user_options <- list(
 
     temperature_data_variable = "Tair",
 
-    input_file = "test/reddyproc/test_reddyproc_process_fixtures/3mon_swap_years.txt",
-    # input_file = "REddyProc.txt",
+    # input_file = "test/reddyproc/test_reddyproc_process_fixtures/3mon_swap_years.txt",
     # output_dir = test_dir
+
+    input_file = "REddyProc.txt",
     output_dir = "output/reddyproc"
 )
 
