@@ -8,7 +8,7 @@ from src.ipynb_helpers import display_images
 # Ipynb is not true code, that's excuse for unicode
 OUTPUT_ORDER = (
     "## Тепловые карты",
-    ['FP_NEE_map', 'FP_NEE_uStar_f_map', 'FP_NEE_uStar_f_legend'],
+    ['FP_NEE_map', 'FP_NEE_f_map', 'FP_NEE_f_legend'],
     ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
     ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend'],
     "## Суточный ход",
