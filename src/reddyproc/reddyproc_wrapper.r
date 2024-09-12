@@ -145,10 +145,14 @@ reddyproc_tool_wrapper <- function(eddyproc_config){
 reddyproc_and_postprocess <- function(user_options){
     # combined function to avoid converting output or using global env
 
-    # helps under iptyb or Colab cell
+    # try this in case of output hinders
+    # sink(stdout(), type = "message", split = TRUE)
+
+    # REddyProc web tool uses this
+    options(warn=1)
+
     options(max.print = 80)
-    sink(stdout(), type = "message")
-    message("Info: output of R is redirected to stdout and truncated.")
+    message("Output of R is truncated to improve rpy2 output.")
 
     INPUT_FILE <<- user_options$input_file
     OUTPUT_DIR <<- user_options$output_dir
