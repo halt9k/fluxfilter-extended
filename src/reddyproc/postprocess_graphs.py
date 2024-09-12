@@ -47,7 +47,7 @@ class EddyImgPostProcess():
             fname = replace_fname_end(path, tag, tag + map_postfix)
             map.save(fname)
 
-            if tags_skip_legend and tag not in tags_skip_legend:
+            if tags_skip_legend is None or tag not in tags_skip_legend:
                 fname = replace_fname_end(path, tag, tag + legend_postfix)
                 legend.save(fname)
 
