@@ -1,7 +1,7 @@
 from pathlib import Path
 from types import SimpleNamespace
 from typing import List
-from warnings import warn
+from logging import warning
 
 from IPython.core.display import Markdown
 from IPython.display import display
@@ -57,7 +57,7 @@ class EddyImgPostProcess():
         for merge in merges:
             tp = self.tags_to_img_fnames(merge)
             if len(tp) != 3:
-                warn(f"Cannot merge {merge}, files missing")
+                warning(f"Cannot merge {merge}, files missing")
                 continue
 
             imgs = [Image.open(path) for path in list(tp.values())]
@@ -107,7 +107,7 @@ class EddyImgPostProcess():
             for p in prefixes:
                  if s.startswith(p):
                     return p
-            warn('Unexpected file name start: ' + s)
+            warning('Unexpected file name start: ' + s)
             return s
 
         prefixes_list = list(vars(self.prefixes).values())
