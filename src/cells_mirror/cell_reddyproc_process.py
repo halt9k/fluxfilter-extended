@@ -8,7 +8,7 @@ from src.helpers.io_helpers import ensure_empty_dir
 eddyproc_options = SimpleNamespace(
     site_id=ias_output_prefix,
 
-    is_to_apply_u_star_filtering=True,
+    is_to_apply_u_star_filtering=False,
 
     # uStarSeasoning = "WithinYear", "Continuous" , ...
     u_star_seasoning="Continuous",
