@@ -24,8 +24,6 @@ OUTPUT_ORDER = (
 eipp = EddyImgPostProcess('output/reddyproc', eddy_out_prefix)
 eipp.extract_img_tags(OUTPUT_ORDER)
 
-eipp.display_tag_info()
-
 eipp.prepare_images()
 eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_uStar_f_map', 'FP_NEE_uStar_f_legend'],
                      ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
@@ -33,6 +31,7 @@ eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_uStar_f_map', 'FP_NEE_uStar_f_legend
                     del_postfix='_map', postfix='_all')
 
 no_scroll()
+eipp.display_tag_info()
 display_images(OUTPUT_ORDER, main_path='output/reddyproc', prefix=eddy_out_prefix)
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=eddy_out_prefix + '.zip',
