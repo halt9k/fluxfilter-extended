@@ -16,7 +16,7 @@ from src.ipynb_helpers import display_images
 eipp = EddyImgPostProcess(main_path='output/reddyproc', out_prefix=eddy_out_prefix)
 
 eipp.process_heatmaps(img_tags=['FP_NEE', 'FP_NEE_uStar_f', 'FP_LE', 'FP_LE_f', 'FP_H', 'FP_H_f'],
-                      tags_skip_legend=['FP_NEE', 'FP_LE', 'FP_H'],
+                      tags_skip_legend=['FP_LE', 'FP_H'],
                       map_postfix='_map', legend_postfix='_legend')
 eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_uStar_f_map', 'FP_NEE_uStar_f_legend'],
                     ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
@@ -33,7 +33,7 @@ arc_path = create_archive(dir='output/reddyproc', arc_fname=f'{eddy_out_prefix}.
 # just for the record: unicode in code is mediocre practice
 OUTPUT_ORDER = (
     "## Тепловые карты",
-    ['FP_NEE_map', 'FP_NEE_uStar_f_map', 'FP_NEE_uStar_f_legend'],
+    ['FP_NEE_map', 'FP_NEE_legend'],
     ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
     ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend'],
     "## Суточный ход",
