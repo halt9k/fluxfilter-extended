@@ -2,6 +2,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import List
 from warnings import warn
+
+from IPython.core.display import Markdown
 from IPython.display import display
 
 from PIL import Image
@@ -118,7 +120,7 @@ class EddyImgPostProcess():
             final_print += f'**{tag}** ' if tag in self.requested_tags else tag + ' '
             last_prefix = prefix
 
-        display(final_print  + '\n')
+        display(Markdown(final_print  + '\n'))
 
     def extended_tags_to_raw_tags(self, ex_tags):
         suffixes_list = list(vars(self.suffixes).values())
