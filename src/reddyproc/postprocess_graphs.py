@@ -1,7 +1,7 @@
 from pathlib import Path
 from types import SimpleNamespace
 from typing import List
-from logging import warning
+from warnings import warn
 
 from IPython.core.display import Markdown
 from IPython.display import display
@@ -57,7 +57,7 @@ class EddyImgPostProcess():
         for merge in merges:
             tp = self.tags_to_img_fnames(merge)
             if len(tp) != 3:
-                warning(f"Cannot merge {merge}, files missing")
+                warn(f"Cannot merge {merge}, files missing")
                 continue
 
             imgs = [Image.open(path) for path in list(tp.values())]
@@ -107,20 +107,27 @@ class EddyImgPostProcess():
             for p in prefixes:
                  if s.startswith(p):
                     return p
-            warning('Unexpected file name start: ' + s)
+            warn('Unexpected file name start: ' + s)
             return s
 
+        def bold(s):
+            class PyPrint:
+                BOLD = '\033[1m'
+                END = '\033[0m'
+            return PyPrint.BOLD + s + PyPrint.END
+
         prefixes_list = list(vars(self.prefixes).values())
-        final_print = 'Unused and **used** tags: <br>'
+        final_print = '\nUnused and **used** tags: '
         last_prefix = ''
         for tag in sorted(possible_tags):
             prefix = which_pefix(tag, prefixes_list)
             if last_prefix != prefix:
-                final_print += '<br>'
-            final_print += f'**{tag}** ' if tag in self.requested_extended_tags else tag + ' '
+                final_print += '\n'
+            final_print += bold(tag) if tag in self.requested_extended_tags else tag
+            final_print += ' '
             last_prefix = prefix
 
-        display(Markdown(final_print + '<br>'))
+        print(final_print + '\n')
 
     def extended_tags_to_raw_tags(self, ex_tags):
         suffixes_list = list(vars(self.suffixes).values())
