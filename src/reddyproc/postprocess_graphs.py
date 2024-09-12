@@ -111,7 +111,7 @@ class EddyImgPostProcess():
             return s
 
         prefixes_list = list(vars(self.prefixes).values())
-        final_print = 'All possible and **used** tags: <br>'
+        final_print = 'Unused and **used** tags: <br>'
         last_prefix = ''
         for tag in sorted(possible_tags):
             prefix = which_pefix(tag, prefixes_list)

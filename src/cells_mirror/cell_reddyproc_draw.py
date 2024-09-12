@@ -29,10 +29,12 @@ eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_f_map', 'FP_NEE_f_legend'],
                      ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
                      ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend']],
                     del_postfix='_map', postfix='_all')
-no_scroll()
-eipp.display_tag_info()
-display_images(OUTPUT_ORDER, main_path='output/reddyproc', prefix=eddy_out_prefix)
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=eddy_out_prefix + '.zip',
                           include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eipp.imgs_before_postprocess)
 add_download_button(arc_path, 'Download all images')
+
+no_scroll()
+display_images(OUTPUT_ORDER, main_path='output/reddyproc', prefix=eddy_out_prefix)
+
+eipp.display_tag_info()
