@@ -111,16 +111,16 @@ class EddyImgPostProcess():
             return s
 
         prefixes_list = list(vars(self.prefixes).values())
-        final_print = 'All possible tags: \n'
+        final_print = 'All possible and **used** tags: <br>'
         last_prefix = ''
-        for tag in possible_tags:
+        for tag in sorted(possible_tags):
             prefix = which_pefix(tag, prefixes_list)
             if last_prefix != prefix:
-                final_print += '\n'
-            final_print += f'**{tag}** ' if tag in self.requested_tags else tag + ' '
+                final_print += '<br>'
+            final_print += f'**{tag}** ' if tag in self.requested_extended_tags else tag + ' '
             last_prefix = prefix
 
-        display(Markdown(final_print  + '\n'))
+        display(Markdown(final_print + '<br>'))
 
     def extended_tags_to_raw_tags(self, ex_tags):
         suffixes_list = list(vars(self.suffixes).values())
