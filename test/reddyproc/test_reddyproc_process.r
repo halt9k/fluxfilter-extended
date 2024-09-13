@@ -19,7 +19,7 @@ eddyproc_user_options <- list(
 
     is_to_apply_u_star_filtering = FALSE,
 
-    u_star_seasoning =  factor("WithinYear", levels = c("Continuous", "WithinYear")),
+    u_star_seasoning =  factor("WithinYear", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
 
     is_bootstrap_u_star = FALSE,
