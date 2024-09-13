@@ -22,9 +22,7 @@ eddyproc_all_required_options <- list(
 
     isToApplyUStarFiltering = TRUE,
 
-    # TODO "Continuous" level have only 1 level for factor,
-    # but not verified for other opts
-    uStarSeasoning = factor("Continuous", levels = c("Continuous")),
+    uStarSeasoning = factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
     uStarMethod = factor("RTw", levels = "RTw"),
 
     isBootstrapUStar = FALSE,

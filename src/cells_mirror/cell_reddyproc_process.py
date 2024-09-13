@@ -10,7 +10,7 @@ eddyproc_options = SimpleNamespace(
 
     is_to_apply_u_star_filtering=False,
 
-    # uStarSeasoning = "WithinYear", "Continuous" , ...
+    # uStarSeasoning = "WithinYear", "Continuous" , "User"
     u_star_seasoning="Continuous",
     u_star_method="RTw",
 
