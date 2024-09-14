@@ -1,6 +1,8 @@
 - check TODO  in averaging
 
 - warnings (too much shown in colab) or logging (not shown in colab) ?
+- extend multi-year all graphs
+- prep better txt -> csv test for averaging
 
 - remove year from csv if only one day
 - if ustar was in opts, show ustar; if not - show just _f ?

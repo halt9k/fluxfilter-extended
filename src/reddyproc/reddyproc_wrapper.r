@@ -15,7 +15,6 @@ INPUT_FILE <- NULL
 OUTPUT_DIR <- NULL
 
 
-warning("\nWeb tool uStarSeasoning factor type not verified \n\n")
 # corresponds 06.2024 run
 eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
@@ -36,7 +35,6 @@ eddyproc_all_required_options <- list(
     longitude = 32.6,
     timezone = +3,
 
-    # there is also $temperatureVarName ?
     temperatureDataVariable = "Tair",
 
     isCatchingErrorsEnabled = TRUE,
@@ -143,11 +141,12 @@ reddyproc_tool_wrapper <- function(eddyproc_config){
 reddyproc_and_postprocess <- function(user_options){
     # combined function to avoid converting output or using global env
 
-    # try this in case of output hinders
+    # stderr was missing in rpy2 and this was a fix,
+    # but now stderr and stdout are merged in wrapper
     # sink(stdout(), type = "message", split = TRUE)
 
-    # REddyProc web tool uses this
-    options(warn=1)
+    # display warnings immidiately; REddyProc web tool uses this
+    options(warn = 1)
 
     options(max.print = 80)
     message("Output of R is truncated to improve rpy2 output.")
