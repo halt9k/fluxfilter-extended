@@ -27,7 +27,7 @@ eddyproc_options = SimpleNamespace(
 
     temperature_data_variable="Tair",
 
-    input_file="REddyProc.txt",
+    input_file=r"misc\samples\test_3_years\REddyProc.txt",
     output_dir="output/reddyproc",
     log_fname_end='_log.txt'
 )
