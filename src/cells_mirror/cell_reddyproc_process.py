@@ -8,7 +8,7 @@ from src.helpers.io_helpers import ensure_empty_dir
 eddyproc_options = SimpleNamespace(
     site_id=ias_output_prefix,
 
-    is_to_apply_u_star_filtering=False,
+    is_to_apply_u_star_filtering=True,
 
     # uStarSeasoning = "WithinYear", "Continuous" , "User"
     u_star_seasoning="Continuous",
@@ -26,8 +26,7 @@ eddyproc_options = SimpleNamespace(
     timezone=+3.0,
 
     temperature_data_variable="Tair",
-
-    input_file=r"misc\samples\test_3_years\REddyProc.txt",
+    input_file=r"test\reddyproc\test_reddyproc_process_fixtures\_test_3_years.txt",
     output_dir="output/reddyproc",
     log_fname_end='_log.txt'
 )
