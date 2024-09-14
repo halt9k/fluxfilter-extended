@@ -1,3 +1,4 @@
+import textwrap
 from pathlib import Path
 from types import SimpleNamespace
 from typing import List
@@ -117,7 +118,7 @@ class EddyImgPostProcess():
             return PyPrint.BOLD + s + PyPrint.END
 
         prefixes_list = list(vars(self.prefixes).values())
-        final_print = '\nUnused and **used** tags: '
+        final_print = '\nUnused and ' + bold('used') + ' tags: '
         last_prefix = ''
         for tag in sorted(possible_tags):
             prefix = which_pefix(tag, prefixes_list)
@@ -127,7 +128,7 @@ class EddyImgPostProcess():
             final_print += ' '
             last_prefix = prefix
 
-        print(final_print + '\n')
+        print(textwrap.wrap(final_print + '\n'))
 
     def extended_tags_to_raw_tags(self, ex_tags):
         suffixes_list = list(vars(self.suffixes).values())
