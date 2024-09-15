@@ -8,7 +8,7 @@ from sys import path
  Allows to keep consistent imports root src.* when runnning from different dirs. 
  I.e. cmd */run_main.bat, ./main.py, tests start ./test/test_main.py, etc
 
- Import without warning:
+ Import with autorun of declared functions without warning:
  from src.helpers import os_helpers  # noqa: F401
 """
 
@@ -38,16 +38,21 @@ def ch_project_root_dir():
     print(f'Workaround for R lang "source" command: current dir is changed to {project_dir}.\n')
 
 
-# autorun to make imports more readable
+def set_simple_user_warnings():
+    default_show_warning = warnings.showwarning
+    # logging.captureWarnings(True)
+    # not used yet - replaced with logging.warning for ipynb
+
+    def custom_show_warning(message, category, filename, lineno, file=None, line=None):
+        if category != UserWarning:
+            default_show_warning(message, category, filename, lineno, file, line)
+
+        # print(f'{filename}: {lineno} \n WARNING: {message}')
+        print(f'WARNING: {message}')
+
+    warnings.showwarning = custom_show_warning
+    warnings.simplefilter('always', category=UserWarning)
+
+
+set_simple_user_warnings()
 ch_project_root_dir()
-
-
-def custom_show_warning(message, category, filename, lineno, file=None, line=None):
-    # print(f'{filename}: {lineno} \n WARNING: {message}')
-    print(f'WARNING: {message}')
-
-
-# logging.captureWarnings(True)
-# not used yet - replaced with logging.warning for ipynb
-warnings.simplefilter('always')
-warnings.showwarning = custom_show_warning
