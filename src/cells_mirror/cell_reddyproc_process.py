@@ -5,7 +5,7 @@ from src.ipynb_globals import *
 import src.ipynb_globals as ig
 from src.helpers.io_helpers import ensure_empty_dir
 
-eddyproc_options = SimpleNamespace(
+ig.eddyproc_options = SimpleNamespace(
     site_id=ias_output_prefix,
 
     is_to_apply_u_star_filtering=True,
@@ -31,5 +31,5 @@ eddyproc_options = SimpleNamespace(
     log_fname_end='_log.txt'
 )
 
-ensure_empty_dir(eddyproc_options.output_dir)
-ig.eddy_out_prefix = reddyproc_and_postprocess(eddyproc_options)
+ensure_empty_dir(ig.eddyproc_options.output_dir)
+ig.eddy_out_prefix = reddyproc_and_postprocess(ig.eddyproc_options)

@@ -1,6 +1,6 @@
 - warnings (too much shown in colab) or logging (not shown in colab) ?
-- extend multi-year all graphs
 
+- extend multi-year all graphs
 - if ustar was in opts, show ustar; if not - show just _f ?
 
 - Telegram QA

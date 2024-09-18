@@ -14,97 +14,45 @@ from src.helpers.io_helpers import replace_fname_end
 from src.helpers.io_helpers import tags_to_files, tag_to_fname
 from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images, remove_strip
 
+POSTPROC_SUFFIXES = SimpleNamespace(legend='_legend', map='_map', compact='_compact')
+EDDY_PREFIXES = SimpleNamespace(heat_map='FP_', flux='Flux_', diurnal='DC_', daily_sum='DSum')
 
-class EddyImgPostProcess():
-    suffixes = SimpleNamespace(legend='_legend', map='_map', compact='_compact')
-    prefixes = SimpleNamespace(heat_map='FP_', flux='Flux_', diurnal='DC_', daily_sum='DSum')
 
-    def __init__(self, main_path, out_prefix, img_ext='.png'):
+class EddyImgTagHandler:
+    def __init__(self, main_path, eddy_loc_prefix, img_ext='.png'):
         self.main_path = Path(main_path)
-        self.out_prefix = out_prefix
+        self.loc_prefix = eddy_loc_prefix
         self.img_ext = img_ext
-        self.imgs_before_postprocess: List[Path] = []
-        self.requested_extended_tags: List[str] = []
-        self.requested_tags: List[str] = []
 
     def tag_to_img_fname(self, tag):
-        return tag_to_fname(self.main_path, self.out_prefix, tag, self.img_ext)
+        return tag_to_fname(self.main_path, self.loc_prefix, tag, self.img_ext)
 
     def tags_to_img_fnames(self, tags, exclude_missing=True, warn_if_missing=True):
-        return tags_to_files(self.main_path, self.out_prefix, tags, self.img_ext,
+        return tags_to_files(self.main_path, self.loc_prefix, tags, self.img_ext,
                              exclude_missing, warn_if_missing)
 
-    def process_heatmaps(self, img_tags: List[str], map_postfix: str, legend_postfix: str,
-                         tags_skip_legend: List[str] = None):
-        tp = self.tags_to_img_fnames(img_tags)
+    def extract_raw_img_tags(self, extended_tags):
+        suffixes_list = list(vars(POSTPROC_SUFFIXES).values())
 
-        for tag, path in tp.items():
-            img = Image.open(path)
+        def remove_suffixes(s, suffixes):
+            for sub in suffixes:
+                 s = s.removesuffix(sub)
+            return s
 
-            map, legend, _ = split_image(img, Direction.HORIZONTAL, 3)
-            map = crop_monocolor_borders(map, sides='LR')
-            legend = crop_monocolor_borders(legend, sides='LR')
+        raw_with_dupes = [remove_suffixes(ex_tag, suffixes_list) for ex_tag in extended_tags]
+        raw_tags = list(set(raw_with_dupes))
 
-            fname = replace_fname_end(path, tag, tag + map_postfix)
-            map.save(fname)
+        raw_heatmaps = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.heat_map)]
+        raw_fluxes = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.flux)]
+        raw_diurnal = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.diurnal)]
+        raw_daily = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.daily_sum)]
+        return raw_heatmaps, raw_fluxes, raw_diurnal, raw_daily
 
-            if tags_skip_legend is None or tag not in tags_skip_legend:
-                fname = replace_fname_end(path, tag, tag + legend_postfix)
-                legend.save(fname)
+    def display_tag_info(self, extended_tags):
+        img_names = [Path(path).name for path in Path(self.main_path).glob(self.loc_prefix + '_*' + self.img_ext)]
+        possible_tags = [name.removeprefix(self.loc_prefix + '_').removesuffix(self.img_ext) for name in img_names]
 
-            self.imgs_before_postprocess += [path]
-
-    def merge_heatmaps(self, merges, del_postfix, postfix):
-        for merge in merges:
-            tp = self.tags_to_img_fnames(merge)
-            if len(tp) != 3:
-                warn(f"Cannot merge {merge}, files missing")
-                continue
-
-            imgs = [Image.open(path) for path in list(tp.values())]
-            merged = grid_images(imgs, 3)
-
-            path = tp[merge[1]]
-            tag = merge[1]
-            fname = replace_fname_end(path, tag, tag.replace(del_postfix, '') + postfix)
-            merged.save(fname)
-
-            self.imgs_before_postprocess += list(tp.values())
-
-    def process_fluxes(self, img_tags: List[str], postfix):
-        tp = self.tags_to_img_fnames(img_tags)
-        for tag, path in tp.items():
-            img = Image.open(path)
-
-            title, graph = split_image(img, Direction.VERTICAL, 2)
-            c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
-            fixed = grid_images([c_title, c_graph], 1)
-
-            fname = replace_fname_end(path, tag, tag + postfix)
-            fixed.save(fname)
-
-            self.imgs_before_postprocess += [path]
-
-    def process_diurnal_cycles(self, img_tags: List[str], postfix):
-        tp = self.tags_to_img_fnames(img_tags)
-        for tag, path in tp.items():
-            img = Image.open(path)
-
-            title, g1, g2, g3, g4 = split_image(img, Direction.VERTICAL, 5)
-            c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
-            c_title = crop_monocolor_borders(c_title, sides='TB')
-            fixed = grid_images([c_title, g1, g2, g3, g4], 1)
-
-            fname = replace_fname_end(path, tag, tag + postfix)
-            fixed.save(fname)
-
-            self.imgs_before_postprocess += [path]
-
-    def display_tag_info(self):
-        img_names = [Path(path).name for path in Path(self.main_path).glob(self.out_prefix + '_*' + self.img_ext)]
-        possible_tags = [name.removeprefix(self.out_prefix + '_').removesuffix(self.img_ext) for name in img_names]
-
-        def which_pefix(s, prefixes):
+        def detect_pefix(s, prefixes):
             for p in prefixes:
                  if s.startswith(p):
                     return p
@@ -117,44 +65,149 @@ class EddyImgPostProcess():
                 END = '\033[0m'
             return PyPrint.BOLD + s + PyPrint.END
 
-        prefixes_list = list(vars(self.prefixes).values())
+        prefixes_list = list(vars(EDDY_PREFIXES).values())
         final_print = '\nUnused and ' + bold('used') + ' tags: '
         last_prefix = ''
         for tag in sorted(possible_tags):
-            prefix = which_pefix(tag, prefixes_list)
+            prefix = detect_pefix(tag, prefixes_list)
             if last_prefix != prefix:
                 final_print += '\n'
-            final_print += bold(tag) if tag in self.requested_extended_tags else tag
+            final_print += bold(tag) if tag in extended_tags else tag
             final_print += ' '
             last_prefix = prefix
 
         print(textwrap.wrap(final_print + '\n'))
 
-    def extended_tags_to_raw_tags(self, ex_tags):
-        suffixes_list = list(vars(self.suffixes).values())
 
-        def remove_suffixes(s, suffixes):
-            for sub in suffixes:
-                 s = s.removesuffix(sub)
-            return s
+class EddyImgPostProcess:
+    def __init__(self):
+        self.raw_img_duplicates: List[Path] = []
 
-        return [remove_suffixes(ex_tag, suffixes_list) for ex_tag in ex_tags]
+    def process_heatmap(self, tag, path, map_postfix: str, legend_postfix: str):
+        img = Image.open(path)
 
-    def extract_img_tags(self, output_order):
-        self.requested_extended_tags = [tag for tag_list in output_order if type(tag_list) is list for tag in tag_list]
+        map, legend, _ = split_image(img, Direction.HORIZONTAL, 3)
+        map = crop_monocolor_borders(map, sides='LR')
+        legend = crop_monocolor_borders(legend, sides='LR')
 
-        # may contain duplicates NEE_map NEE_legend
-        requested_tags = self.extended_tags_to_raw_tags(self.requested_extended_tags)
+        fname = replace_fname_end(path, tag, tag + map_postfix)
+        map.save(fname)
 
-        self.requested_tags = list(set(requested_tags))
+        fname = replace_fname_end(path, tag, tag + legend_postfix)
+        legend.save(fname)
+
+        self.raw_img_duplicates += [path]
+
+    def merge_heatmap(self, tag_paths, del_postfix, postfix):
+        if len(tag_paths) != 3:
+            warn(f"Cannot merge {tag_paths.values()}, files missing")
+            return
+
+        paths = tag_paths.values()
+        imgs = [Image.open(path) for path in paths]
+        merged = grid_images(imgs, 3)
+
+        tag = list(tag_paths)[0]
+        path = tag_paths[tag]
+        fname = replace_fname_end(path, tag, tag.replace(del_postfix, '') + postfix)
+        merged.save(fname)
+
+        self.raw_img_duplicates += paths
+
+    def process_flux(self, tag, path, postfix):
+        img = Image.open(path)
+
+        title, graph = split_image(img, Direction.VERTICAL, 2)
+        c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
+        fixed = grid_images([c_title, c_graph], 1)
+
+        fname = replace_fname_end(path, tag, tag + postfix)
+        fixed.save(fname)
+
+        self.raw_img_duplicates += [path]
+
+    def process_diurnal_cycle(self, tag, path, postfix):
+            img = Image.open(path)
+
+            title, g1, g2, g3, g4 = split_image(img, Direction.VERTICAL, 5)
+            c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
+            c_title = crop_monocolor_borders(c_title, sides='TB')
+            fixed = grid_images([c_title, g1, g2, g3, g4], 1)
+
+            fname = replace_fname_end(path, tag, tag + postfix)
+            fixed.save(fname)
+
+            self.raw_img_duplicates += [path]
+
+
+class EddyOutput:
+    # output is declared as auto generated on each run list of image tags
+    # tags mean unique suffixes of image file names,
+    # i.e. for 'tv_fy4_22-14_21-24_FP_Rg_f.png' tag is 'FP_Rg_f'
+    # this allows both default auto-detected order of cell output by this class
+    # or custom order if to declare output list manually in the notebook cell
+    # auto generation is nessesary because order depends on reddyproc options
+
+    def __init__(self, output_sequence, tag_handler):
+        self.output_sequence = output_sequence
+        self.tag_handler = tag_handler
+        self.img_proc = EddyImgPostProcess()
+
+    @staticmethod
+    def default_sequence(is_ustar):
+        # list: row of images, specified by image tag
+        # text: Markdown
+
+        def hmap_compare_row(col_name, suffix):
+            hm, cn, sf = EDDY_PREFIXES.heat_map, col_name, suffix
+            return [f'FP_{cn}_map', f'FP_{cn}_{sf}_map', f'FP_{cn}_{sf}_legend']
+
+        def diurnal_cycle_row(col_name, suffix):
+            # for example, 'DC_NEE_uStar_f_compact'
+            cn, sf = col_name, suffix
+            return [f'DC_{cn}_{sf}_compact']
+
+        def flux_compare_row(col_name, suffix):
+            # for example, ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
+            cn, sf = col_name, suffix
+            return [f'Flux_{cn}_compact', f'Flux_{cn}_{sf}_compact']
+
+        return (
+            "## Тепловые карты",
+            hmap_compare_row('NEE', 'uStar_f' if is_ustar else 'f'),
+            hmap_compare_row('LE', 'f'),
+            hmap_compare_row('H', 'f'),
+            "## Суточный ход",
+            diurnal_cycle_row('NEE', 'uStar_f' if is_ustar else 'f'),
+            diurnal_cycle_row('LE', 'f'),
+            diurnal_cycle_row('H', 'f'),
+            "## 30-минутные потоки",
+            flux_compare_row('NEE', 'uStar_f' if is_ustar else 'f'),
+            flux_compare_row('LE', 'f'),
+            flux_compare_row('H', 'f')
+        )
+
+    def extended_tags(self):
+        # in one list, exclude markdown text
+        return [tag for tag_list in self.output_sequence if type(tag_list) is list for tag in tag_list]
 
     def prepare_images(self):
-        need_heatmaps = [tag for tag in self.requested_tags if tag.startswith(self.prefixes.heat_map)]
-        need_fluxes = [tag for tag in self.requested_tags if tag.startswith(self.prefixes.flux)]
-        need_diurnal = [tag for tag in self.requested_tags if tag.startswith(self.prefixes.diurnal)]
-        need_daily = [tag for tag in self.requested_tags if tag.startswith(self.prefixes.daily_sum)]
+        heatmaps, fluxes, diurnal, daily = self.tag_handler.extract_raw_img_tags(self.extended_tags())
 
-        self.process_heatmaps(img_tags=need_heatmaps, map_postfix='_map', legend_postfix='_legend')
-        self.process_fluxes(img_tags=need_fluxes, postfix='_compact')
-        self.process_diurnal_cycles(img_tags=need_diurnal, postfix='_compact')
+        tp = self.tag_handler.tags_to_img_fnames(heatmaps)
+        for tag, path in tp.items():
+            self.img_proc.process_heatmap(tag, path, map_postfix='_map', legend_postfix='_legend')
 
+        img_rows = [tag_list for tag_list in self.output_sequence if type(tag_list) is list]
+        merges = [row for row in img_rows if row[0].startswith(EDDY_PREFIXES.heat_map) ]
+        for merge in merges:
+            tp = self.tag_handler.tags_to_img_fnames(merge)
+            self.img_proc.merge_heatmap(tp, del_postfix='_map', postfix='_all')
+
+        tp = self.tag_handler.tags_to_img_fnames(fluxes)
+        for tag, path in tp.items():
+            self.img_proc.process_flux(tag, path, postfix='_compact')
+
+        tp = self.tag_handler.tags_to_img_fnames(diurnal)
+        for tag, path in tp.items():
+            self.img_proc.process_diurnal_cycle(tag, path, postfix='_compact')
