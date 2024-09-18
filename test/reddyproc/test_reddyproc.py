@@ -1,6 +1,8 @@
 import shutil
 from pathlib import Path
 import os, sys
+from types import SimpleNamespace
+
 import pytest
 
 import src.helpers.os_helpers  # noqa: F401
@@ -24,7 +26,10 @@ def test_process(use_r_from_python_env):
 
 
 def test_draw():
-    ig.eddy_out_prefix = 'tv_fy4_22-14_2023'
+    ig.eddyproc_options = SimpleNamespace(is_to_apply_u_star_filtering=True)
+    ig.eddy_out_prefix = 'tv_fy4_22-14_21-24'
     # ensure_empty_dir('output/reddyproc')
     # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/reddyproc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
+
+

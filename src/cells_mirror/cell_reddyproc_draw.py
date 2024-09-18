@@ -1,40 +1,25 @@
-
 from src.ipynb_globals import *
 from src.reddyproc.postprocess import create_archive
-from src.reddyproc.postprocess_graphs import EddyImgPostProcess
+from src.reddyproc.postprocess_graphs import EddyOutput, EddyImgTagHandler
 from src.colab_routines import add_download_button, no_scroll
 from src.ipynb_helpers import display_images
 
-# Ipynb is not true code, that's excuse for unicode
-OUTPUT_ORDER = (
-    "## Тепловые карты",
-    ['FP_NEE_map', 'FP_NEE_f_map', 'FP_NEE_f_legend'],
-    ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
-    ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend'],
-    "## Суточный ход",
-    ['DC_NEE_uStar_f_compact'],
-    ['DC_LE_f_compact'],
-    ['DC_H_f_compact'],
-    "## 30-минутные потоки",
-    ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
-    ['Flux_LE_compact', 'Flux_LE_f_compact'],
-    ['Flux_H_compact', 'Flux_H_f_compact']
-)
+output_sequence = EddyOutput.default_sequence(is_ustar=eddyproc_options.is_to_apply_u_star_filtering)
+# possible to modify or replace output_sequence for output customization
+# output_sequence[3] = []
 
-eipp = EddyImgPostProcess('output/reddyproc', eddy_out_prefix)
-eipp.extract_img_tags(OUTPUT_ORDER)
-
-eipp.prepare_images()
-eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_f_map', 'FP_NEE_f_legend'],
-                     ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
-                     ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend']],
-                    del_postfix='_map', postfix='_all')
+tag_handler = EddyImgTagHandler(main_path='output/reddyproc',
+                                eddy_loc_prefix=eddy_out_prefix, img_ext='.png')
+eio = EddyOutput(output_sequence=output_sequence,
+                 tag_handler=tag_handler)
+eio.prepare_images()
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=eddy_out_prefix + '.zip',
-                          include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eipp.imgs_before_postprocess)
+                          include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eio.img_proc.raw_img_duplicates)
 add_download_button(arc_path, 'Download all images')
 
 no_scroll()
-display_images(OUTPUT_ORDER, main_path='output/reddyproc', prefix=eddy_out_prefix)
+# TODO move to class?
+display_images(output_sequence, main_path='output/reddyproc', prefix=eddy_out_prefix)
 
-eipp.display_tag_info()
+tag_handler.display_tag_info(eio.extended_tags())
