@@ -4,9 +4,22 @@ from src.reddyproc.postprocess_graphs import EddyOutput, EddyImgTagHandler
 from src.colab_routines import add_download_button, no_scroll
 from src.ipynb_helpers import display_images
 
-output_sequence = EddyOutput.default_sequence(is_ustar=eddyproc_options.is_to_apply_u_star_filtering)
-# possible to modify or replace output_sequence for output customization
-# output_sequence[3] = []
+is_ustar = eddyproc_options.is_to_apply_u_star_filtering
+usuffix = 'uStar_f' if is_ustar else 'f'
+output_sequence = (
+    "## Тепловые карты",
+    EddyOutput.hmap_compare_row('NEE', usuffix),
+    EddyOutput.hmap_compare_row('LE', 'f'),
+    EddyOutput.hmap_compare_row('H', 'f'),
+    "## Суточный ход",
+    EddyOutput.diurnal_cycle_row('NEE', usuffix),
+    EddyOutput.diurnal_cycle_row('LE', 'f'),
+    EddyOutput.diurnal_cycle_row('H', 'f'),
+    "## 30-минутные потоки",
+    EddyOutput.flux_compare_row('NEE', usuffix),
+    EddyOutput.flux_compare_row('LE', 'f'),
+    EddyOutput.flux_compare_row('H', 'f')
+)
 
 tag_handler = EddyImgTagHandler(main_path='output/reddyproc',
                                 eddy_loc_prefix=eddy_out_prefix, img_ext='.png')

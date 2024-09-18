@@ -15,7 +15,7 @@ from src.helpers.io_helpers import tags_to_files, tag_to_fname
 from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images, remove_strip
 
 POSTPROC_SUFFIXES = SimpleNamespace(legend='_legend', map='_map', compact='_compact')
-EDDY_PREFIXES = SimpleNamespace(heat_map='FP_', flux='Flux_', diurnal='DC_', daily_sum='DSum')
+EDDY_PREFIXES = SimpleNamespace(heat_map='FP', flux='Flux', diurnal='DC', daily_sum='DSum', daily_sumu='DSumU')
 
 
 class EddyImgTagHandler:
@@ -42,41 +42,44 @@ class EddyImgTagHandler:
         raw_with_dupes = [remove_suffixes(ex_tag, suffixes_list) for ex_tag in extended_tags]
         raw_tags = list(set(raw_with_dupes))
 
-        raw_heatmaps = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.heat_map)]
-        raw_fluxes = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.flux)]
-        raw_diurnal = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.diurnal)]
-        raw_daily = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.daily_sum)]
+        raw_heatmaps = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.heat_map + '_')]
+        raw_fluxes = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.flux + '_')]
+        raw_diurnal = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.diurnal + '_')]
+        raw_daily = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.daily_sum + '_')]
         return raw_heatmaps, raw_fluxes, raw_diurnal, raw_daily
 
     def display_tag_info(self, extended_tags):
         img_names = [Path(path).name for path in Path(self.main_path).glob(self.loc_prefix + '_*' + self.img_ext)]
         possible_tags = [name.removeprefix(self.loc_prefix + '_').removesuffix(self.img_ext) for name in img_names]
 
-        def detect_pefix(s, prefixes):
-            for p in prefixes:
-                 if s.startswith(p):
-                    return p
-            warn('Unexpected file name start: ' + s)
+        def detect_prefix(s, prefixes):
+            s = tag.partition('_')[0]
+            if s not in prefixes:
+                warn('Unexpected file name start: ' + s)
             return s
 
-        def bold(s):
-            class PyPrint:
-                BOLD = '\033[1m'
-                END = '\033[0m'
-            return PyPrint.BOLD + s + PyPrint.END
+        class PyPrint:
+            BOLD = '\033[1m'
+            END = '\033[0m'
 
         prefixes_list = list(vars(EDDY_PREFIXES).values())
-        final_print = '\nUnused and ' + bold('used') + ' tags: '
+        final_print = '\nUnused and ' + '[used]' + ' tags: '
         last_prefix = ''
         for tag in sorted(possible_tags):
-            prefix = detect_pefix(tag, prefixes_list)
+            prefix = detect_prefix(tag, prefixes_list)
             if last_prefix != prefix:
-                final_print += '\n'
-            final_print += bold(tag) if tag in extended_tags else tag
+                final_print += '\n\n'
+            final_print += f'[{tag}]' if tag in extended_tags else tag
             final_print += ' '
             last_prefix = prefix
 
-        print(textwrap.wrap(final_print + '\n'))
+        lines = textwrap.wrap(final_print + '\n', replace_whitespace=False,
+                              break_long_words=False)
+        for line in lines:
+            repl = line.replace('[', PyPrint.BOLD).replace(']', PyPrint.END)
+            print(repl)
+
+
 
 
 class EddyImgPostProcess:
@@ -154,38 +157,21 @@ class EddyOutput:
         self.img_proc = EddyImgPostProcess()
 
     @staticmethod
-    def default_sequence(is_ustar):
-        # list: row of images, specified by image tag
-        # text: Markdown
+    def hmap_compare_row(col_name, suffix):
+        fp, cn, sf = EDDY_PREFIXES.heat_map, col_name, suffix
+        return [f'{fp}_{cn}_map', f'{fp}_{cn}_{sf}_map', f'{fp}_{cn}_{sf}_legend']
 
-        def hmap_compare_row(col_name, suffix):
-            hm, cn, sf = EDDY_PREFIXES.heat_map, col_name, suffix
-            return [f'FP_{cn}_map', f'FP_{cn}_{sf}_map', f'FP_{cn}_{sf}_legend']
+    @staticmethod
+    def diurnal_cycle_row(col_name, suffix):
+        # for example, 'DC_NEE_uStar_f_compact'
+        dc, cn, sf = EDDY_PREFIXES.diurnal, col_name, suffix
+        return [f'{dc}_{cn}_{sf}_compact']
 
-        def diurnal_cycle_row(col_name, suffix):
-            # for example, 'DC_NEE_uStar_f_compact'
-            cn, sf = col_name, suffix
-            return [f'DC_{cn}_{sf}_compact']
-
-        def flux_compare_row(col_name, suffix):
-            # for example, ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
-            cn, sf = col_name, suffix
-            return [f'Flux_{cn}_compact', f'Flux_{cn}_{sf}_compact']
-
-        return (
-            "## Тепловые карты",
-            hmap_compare_row('NEE', 'uStar_f' if is_ustar else 'f'),
-            hmap_compare_row('LE', 'f'),
-            hmap_compare_row('H', 'f'),
-            "## Суточный ход",
-            diurnal_cycle_row('NEE', 'uStar_f' if is_ustar else 'f'),
-            diurnal_cycle_row('LE', 'f'),
-            diurnal_cycle_row('H', 'f'),
-            "## 30-минутные потоки",
-            flux_compare_row('NEE', 'uStar_f' if is_ustar else 'f'),
-            flux_compare_row('LE', 'f'),
-            flux_compare_row('H', 'f')
-        )
+    @staticmethod
+    def flux_compare_row(col_name, suffix):
+        # for example, ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
+        fl, cn, sf = EDDY_PREFIXES.flux, col_name, suffix
+        return [f'{fl}_{cn}_compact', f'{fl}_{cn}_{sf}_compact']
 
     def extended_tags(self):
         # in one list, exclude markdown text
