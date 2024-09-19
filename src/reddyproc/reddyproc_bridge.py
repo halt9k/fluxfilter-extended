@@ -37,11 +37,14 @@ def reddyproc_and_postprocess(eddy_options):
         func_run_web_tool = ro.globalenv['reddyproc_and_postprocess']
 
         res = func_run_web_tool(user_options=reddyproc_r_options)
+        # [0][0] eproc_info, [1][0] out_prefix
 
-    # StrVector to python string
-    r_fnames_suffix = res[0]
+    assert type(res[0][2]) is ro.FloatVector and type(res[0][3]) is ro.FloatVector
+    year_start, year_end = int(res[0][2][0]), int(res[0][3][0])
+    assert type(res[1]) is ro.StrVector
+    fnames_prefix = res[1][0]
 
-    new_path = draft_log_name.parent / draft_log_name.name.replace(err_prefix, r_fnames_suffix)
+    new_path = draft_log_name.parent / draft_log_name.name.replace(err_prefix, fnames_prefix)
     draft_log_name.rename(new_path)
 
-    return r_fnames_suffix
+    return year_start, year_end, fnames_prefix
