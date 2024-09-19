@@ -5,7 +5,8 @@ However, output may be auto replaced with text.
 import io
 from pathlib import Path
 
-from IPython.display import Markdown, display
+from IPython import get_ipython
+from IPython.display import Markdown, HTML, display
 from PIL import Image
 from ipywidgets import widgets, HBox
 
@@ -19,3 +20,28 @@ def display_image_row(paths):
 
     hbox = HBox(img_widgets)
     display(hbox)
+
+
+def ipython_only(func):
+    def wrapper(*args, **kwargs):
+        if get_ipython():
+            return func(*args, **kwargs)
+        else:
+            print(f"IPython env not detected. {func.__name__} is skipped by design.")
+            return None
+
+    return wrapper
+
+
+@ipython_only
+def word_wrap():
+    def set_css(*args, **kwargs):
+        display(HTML('''
+        <style>
+            pre {
+                white-space: pre-wrap;
+            }
+        </style>
+        '''))
+
+    get_ipython().events.register('pre_run_cell', set_css)
