@@ -1,4 +1,5 @@
 import textwrap
+from enum import Enum
 from pathlib import Path
 from types import SimpleNamespace
 from typing import List
@@ -10,12 +11,13 @@ from IPython.display import display
 from PIL import Image
 
 import src.helpers.os_helpers  # noqa: F401
+from src.ipynb_helpers import display_image_row
 from src.helpers.io_helpers import replace_fname_end
 from src.helpers.io_helpers import tags_to_files, tag_to_fname
 from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images, remove_strip
 
-POSTPROC_SUFFIXES = SimpleNamespace(legend='_legend', map='_map', compact='_compact')
-EDDY_PREFIXES = SimpleNamespace(heat_map='FP', flux='Flux', diurnal='DC', daily_sum='DSum', daily_sumu='DSumU')
+PostProcSuffixes = SimpleNamespace(LEGEND='_legend', MAP='_map', COMPACT='_compact')
+EddyPrefixes = SimpleNamespace(HEAT_MAP='FP', FLUX='Flux', DIURNAL='DC', DAILY_SUM='DSum', DAILY_SUMU='DSumU')
 
 
 class EddyImgTagHandler:
@@ -32,20 +34,20 @@ class EddyImgTagHandler:
                              exclude_missing, warn_if_missing)
 
     def extract_raw_img_tags(self, extended_tags):
-        suffixes_list = list(vars(POSTPROC_SUFFIXES).values())
+        suffixes_list = list(vars(PostProcSuffixes).values())
 
         def remove_suffixes(s, suffixes):
             for sub in suffixes:
-                 s = s.removesuffix(sub)
+                s = s.removesuffix(sub)
             return s
 
         raw_with_dupes = [remove_suffixes(ex_tag, suffixes_list) for ex_tag in extended_tags]
         raw_tags = list(set(raw_with_dupes))
 
-        raw_heatmaps = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.heat_map + '_')]
-        raw_fluxes = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.flux + '_')]
-        raw_diurnal = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.diurnal + '_')]
-        raw_daily = [tag for tag in raw_tags if tag.startswith(EDDY_PREFIXES.daily_sum + '_')]
+        raw_heatmaps = [tag for tag in raw_tags if tag.startswith(EddyPrefixes.HEAT_MAP + '_')]
+        raw_fluxes = [tag for tag in raw_tags if tag.startswith(EddyPrefixes.FLUX + '_')]
+        raw_diurnal = [tag for tag in raw_tags if tag.startswith(EddyPrefixes.DIURNAL + '_')]
+        raw_daily = [tag for tag in raw_tags if tag.startswith(EddyPrefixes.DAILY_SUM + '_')]
         return raw_heatmaps, raw_fluxes, raw_diurnal, raw_daily
 
     def display_tag_info(self, extended_tags):
@@ -58,11 +60,7 @@ class EddyImgTagHandler:
                 warn('Unexpected file name start: ' + s)
             return s
 
-        class PyPrint:
-            BOLD = '\033[1m'
-            END = '\033[0m'
-
-        prefixes_list = list(vars(EDDY_PREFIXES).values())
+        prefixes_list = list(vars(EddyPrefixes).values())
         final_print = '\nUnused and ' + '[used]' + ' tags: '
         last_prefix = ''
         for tag in sorted(possible_tags):
@@ -75,11 +73,14 @@ class EddyImgTagHandler:
 
         lines = textwrap.wrap(final_print + '\n', replace_whitespace=False,
                               break_long_words=False)
+
+        class PyPrint:
+            BOLD = '\033[1m'
+            END = '\033[0m'
+
         for line in lines:
             repl = line.replace('[', PyPrint.BOLD).replace(']', PyPrint.END)
             print(repl)
-
-
 
 
 class EddyImgPostProcess:
@@ -130,17 +131,17 @@ class EddyImgPostProcess:
         self.raw_img_duplicates += [path]
 
     def process_diurnal_cycle(self, tag, path, postfix):
-            img = Image.open(path)
+        img = Image.open(path)
 
-            title, g1, g2, g3, g4 = split_image(img, Direction.VERTICAL, 5)
-            c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
-            c_title = crop_monocolor_borders(c_title, sides='TB')
-            fixed = grid_images([c_title, g1, g2, g3, g4], 1)
+        title, g1, g2, g3, g4 = split_image(img, Direction.VERTICAL, 5)
+        c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
+        c_title = crop_monocolor_borders(c_title, sides='TB')
+        fixed = grid_images([c_title, g1, g2, g3, g4], 1)
 
-            fname = replace_fname_end(path, tag, tag + postfix)
-            fixed.save(fname)
+        fname = replace_fname_end(path, tag, tag + postfix)
+        fixed.save(fname)
 
-            self.raw_img_duplicates += [path]
+        self.raw_img_duplicates += [path]
 
 
 class EddyOutput:
@@ -158,19 +159,19 @@ class EddyOutput:
 
     @staticmethod
     def hmap_compare_row(col_name, suffix):
-        fp, cn, sf = EDDY_PREFIXES.heat_map, col_name, suffix
+        fp, cn, sf = EddyPrefixes.HEAT_MAP, col_name, suffix
         return [f'{fp}_{cn}_map', f'{fp}_{cn}_{sf}_map', f'{fp}_{cn}_{sf}_legend']
 
     @staticmethod
     def diurnal_cycle_row(col_name, suffix):
         # for example, 'DC_NEE_uStar_f_compact'
-        dc, cn, sf = EDDY_PREFIXES.diurnal, col_name, suffix
+        dc, cn, sf = EddyPrefixes.DIURNAL, col_name, suffix
         return [f'{dc}_{cn}_{sf}_compact']
 
     @staticmethod
     def flux_compare_row(col_name, suffix):
         # for example, ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
-        fl, cn, sf = EDDY_PREFIXES.flux, col_name, suffix
+        fl, cn, sf = EddyPrefixes.FLUX, col_name, suffix
         return [f'{fl}_{cn}_compact', f'{fl}_{cn}_{sf}_compact']
 
     def extended_tags(self):
@@ -185,7 +186,7 @@ class EddyOutput:
             self.img_proc.process_heatmap(tag, path, map_postfix='_map', legend_postfix='_legend')
 
         img_rows = [tag_list for tag_list in self.output_sequence if type(tag_list) is list]
-        merges = [row for row in img_rows if row[0].startswith(EDDY_PREFIXES.heat_map) ]
+        merges = [row for row in img_rows if row[0].startswith(EddyPrefixes.HEAT_MAP)]
         for merge in merges:
             tp = self.tag_handler.tags_to_img_fnames(merge)
             self.img_proc.merge_heatmap(tp, del_postfix='_map', postfix='_all')
@@ -197,3 +198,14 @@ class EddyOutput:
         tp = self.tag_handler.tags_to_img_fnames(diurnal)
         for tag, path in tp.items():
             self.img_proc.process_diurnal_cycle(tag, path, postfix='_compact')
+
+    def display_images(self):
+        for output_step in self.output_sequence:
+            if type(output_step) is str:
+                title_text = output_step
+                display(Markdown(title_text))
+            elif type(output_step) is list:
+                paths = self.tag_handler.tags_to_img_fnames(output_step)
+                display_image_row(list(paths.values()))
+            else:
+                raise Exception("Wrong OUTPUT_HEADERS contents")
