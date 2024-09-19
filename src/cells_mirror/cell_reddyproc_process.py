@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 
+from src.ipynb_helpers import word_wrap
 from src.reddyproc.reddyproc_bridge import reddyproc_and_postprocess
 from src.ipynb_globals import *
 import src.ipynb_globals as ig
@@ -32,4 +33,6 @@ ig.eddyproc_options = SimpleNamespace(
 )
 
 ensure_empty_dir(ig.eddyproc_options.output_dir)
+
+word_wrap()
 ig.eddy_out_prefix = reddyproc_and_postprocess(ig.eddyproc_options)
