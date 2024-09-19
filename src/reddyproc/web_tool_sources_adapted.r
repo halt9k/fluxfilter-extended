@@ -413,5 +413,5 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, ou
     list(mode = encodeEddyProcTasks(eddyProcConfiguration), inputSize = paste(dim(inputData), collapse = ","), err = caught_error,
         EProc = EProc)
 
-    return(list(df_output,  EProc$sINFO$Y.NAME))
+    return(list(df_output,  EProc$sINFO))
 }
