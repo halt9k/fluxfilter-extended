@@ -130,10 +130,11 @@ reddyproc_tool_wrapper <- function(eddyproc_config){
                            outputFileName = output_file,
                            figureFormat = tools::file_ext(EDDY_IMAGES_EXT))
 
-    # res: [df_output, years_str]
-    out_prefix <<- paste0(eddyproc_config$siteId, '_' , res[[2]])
+    # res: [df_output, EProc$sINFO]
+    out_prefix <- paste0(eddyproc_config$siteId, '_' , res[[2]]$Y.NAME)
     file.rename(output_file, add_file_prefix(output_file, out_prefix))
 
+    # [df_output, EProc$sINFO, out_prefix]
 	return(append(res, out_prefix))
 }
 
@@ -166,12 +167,13 @@ reddyproc_and_postprocess <- function(user_options){
 
 
     res <- reddyproc_tool_wrapper(eddyproc_config)
-    # res: [df_output, years_str, out_prefix]
+    # res: [df_output, EProc$sINFO, out_prefix]
+    eproc_info <- res[[2]]
     out_prefix <- res[[3]]
 
     # processEddyData guaranteed to output equi-time-distant series
     dfs = calc_averages(res[[1]])
     save_averages(dfs, OUTPUT_DIR, out_prefix, STATS_FNAME_EXT)
 
-    return(out_prefix)
+    return(list(eproc_info, out_prefix))
 }
