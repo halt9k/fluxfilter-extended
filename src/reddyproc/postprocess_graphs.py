@@ -61,7 +61,7 @@ class EddyImgTagHandler:
             return s
 
         prefixes_list = list(vars(EddyPrefixes).values())
-        final_print = '\nUnused and ' + '[used]' + ' tags: '
+        final_print = '\nUnused and ' + '[used]' + ' tags in output_sequence: '
         last_prefix = ''
         for tag in sorted(possible_tags):
             prefix = detect_prefix(tag, prefixes_list)
