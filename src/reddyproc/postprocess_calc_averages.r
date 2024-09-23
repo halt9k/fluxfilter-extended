@@ -129,7 +129,7 @@ calc_averages <- function(df_full){
     df_m <- merge_cols_aligning(df_means_m, df_nna_m, unique_cols_m, align_pair = c('*_f$', '*_sqc$'))
     df_y <- merge_cols_aligning(df_means_y, df_nna_y, unique_cols_y, align_pair = c('*_f$', '*_sqc$'))
 
-    return(list(df_d, df_m, df_y))
+    return(list(daily = df_d, monthly = df_m, yearly = df_y))
 }
 
 
@@ -139,9 +139,9 @@ save_averages <- function(dfs, output_dir, output_unmask, ext){
     m_name <- paste0(prename, '_monthly', ext)
     y_name <- paste0(prename, '_yearly', ext)
 
-    write.csv(dfs[[1]], file = d_name, row.names = FALSE)
-    write.csv(dfs[[2]], file = m_name, row.names = FALSE)
-    write.csv(dfs[[3]], file = y_name, row.names = FALSE)
+    write.csv(dfs$daily, file = d_name, row.names = FALSE)
+    write.csv(dfs$monthly, file = m_name, row.names = FALSE)
+    write.csv(dfs$yearly, file = y_name, row.names = FALSE)
 
     cat(sprintf('Saved summary stats to : \n %s \n %s \n %s \n',
                 d_name, m_name, y_name))
