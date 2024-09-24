@@ -14,7 +14,8 @@ import src.helpers.os_helpers  # noqa: F401
 from src.ipynb_helpers import display_image_row
 from src.helpers.io_helpers import replace_fname_end
 from src.helpers.io_helpers import tags_to_files, tag_to_fname
-from src.helpers.image_tools import crop_monocolor_borders, split_image, Direction, grid_images, remove_strip
+from src.helpers.image_tools import crop_monocolor_borders, Direction, grid_images, remove_strip, \
+    ungrid_image
 
 PostProcSuffixes = SimpleNamespace(LEGEND='_legend', MAP='_map', COMPACT='_compact')
 EddyPrefixes = SimpleNamespace(HEAT_MAP='FP', FLUX='Flux', DIURNAL='DC', DAILY_SUM='DSum', DAILY_SUMU='DSumU')
@@ -84,21 +85,34 @@ class EddyImgTagHandler:
 
 
 class EddyImgPostProcess:
-    def __init__(self):
+    def __init__(self, total_years):
+        self.total_years = total_years
         self.raw_img_duplicates: List[Path] = []
+
+    def ungrid_heatmap(self, img):
+        tile_count = self.total_years + 1
+        row_count = (tile_count - 1) // 3 + 1
+        tiles_2d = ungrid_image(img, nx=3, ny=row_count)
+        assert len(tiles_2d) == 3 and len(tiles_2d[0]) == row_count
+
+        tiles_ordered = [elem for row in tiles_2d for elem in row]
+        legend_tile = tiles_ordered[tile_count - 1]
+
+        year_tiles_stacked_vertically = grid_images(tiles_ordered[0: tile_count - 1], max_horiz=1)
+        return year_tiles_stacked_vertically, legend_tile
 
     def process_heatmap(self, tag, path, map_postfix: str, legend_postfix: str):
         img = Image.open(path)
 
-        map, legend, _ = split_image(img, Direction.HORIZONTAL, 3)
-        map = crop_monocolor_borders(map, sides='LR')
-        legend = crop_monocolor_borders(legend, sides='LR')
+        maps, legends = self.ungrid_heatmap(img)
+        cmap = crop_monocolor_borders(maps, sides='LR')
+        clegend = crop_monocolor_borders(legends, sides='LR')
 
         fname = replace_fname_end(path, tag, tag + map_postfix)
-        map.save(fname)
+        cmap.save(fname)
 
         fname = replace_fname_end(path, tag, tag + legend_postfix)
-        legend.save(fname)
+        clegend.save(fname)
 
         self.raw_img_duplicates += [path]
 
@@ -121,7 +135,7 @@ class EddyImgPostProcess:
     def process_flux(self, tag, path, postfix):
         img = Image.open(path)
 
-        title, graph = split_image(img, Direction.VERTICAL, 2)
+        title, graph = ungrid_image(img, ny=2, flatten=True)
         c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
         fixed = grid_images([c_title, c_graph], 1)
 
@@ -133,7 +147,7 @@ class EddyImgPostProcess:
     def process_diurnal_cycle(self, tag, path, postfix):
         img = Image.open(path)
 
-        title, g1, g2, g3, g4 = split_image(img, Direction.VERTICAL, 5)
+        title, g1, g2, g3, g4 = ungrid_image(img, ny=5, flatten=True)
         c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
         c_title = crop_monocolor_borders(c_title, sides='TB')
         fixed = grid_images([c_title, g1, g2, g3, g4], 1)
@@ -152,10 +166,13 @@ class EddyOutput:
     # or custom order if to declare output list manually in the notebook cell
     # auto generation is nessesary because order depends on reddyproc options
 
-    def __init__(self, output_sequence, tag_handler):
+    def __init__(self, output_sequence, tag_handler, out_info):
         self.output_sequence = output_sequence
         self.tag_handler = tag_handler
-        self.img_proc = EddyImgPostProcess()
+
+        total_years = out_info.end_year - out_info.start_year + 1
+        assert total_years > 0
+        self.img_proc = EddyImgPostProcess(total_years)
 
     @staticmethod
     def hmap_compare_row(col_name, suffix):
