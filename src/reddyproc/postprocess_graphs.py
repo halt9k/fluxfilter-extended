@@ -99,7 +99,16 @@ class EddyImgPostProcess:
         legend_tile = tiles_ordered[tile_count - 1]
 
         year_tiles_stacked_vertically = grid_images(tiles_ordered[0: tile_count - 1], max_horiz=1)
-        return year_tiles_stacked_vertically, legend_tile
+        # just a copy of same legend
+        legend_tiles_stacked_vertically = grid_images([legend_tile] * (tile_count - 1), max_horiz=1)
+        return year_tiles_stacked_vertically, legend_tiles_stacked_vertically
+
+    def compact_title_row(self, img, row_count):
+        rows = ungrid_image(img, ny=row_count, flatten=True)
+        title = remove_strip(rows[0], Direction.HORIZONTAL, 0.5)
+        c_title = crop_monocolor_borders(title, sides='TB')
+        fixed = grid_images([c_title] + rows[1: row_count], 1)
+        return fixed
 
     def process_heatmap(self, tag, path, map_postfix: str, legend_postfix: str):
         img = Image.open(path)
@@ -134,11 +143,7 @@ class EddyImgPostProcess:
 
     def process_flux(self, tag, path, postfix):
         img = Image.open(path)
-
-        title, graph = ungrid_image(img, ny=2, flatten=True)
-        c_title, c_graph = crop_monocolor_borders(title, sides='TB'), crop_monocolor_borders(graph, sides='TB')
-        fixed = grid_images([c_title, c_graph], 1)
-
+        fixed = self.compact_title_row(img, self.total_years + 1)
         fname = replace_fname_end(path, tag, tag + postfix)
         fixed.save(fname)
 
@@ -146,12 +151,7 @@ class EddyImgPostProcess:
 
     def process_diurnal_cycle(self, tag, path, postfix):
         img = Image.open(path)
-
-        title, g1, g2, g3, g4 = ungrid_image(img, ny=5, flatten=True)
-        c_title = remove_strip(title, Direction.HORIZONTAL, 0.5)
-        c_title = crop_monocolor_borders(c_title, sides='TB')
-        fixed = grid_images([c_title, g1, g2, g3, g4], 1)
-
+        fixed = self.compact_title_row(img, 5)
         fname = replace_fname_end(path, tag, tag + postfix)
         fixed.save(fname)
 
