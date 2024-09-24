@@ -30,9 +30,9 @@ def test_draw():
     ig.eddyproc = SimpleNamespace()
     ig.eddyproc.out_info = SimpleNamespace()
     ig.eddyproc.options = SimpleNamespace(is_to_apply_u_star_filtering=False)
-    ig.eddyproc.out_info.fnames_prefix = 'tv_fy4_22-14_22-23'
-    ig.eddyproc.out_info.start_year = 2022
-    ig.eddyproc.out_info.end_year = 2023
+    ig.eddyproc.out_info.fnames_prefix = 'tv_fy4_22-14_21-24'
+    ig.eddyproc.out_info.start_year = 2021
+    ig.eddyproc.out_info.end_year = 2024
     # ensure_empty_dir('output/reddyproc')
     # shutil.copytree('test/reddyproc/test_reddyproc_process/output_sample', 'output/reddyproc', dirs_exist_ok=True)
     import src.cells_mirror.cell_reddyproc_draw  # noqa: F401

@@ -58,20 +58,20 @@ def split_image(img: Image, direction: Direction, n):
 
 
 def ungrid_image(img: PIL.Image, nx=1, ny=1, flatten=False):
-    """ Without flatten=True return indices order is [tile_x][tile_y] """
+    """  Without flatten=True returns row major [tile_j][tile_i]: PIL.Image """
 
     w, h = img.size
     assert w >= nx > 0 and h >= ny > 0
     cw, ch = w // nx, h // ny
 
     if w % nx != 0 or h % ny != 0:
-        warn('Unexpected image size for pixel-perfect subdivision.')
+        warn('Unexpected image size for pixel-perfect subdivision. Tiles will match cropped source image.')
 
     def box(i, j):
         # left, top, right, bottom for (i, j) tile
         return i * cw, j * ch, (i + 1) * cw, (j + 1) * ch
 
-    res = [[img.crop(box(i, j)) for j in range(ny)] for i in range(nx)]
+    res = [[img.crop(box(i, j)) for i in range(nx)] for j in range(ny)]
     return list(itertools.chain.from_iterable(res)) if flatten else res
 
 

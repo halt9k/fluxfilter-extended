@@ -8,7 +8,7 @@ ig.eddyproc = SimpleNamespace()
 ig.eddyproc.options = SimpleNamespace(
     site_id=ias_output_prefix,
 
-    is_to_apply_u_star_filtering=False,
+    is_to_apply_u_star_filtering=True,
 
     # uStarSeasoning = "WithinYear", "Continuous" , "User"
     u_star_seasoning="Continuous",
@@ -27,7 +27,6 @@ ig.eddyproc.options = SimpleNamespace(
 
     temperature_data_variable="Tair",
 
-    # input_file=r"test\reddyproc\test_reddyproc_process_fixtures\_test_3_years.txt"
     input_file=r"REddyProc.txt",
     output_dir="output/reddyproc",
     log_fname_end='_log.txt'

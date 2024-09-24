@@ -93,7 +93,7 @@ class EddyImgPostProcess:
         tile_count = self.total_years + 1
         row_count = (tile_count - 1) // 3 + 1
         tiles_2d = ungrid_image(img, nx=3, ny=row_count)
-        assert len(tiles_2d) == 3 and len(tiles_2d[0]) == row_count
+        assert len(tiles_2d) == row_count and len(tiles_2d[0]) == 3
 
         tiles_ordered = [elem for row in tiles_2d for elem in row]
         legend_tile = tiles_ordered[tile_count - 1]
