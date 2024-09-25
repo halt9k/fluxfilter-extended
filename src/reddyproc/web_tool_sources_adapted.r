@@ -405,13 +405,13 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, ou
     }
 
 
-    df_output <- writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName, output_format = eddyProcConfiguration$output_format)
+    df_output <- writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName,
+                                              output_format = eddyProcConfiguration$output_format)
 
     ## value<< list of describe<< << string binary code 0/1 if UstarFiltering, GapFilling, FluxPartitioning was used <<
     ## string of size of the inputFile '<nrow>,<col>' << NULL or error object caught but not stopped << to end up in dump so
     ## that maybe debugged end<<
-    list(mode = encodeEddyProcTasks(eddyProcConfiguration), inputSize = paste(dim(inputData), collapse = ","), err = caught_error,
-        EProc = EProc)
-
-    return(list(df_output,  EProc$sINFO$Y.NAME))
+    return(list(mode = encodeEddyProcTasks(eddyProcConfiguration),
+                inputSize = paste(dim(inputData), collapse = ","),
+                err = caught_error, EProc = EProc, df_output = df_output))
 }

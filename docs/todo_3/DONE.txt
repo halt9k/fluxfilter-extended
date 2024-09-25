@@ -16,6 +16,9 @@
 
 + минимум: не вылетать, если графики не построились в eddy, а просто WARNING
 
+- extend multi-year all graphs
+
++? автоподстройка if ustar was in opts, show ustar; if not - show just _f
 
 
 >Большие расстояния между графиками-заголовками-графиками. Сжать бы их.
