@@ -2,52 +2,10 @@ library(dplyr)
 library(lubridate)
 library(tibble)
 
-combine_cols_alternating <- function(df, df_merge, expected_col_dupes){
-    # not tested
-
-    stopifnot(all(df[expected_col_dupes] == df_merge[expected_col_dupes]))
-    stopifnot(nrows(df) == nrows(df_merge))
-
-    df_ma <- df %>% select(-any_of(expected_col_dupes))
-    df_mb <- df_merge %>% select(-any_of(expected_col_dupes))
-
-    neworder <- order(c(2 * (seq_along(df_ma) - 1) + 1,
-                        2 * seq_along(df_mb)))
-
-    merged_alternating <- cbind(df_ma, df_mb)[,neworder]
-    cbind(df[expected_col_dupes], merged_alternating)
-}
+source('src/reddyproc/r_helpers.r')
 
 
-merge_cols_aligning <- function(df, df_merge, expected_col_dupes, align_pair){
-    # H_f LE_f U_f , H_sqc LE_sqc U_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
-    # supports regex for align_pair '*_f$', '*_sqc$'
-    # supports missing align_pair[[2]] columns
-
-    stopifnot(df[expected_col_dupes] == df_merge[expected_col_dupes])
-    df_unique_merge <- df_merge %>% select(-matches(expected_col_dupes))
-
-    mask_a <- align_pair[[1]]
-    mask_b <- align_pair[[2]]
-    df_unmasks <- sub(mask_a, '', colnames(df))
-    merge_unmasks <- sub(mask_b, '', colnames(df_unique_merge))
-
-    if (anyDuplicated(merge_unmasks) || anyDuplicated(df_unmasks))
-        stop('\n Cannot merge columns due to duplicate names for align patterns \n')
-
-    names <- c(colnames(df), colnames(df_unique_merge))
-    unmasks <- c(df_unmasks, merge_unmasks)
-
-    unique_unmasks <- unique(unmasks)
-    reordered_colnames <- unlist(Map(function(.) {names[unmasks == .]}, unique_unmasks))
-    stopifnot(length(reordered_colnames) == ncol(merge))
-    stopifnot(!duplicated(reordered_colnames))
-
-    return(cbind(df, df_unique_merge)[reordered_colnames])
-}
-
-
-aggregate_df <- function(data, by_col, FUN) {
+.aggregate_df <- function(data, by_col, FUN) {
     # forms unique combinations with by_col
     # applies agg_FUN to all rows matching onr of combination
     # usually original dataframe is simply df = cbind(by_col, data)
@@ -62,8 +20,7 @@ aggregate_df <- function(data, by_col, FUN) {
 }
 
 
-
-remove_too_short_years <- function(df) {
+.remove_too_short_years <- function(df) {
     stopifnot(nrow(df) > 3)
 
     first <- 1
@@ -84,7 +41,7 @@ remove_too_short_years <- function(df) {
 
 calc_averages <- function(df_full){
     # write.csv(df_full, file = '_test.txt', row.names = FALSE, quote=FALSE)
-    df <- remove_too_short_years(df_full)
+    df <- .remove_too_short_years(df_full)
     df$Month <- month(df$DateTime)
 
     # indeed, R have no default list(str) better than %>% select
@@ -113,17 +70,17 @@ calc_averages <- function(df_full){
 
     # mapply is less readable here
     mean_nna <- function(x) mean(x, na.rm = TRUE)
-    df_means_d <- aggregate_df(df_to_mean, by_col = df[unique_cols_d], mean_nna)
-    df_means_m <- aggregate_df(df_to_mean, by_col = df[unique_cols_m], mean_nna)
-    df_means_y <- aggregate_df(df_to_mean, by_col = df[unique_cols_y], mean_nna)
+    df_means_d <- .aggregate_df(df_to_mean, by_col = df[unique_cols_d], mean_nna)
+    df_means_m <- .aggregate_df(df_to_mean, by_col = df[unique_cols_m], mean_nna)
+    df_means_y <- .aggregate_df(df_to_mean, by_col = df[unique_cols_y], mean_nna)
 
     # renaming is easier before the actual calc
     stopifnot(ncol(df_to_nna) == length(cols_nna_sqc) - length(missing))
     names(df_to_nna) <- cols_nna_sqc
     nna_percent <- function(x) return(mean(!is.na(x)))
-    df_nna_d <- aggregate_df(df_to_nna, by_col = df[unique_cols_d], nna_percent)
-    df_nna_m <- aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_percent)
-    df_nna_y <- aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_percent)
+    df_nna_d <- .aggregate_df(df_to_nna, by_col = df[unique_cols_d], nna_percent)
+    df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_percent)
+    df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_percent)
 
     df_d <- merge_cols_aligning(df_means_d, df_nna_d, unique_cols_d, align_pair = c('*_f$', '*_sqc$'))
     df_m <- merge_cols_aligning(df_means_m, df_nna_m, unique_cols_m, align_pair = c('*_f$', '*_sqc$'))
