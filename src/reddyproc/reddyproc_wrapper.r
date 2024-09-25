@@ -4,6 +4,7 @@ cat('REddyProc version: ', paste(packageVersion('REddyProc')), '\n')
 
 source('src/reddyproc/web_tool_sources_adapted.r')
 source('src/reddyproc/postprocess_calc_averages.r')
+source('src/reddyproc/r_helpers.r')
 
 
 EDDY_IMAGES_EXT <- '.png'
@@ -16,7 +17,7 @@ OUTPUT_DIR <- NULL
 
 
 # corresponds 06.2024 run
-eddyproc_all_required_options <- list(
+.eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
 
     isToApplyUStarFiltering = TRUE,
@@ -48,7 +49,7 @@ eddyproc_all_required_options <- list(
 )
 
 
-eddyproc_extra_options <- list(
+.eddyproc_extra_options <- list(
     isCatchingErrorsEnabled = TRUE,
 
     input_format = "onlinetool",
@@ -60,7 +61,7 @@ eddyproc_extra_options <- list(
 )
 
 
-merge_options <- function(user_opts, extra_opts){
+.merge_options <- function(user_opts, extra_opts){
     merge <- list()
 
     merge$siteId <- user_opts$site_id
@@ -82,33 +83,6 @@ merge_options <- function(user_opts, extra_opts){
     merge$temperatureDataVariable <- user_opts$temperature_data_variable
 
     return(c(merge, extra_opts))
-}
-
-
-first_and_last <- function(vec){
-    ret <- vec
-    if (length(vec) > 2)
-        ret <- c(vec[1], vec[length(vec)])
-
-    return(ret)
-}
-
-
-right = function(string, char) {
-    substr(string,nchar(string)-(char-1),nchar(string))
-}
-
-
-left = function(string,char) {
-    substr(string,1,char)
-}
-
-
-add_file_prefix <- function(fpath, prefix){
-    dir <- dirname(fpath)
-    base <- basename(fpath)
-    stopifnot(right(prefix, 1) != '_' && left(base, 1) != '_')
-    return(file.path(dir, paste0(prefix, '_', base)))
 }
 
 
@@ -152,10 +126,10 @@ reddyproc_and_postprocess <- function(user_options){
 
     INPUT_FILE <<- user_options$input_file
     OUTPUT_DIR <<- user_options$output_dir
-    eddyproc_config <- merge_options(user_options, eddyproc_extra_options)
+    eddyproc_config <- .merge_options(user_options, .eddyproc_extra_options)
 
     got_types <- sapply(eddyproc_config, class)
-    need_types <- sapply(eddyproc_all_required_options, class)
+    need_types <- sapply(.eddyproc_all_required_options, class)
 
     if (any(got_types != need_types)) {
         df_cmp = data.frame(got_types, need_types)
