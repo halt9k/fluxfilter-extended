@@ -127,16 +127,16 @@ OUTPUT_DIR <- NULL
 
 .reddyproc_ustar_fallback_wrapper <- function(eddyproc_config){
     res <- .reddyproc_io_wrapper(eddyproc_config)
-    if (res$err$call[[1]][[3]] != 'sMDSGapFillAfterUstar')
-        return(res)
 
-    if (eddyproc_config$isToApplyUStarFiltering != TRUE)
-        stop('Unexpected option: ustar failed while disabled.')
-    warning('\n\n\n OPTION FAILURE: uStar filtering failed. Fallback attempt ',
-            'to eddyproc_config$isToApplyUStarFiltering = FALSE \n\n')
-    eddyproc_config$isToApplyUStarFiltering <- FALSE
-    res <- .reddyproc_io_wrapper(eddyproc_config)
-    res$changed_config <- eddyproc_config
+    if (!is.null(res$err$call) && res$err$call[[1]][[3]] == 'sMDSGapFillAfterUstar') {
+        if (eddyproc_config$isToApplyUStarFiltering != TRUE)
+            stop('Unexpected option: ustar failed while disabled.')
+        warning('\n\n\n OPTION FAILURE: uStar filtering failed. Fallback attempt ',
+                'to eddyproc_config$isToApplyUStarFiltering = FALSE \n\n')
+        eddyproc_config$isToApplyUStarFiltering <- FALSE
+        res <- .reddyproc_io_wrapper(eddyproc_config)
+        res$changed_config <- eddyproc_config
+    }
 
     return(res)
 }
