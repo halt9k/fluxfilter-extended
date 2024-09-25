@@ -1,8 +1,3 @@
-- warnings (too much shown in colab) or logging (not shown in colab) ?
-
-- extend multi-year all graphs
-- if ustar was in opts, show ustar; if not - show just _f ?
-
 - Telegram QA
 
 - Было бы еще хорошо вывести суточные ходы в виде отдельного численного аутпута, еще одну csv-шку, сверху вниз от 0:00 до 23:30, переменная_месяц, для каждой переменной 12 колонок будет.
@@ -22,7 +17,9 @@ REddyProc в некоторых случаях сбоит на ustarFiltering, �
 - настроить сравнивалку для блокнотов exe, SO answer, другим
 
 - Commit to RProc fixes? or share notebook
-- random 2 last column output 1.3.3?!
+	- random 2 last column output 1.3.3?!
+	- output size not wrapped in the end
+	- stdout and stderr are mixed
 
 --- LATER
 

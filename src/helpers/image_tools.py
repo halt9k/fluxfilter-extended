@@ -1,15 +1,19 @@
+import itertools
+from copy import copy
 from enum import Enum, auto
+from itertools import product
 from warnings import warn
 
+import PIL
 import numpy as np
 from PIL import Image, ImageChops, ImageColor
 
 
 class Direction(Enum):
-    VERTICAL, HORIZONTAL = 1, 2
+    VERTICAL, HORIZONTAL = auto(), auto()
 
 
-def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
+def crop_monocolor_borders(img, sides='LTRB', col=None, margin=10):
     img_rgb = img.convert("RGB")
     w, h = img_rgb.size
 
@@ -32,8 +36,8 @@ def crop_monocolor_borders(img, sides='LTRB', col=None,  margin=10):
         warn('Cannot crop image, border color inconsistent')
         return img
 
-    bbox_crop_mg = (max(bbox_crop[0] - margin, 0),  max(bbox_crop[1] - margin, 0),
-                    min(bbox_crop[2] + margin, bbox[2]),min(bbox_crop[3] + margin, bbox[3]))
+    bbox_crop_mg = (max(bbox_crop[0] - margin, 0), max(bbox_crop[1] - margin, 0),
+                    min(bbox_crop[2] + margin, bbox[2]), min(bbox_crop[3] + margin, bbox[3]))
     mask = np.array(['L' in sides, 'T' in sides, 'R' in sides, 'B' in sides])
     bbox_final = tuple(np.where(mask, bbox_crop_mg, bbox))
     return img.crop(bbox_final)
@@ -51,6 +55,24 @@ def split_image(img: Image, direction: Direction, n):
         imgs = [img.crop((0, h * i / n, w, h * (i + 1) / n)) for i in range(n)]
 
     return imgs
+
+
+def ungrid_image(img: PIL.Image, nx=1, ny=1, flatten=False):
+    """  Without flatten=True returns row major [tile_j][tile_i]: PIL.Image """
+
+    w, h = img.size
+    assert w >= nx > 0 and h >= ny > 0
+    cw, ch = w // nx, h // ny
+
+    if w % nx != 0 or h % ny != 0:
+        warn('Unexpected image size for pixel-perfect subdivision. Tiles will match cropped source image.')
+
+    def box(i, j):
+        # left, top, right, bottom for (i, j) tile
+        return i * cw, j * ch, (i + 1) * cw, (j + 1) * ch
+
+    res = [[img.crop(box(i, j)) for i in range(nx)] for j in range(ny)]
+    return list(itertools.chain.from_iterable(res)) if flatten else res
 
 
 def grid_images(images, max_horiz=np.iinfo(int).max):

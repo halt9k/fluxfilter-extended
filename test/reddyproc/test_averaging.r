@@ -35,9 +35,9 @@ test_model_3_month <- function(){
 
 	dfs <- calc_averages(df)
 	df <- NULL
-	dd <- df_daily <- dfs[[1]]
-	dm <- df_monthly <- dfs[[2]]
-	dy <- df_yearly <- dfs[[3]]
+	dd <- dfs$daily
+	dm <- dfs$monthly
+	dy <- dfs$yearly
 
 	# ensure years are processed separately
 	stopifnot(dd[dd$Year == 2022 & dd$DoY == 354,]$LE_f == 17)
@@ -89,9 +89,9 @@ test_real_year <- function(){
 
 	dfs <- calc_averages(df)
 	df <- NULL
-	dd <- df_daily <- dfs[[1]]
-	dm <- df_monthly <- dfs[[2]]
-	dy <- df_yearly <- dfs[[3]]
+	dd <- dfs$daily
+	dm <- dfs$monthly
+	dy <- dfs$yearly
 
 	# ensure years are processed separately
 	stopifnot(dd[dd$Year == 2023 & dd$DoY == 354,]$LE_f == 17)

@@ -23,4 +23,4 @@ ias_output_prefix: str
 # eddy_out_prefix: str = 'tv_fy4_22-14_2023'
 eddy_out_prefix: str
 
-eddyproc_options: SimpleNamespace
+eddyproc: SimpleNamespace

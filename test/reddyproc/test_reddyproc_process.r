@@ -34,10 +34,10 @@ eddyproc_user_options <- list(
 
     temperature_data_variable = "Tair",
 
-    input_file = "misc\\samples\\test_3_years\\REddyProc.txt",
+    # input_file = "test\\reddyproc\\test_reddyproc_process_fixtures\\_test_3_years.txt",
     # output_dir = test_dir
 
-    # input_file = "REddyProc.txt",
+    input_file = "REddyProc.txt",
     output_dir = "output/reddyproc"
 )
 
