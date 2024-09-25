@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from io import TextIOWrapper
 from pathlib import Path
 from types import SimpleNamespace
+from warnings import warn
 
 import rpy2.robjects as ro
 from rpy2 import rinterface_lib as rl
@@ -43,6 +44,13 @@ def reddyproc_and_postprocess(options):
             end_year=int(r_res.rx2['info'].rx2['Y.END'][0]),
             fnames_prefix=r_res.rx2['out_prefix'][0]
         )
+
+    changed_config = r_res.rx2['changed_config']
+    if changed_config:
+        changed_ustar = changed_config.rx2['isToApplyUStarFiltering'][0]
+        if changed_ustar != options.is_to_apply_u_star_filtering:
+            warn('REddyProc fallback on isToApplyUStarFiltering is detected and propagated.')
+            options.is_to_apply_u_star_filtering = changed_ustar
 
     new_path = draft_log_name.parent / draft_log_name.name.replace(err_prefix, res.fnames_prefix)
     draft_log_name.rename(new_path)
