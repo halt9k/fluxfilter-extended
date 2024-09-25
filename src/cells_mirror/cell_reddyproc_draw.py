@@ -1,40 +1,35 @@
-
-from src.ipynb_globals import *
+import src.ipynb_globals as ig
 from src.reddyproc.postprocess import create_archive
-from src.reddyproc.postprocess_graphs import EddyImgPostProcess
+from src.reddyproc.postprocess_graphs import EddyOutput, EddyImgTagHandler
 from src.colab_routines import add_download_button, no_scroll
-from src.ipynb_helpers import display_images
 
-# Ipynb is not true code, that's excuse for unicode
-OUTPUT_ORDER = (
+is_ustar = ig.eddyproc.options.is_to_apply_u_star_filtering
+usuffix = 'uStar_f' if is_ustar else 'f'
+output_sequence = (
     "## Тепловые карты",
-    ['FP_NEE_map', 'FP_NEE_f_map', 'FP_NEE_f_legend'],
-    ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
-    ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend'],
+    EddyOutput.hmap_compare_row('NEE', usuffix),
+    EddyOutput.hmap_compare_row('LE', 'f'),
+    EddyOutput.hmap_compare_row('H', 'f'),
     "## Суточный ход",
-    ['DC_NEE_uStar_f_compact'],
-    ['DC_LE_f_compact'],
-    ['DC_H_f_compact'],
+    EddyOutput.diurnal_cycle_row('NEE', usuffix),
+    EddyOutput.diurnal_cycle_row('LE', 'f'),
+    EddyOutput.diurnal_cycle_row('H', 'f'),
     "## 30-минутные потоки",
-    ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
-    ['Flux_LE_compact', 'Flux_LE_f_compact'],
-    ['Flux_H_compact', 'Flux_H_f_compact']
+    EddyOutput.flux_compare_row('NEE', usuffix),
+    EddyOutput.flux_compare_row('LE', 'f'),
+    EddyOutput.flux_compare_row('H', 'f')
 )
 
-eipp = EddyImgPostProcess('output/reddyproc', eddy_out_prefix)
-eipp.extract_img_tags(OUTPUT_ORDER)
+tag_handler = EddyImgTagHandler(main_path='output/reddyproc',
+                                eddy_loc_prefix=ig.eddyproc.out_info.fnames_prefix, img_ext='.png')
+eio = EddyOutput(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
+eio.prepare_images()
 
-eipp.prepare_images()
-eipp.merge_heatmaps([['FP_NEE_map', 'FP_NEE_f_map', 'FP_NEE_f_legend'],
-                     ['FP_LE_map', 'FP_LE_f_map', 'FP_LE_f_legend'],
-                     ['FP_H_map', 'FP_H_f_map', 'FP_H_f_legend']],
-                    del_postfix='_map', postfix='_all')
-
-arc_path = create_archive(dir='output/reddyproc', arc_fname=eddy_out_prefix + '.zip',
-                          include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eipp.imgs_before_postprocess)
+arc_path = create_archive(dir='output/reddyproc', arc_fname=ig.eddyproc.out_info.fnames_prefix + '.zip',
+                          include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eio.img_proc.raw_img_duplicates)
 add_download_button(arc_path, 'Download all images')
 
 no_scroll()
-display_images(OUTPUT_ORDER, main_path='output/reddyproc', prefix=eddy_out_prefix)
+eio.display_images()
 
-eipp.display_tag_info()
+tag_handler.display_tag_info(eio.extended_tags())

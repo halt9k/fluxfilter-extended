@@ -16,6 +16,9 @@
 
 + минимум: не вылетать, если графики не построились в eddy, а просто WARNING
 
+- extend multi-year all graphs
+
++? автоподстройка if ustar was in opts, show ustar; if not - show just _f
 
 
 >Большие расстояния между графиками-заголовками-графиками. Сжать бы их.
@@ -35,7 +38,7 @@
 
 
 Доля заполнений, а не пропусков
-
++ remove year from csv if only one day
 
 Примеры вот (это европейская база данных, уровень данных 4)
 	Нужно ли точно разбираться в уровне 4 и провдить все в соответствие?
@@ -59,3 +62,4 @@ all files to arc
 + fix years 1 day of new year
 + incorrect out prefix
 
++move btn progeess to top

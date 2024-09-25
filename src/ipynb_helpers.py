@@ -4,26 +4,12 @@ However, output may be auto replaced with text.
 """
 import io
 from pathlib import Path
+from warnings import warn
 
-from IPython.display import Markdown, display
+from IPython import get_ipython
+from IPython.display import Markdown, HTML, display
 from PIL import Image
 from ipywidgets import widgets, HBox
-
-from src.helpers.io_helpers import tags_to_files
-
-
-def display_images(output_order, main_path, prefix):
-    main_path = Path(main_path)
-
-    for output_step in output_order:
-        if type(output_step) is str:
-            title_text = output_step
-            display(Markdown(title_text))
-        elif type(output_step) is list:
-            paths = tags_to_files(main_path, prefix, output_step, '.png')
-            display_image_row(list(paths.values()))
-        else:
-            raise Exception("Wrong OUTPUT_HEADERS contents")
 
 
 def display_image_row(paths):
@@ -35,3 +21,43 @@ def display_image_row(paths):
 
     hbox = HBox(img_widgets)
     display(hbox)
+
+
+def ipython_only(func):
+    def wrapper(*args, **kwargs):
+        if get_ipython():
+            return func(*args, **kwargs)
+        else:
+            print(f"IPython env not detected. {func.__name__} is skipped by design.")
+            return None
+
+    return wrapper
+
+
+def css_enable_word_wrap(*args, **kwargs):
+    display(HTML('''
+    <style>
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+    '''))
+
+
+def register_ipython_callback_once(event_name, cb):
+    ev = get_ipython().events
+    cb_unregs = [cb_old for cb_old in ev.callbacks[event_name] if cb_old.__name__ == cb.__name__]
+    if len(cb_unregs) == 1 and cb.__code__ == cb_unregs[0].__code__:
+        return
+
+    for cb_old in cb_unregs:
+        warn(f'Removing unexpected callback {cb_old}.')
+        ev.unregister(event_name, cb_old)
+
+    ev.register(event_name, cb)
+
+
+@ipython_only
+def enable_word_wrap():
+    register_ipython_callback_once('pre_run_cell', css_enable_word_wrap)
+    print("Word wrap in output is enabled.")

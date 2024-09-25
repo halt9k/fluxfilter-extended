@@ -35,16 +35,16 @@ test_model_3_month <- function(){
 
 	dfs <- calc_averages(df)
 	df <- NULL
-	dd <- df_daily <- dfs[[1]]
-	dm <- df_monthly <- dfs[[2]]
-	dy <- df_yearly <- dfs[[3]]
+	dd <- dfs$daily
+	dm <- dfs$monthly
+	dy <- dfs$yearly
 
 	# ensure years are processed separately
 	stopifnot(dd[dd$Year == 2022 & dd$DoY == 354,]$LE_f == 17)
 	stopifnot(dd[dd$Year == 2023 & dd$DoY == 354,]$LE_f == 11)
 
 	# ensure order
-	stopifnot(dm$Year[1] == 2022 & dm$Year[length(dm$Year)] == 2023)
+	stopifnot(dm$Year[1] == 2022 & dm$Year[nrow(dm)] == 2023)
 
 	# ensure missing columns won't break
 	stopifnot(!'NEE_f' %in% colnames(dm), !'NEE' %in% colnames(dd))
@@ -78,8 +78,7 @@ test_real_year <- function(){
 	df$VVPD_ff = df$DoY
 
 	# ensure NA calculated correctly
-	nna_prc <- df[df$Year == 2022 & df$DoY == 354,]$LE %>%
-		{sum(!is.na(.)) / length(.)}
+	nna_prc <- df[df$Year == 2022 & df$DoY == 354,]$LE %>% {mean(!is.na(.))}
 	df[df$Year == 2023 & between(df$DoY, 1, 31),]$H_f <- NA
 	stopifnot(df[df$Year == 2022 & between(df$DoY, 1, 31),]$H %>% is.na)
 	df[df$Year == 2023 & between(df$DoY, 335, 365),]$H <- -5
@@ -90,9 +89,9 @@ test_real_year <- function(){
 
 	dfs <- calc_averages(df)
 	df <- NULL
-	dd <- df_daily <- dfs[[1]]
-	dm <- df_monthly <- dfs[[2]]
-	dy <- df_yearly <- dfs[[3]]
+	dd <- dfs$daily
+	dm <- dfs$monthly
+	dy <- dfs$yearly
 
 	# ensure years are processed separately
 	stopifnot(dd[dd$Year == 2023 & dd$DoY == 354,]$LE_f == 17)
@@ -106,7 +105,7 @@ test_real_year <- function(){
 	stopifnot(dm[dm$Year == 2023 & dm$Month == 12,]$H_sqc == 1.0)
 
 	# ensure order
-	stopifnot(dm$Year[1] == 2022 & dm$Year[length(dm$Year)] == 2024)
+	stopifnot(dm$Year[1] == 2022 & dm$Year[nrow(dm)] == 2023)
 
 	#  ensure average
 	stopifnot(dm[dm$Year == 2023 & dm$Month == 12,]$VPD_f %>% between(31*11, 31*12))
