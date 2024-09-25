@@ -134,7 +134,7 @@ class EddyImgPostProcess:
         imgs = [Image.open(path) for path in paths]
         merged = grid_images(imgs, 3)
 
-        tag = list(tag_paths)[0]
+        tag = list(tag_paths)[1]
         path = tag_paths[tag]
         fname = replace_fname_end(path, tag, tag.replace(del_postfix, '') + postfix)
         merged.save(fname)
@@ -205,6 +205,9 @@ class EddyOutput:
         img_rows = [tag_list for tag_list in self.output_sequence if type(tag_list) is list]
         merges = [row for row in img_rows if row[0].startswith(EddyPrefixes.HEAT_MAP)]
         for merge in merges:
+            assert all(tag.startswith(EddyPrefixes.HEAT_MAP) for tag in merge), \
+                'Heatmap row does not contain 3 heatmaps'
+
             tp = self.tag_handler.tags_to_img_fnames(merge)
             self.img_proc.merge_heatmap(tp, del_postfix='_map', postfix='_all')
 
