@@ -18,6 +18,7 @@ else:
     from google.colab import output
     from google.colab import files
     from IPython.display import display
+    from IPython.core.display import Javascript
 
 
 def colab_only(func):
@@ -48,15 +49,26 @@ def no_scroll():
     output.no_vertical_scroll()
 
 
+def move_progress_bar_to_top():
+    display(Javascript('''
+        let outputContainer = google.colab.output.getActiveOutputArea().parentNode.parentNode;
+        let outputArea = outputContainer.querySelector('#output-area');
+        outputArea.parentNode.append(outputArea);        
+    '''))
+
+
 @colab_only
 def add_download_button(fname, caption):
     def clicked(arg):
         files.download(fname)
+        move_progress_bar_to_top()
     import ipywidgets as widgets
 
     button_download = widgets.Button(description=caption)
     button_download.on_click(clicked)
-    display(button_download)
+
+    button_box = widgets.HBox([button_download], layout=widgets.Layout(justify_content='center'))
+    display(button_box)
 
 
 """ examples:
