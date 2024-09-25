@@ -86,10 +86,24 @@ OUTPUT_DIR <- NULL
 }
 
 
-reddyproc_tool_wrapper <- function(eddyproc_config){
+.finalise_config <- function(user_options){
+    eddyproc_config <- .merge_options(user_options, .eddyproc_extra_options)
+
+    got_types <- sapply(eddyproc_config, class)
+    need_types <- sapply(.eddyproc_all_required_options, class)
+
+    if (any(got_types != need_types)) {
+        df_cmp = data.frame(got_types, need_types)
+        cmp_str = paste(capture.output(df_cmp), collapse = '\n')
+        stop("Incorrect options or options types: ", cmp_str)
+    }
+    return(eddyproc_config)
+}
+
+
+.reddyproc_io_wrapper <- function(eddyproc_config){
     # more specifically, still calls processEddyData wrapper from web tool,
     # which finally calls REddyProc library
-    # returns: [df_output, years_str, out_prefix]
 
     dir.create(OUTPUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
@@ -111,6 +125,23 @@ reddyproc_tool_wrapper <- function(eddyproc_config){
 }
 
 
+.reddyproc_ustar_fallback_wrapper <- function(eddyproc_config){
+    res <- .reddyproc_io_wrapper(eddyproc_config)
+    if (res$err$call[[1]][[3]] != 'sMDSGapFillAfterUstar')
+        return(res)
+
+    if (eddyproc_config$isToApplyUStarFiltering != TRUE)
+        stop('Unexpected option: ustar failed while disabled.')
+    warning('\n\n\n OPTION FAILURE: uStar filtering failed. Fallback attempt ',
+            'to eddyproc_config$isToApplyUStarFiltering = FALSE \n\n')
+    eddyproc_config$isToApplyUStarFiltering <- FALSE
+    res <- .reddyproc_io_wrapper(eddyproc_config)
+    res$changed_config <- eddyproc_config
+
+    return(res)
+}
+
+
 reddyproc_and_postprocess <- function(user_options){
     # combined function to avoid converting output or using global env
 
@@ -126,23 +157,14 @@ reddyproc_and_postprocess <- function(user_options){
 
     INPUT_FILE <<- user_options$input_file
     OUTPUT_DIR <<- user_options$output_dir
-    eddyproc_config <- .merge_options(user_options, .eddyproc_extra_options)
-
-    got_types <- sapply(eddyproc_config, class)
-    need_types <- sapply(.eddyproc_all_required_options, class)
-
-    if (any(got_types != need_types)) {
-        df_cmp = data.frame(got_types, need_types)
-        cmp_str = paste(capture.output(df_cmp), collapse = '\n')
-        stop("Incorrect options or options types: ", cmp_str)
-    }
-
-
-    wr_res <- reddyproc_tool_wrapper(eddyproc_config)
+    eddyproc_config <- .finalise_config(user_options)
+    wr_res <- .reddyproc_ustar_fallback_wrapper(eddyproc_config)
 
     # processEddyData guaranteed to output equi-time-distant series
     dfs = calc_averages(wr_res$df_output)
     save_averages(dfs, OUTPUT_DIR, wr_res$out_prefix, STATS_FNAME_EXT)
 
-    return(list(info = wr_res$EProc$sINFO, out_prefix = wr_res$out_prefix))
+    # wr_res$df_output better not be returned to python, since it's extra large df
+    return(list(info = wr_res$EProc$sINFO, out_prefix = wr_res$out_prefix,
+                changed_config = wr_res$changed_config))
 }

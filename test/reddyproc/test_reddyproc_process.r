@@ -17,7 +17,7 @@ test_dir = tempdir()
 eddyproc_user_options <- list(
     site_id = 'TestSiteID',
 
-    is_to_apply_u_star_filtering = FALSE,
+    is_to_apply_u_star_filtering = TRUE,
 
     u_star_seasoning =  factor("WithinYear", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
