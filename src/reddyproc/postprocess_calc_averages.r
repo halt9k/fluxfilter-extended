@@ -42,7 +42,7 @@ source('src/reddyproc/r_helpers.r')
 calc_averages <- function(df_full){
     # write.csv(df_full, file = '_test.txt', row.names = FALSE, quote=FALSE)
     df <- .remove_too_short_years(df_full)
-    df$Month <- month(df$DateTime)
+    df <- add_column(df, Month = month(df$DateTime), .after = 'Year')
 
     # indeed, R have no default list(str) better than %>% select
     cols_f <- colnames(df %>% select(ends_with("_f")))
@@ -65,12 +65,14 @@ calc_averages <- function(df_full){
     # i.e. mean and NA percent will be calculated between rows
     # for which unique_cols values are matching
     unique_cols_d <- c('Year', 'Month', 'DoY')
+    unique_cols_t <- c('Year', 'Month', 'Hour')
     unique_cols_m <- c('Year', 'Month')
     unique_cols_y <- c('Year')
 
     # mapply is less readable here
     mean_nna <- function(x) mean(x, na.rm = TRUE)
     df_means_d <- .aggregate_df(df_to_mean, by_col = df[unique_cols_d], mean_nna)
+    df_means_t <- .aggregate_df(df_to_mean, by_col = df[unique_cols_t], mean_nna)
     df_means_m <- .aggregate_df(df_to_mean, by_col = df[unique_cols_m], mean_nna)
     df_means_y <- .aggregate_df(df_to_mean, by_col = df[unique_cols_y], mean_nna)
 
@@ -82,11 +84,12 @@ calc_averages <- function(df_full){
     df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_percent)
     df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_percent)
 
+    df_t <- df_means_t
     df_d <- merge_cols_aligning(df_means_d, df_nna_d, unique_cols_d, align_pair = c('*_f$', '*_sqc$'))
     df_m <- merge_cols_aligning(df_means_m, df_nna_m, unique_cols_m, align_pair = c('*_f$', '*_sqc$'))
     df_y <- merge_cols_aligning(df_means_y, df_nna_y, unique_cols_y, align_pair = c('*_f$', '*_sqc$'))
 
-    return(list(daily = df_d, monthly = df_m, yearly = df_y))
+    return(list(hourly = df_t, daily = df_d, monthly = df_m, yearly = df_y))
 }
 
 

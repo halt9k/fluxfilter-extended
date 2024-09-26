@@ -14,8 +14,23 @@ ensure_correct_names <- function(nd, nm, ny){
 }
 
 
+save_reddyproc_df <- function(df, fname) {
+	df_save$DateTime <- as.character(format(df$DateTime, "%Y-%m-%d %H:%M:%S"))
+	write.csv(df_save, file = 'test.txt', row.names = FALSE, quote = FALSE)
+	# all.equal(test[4993,100], df_full[4993,100], tolerance = 1e-8)
+}
+
+
+load_csv_as_reddyproc_df <- function(fname) {
+	df = read.csv(fname, quote = NULL,  row.names = NULL)
+	df$season <- factor(df$season)
+	df$DateTime <- as.POSIXct(df$DateTime, tz="UTC", format = "%Y-%m-%d %H:%M:%S")
+	return(df)
+}
+
+
 test_model_3_month <- function(){
-	df = read.csv('test/reddyproc/test_averaging_fixtures/3_months_long.txt', quote = NULL,  row.names = NULL)
+	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/3_months_long.txt')
 	stopifnot(!'Reco' %in% colnames(df))
 
 	# ensure order and years are processed separately
@@ -62,7 +77,7 @@ test_model_3_month <- function(){
 
 
 test_real_year <- function(){
-	df = read.csv('test/reddyproc/test_averaging_fixtures/real_data_test_05.09.24.txt', quote = NULL,  row.names = NULL)
+	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/verify_model_2.txt')
 
 	# ensure order and years are processed separately
 	df[df$Year == 2023 & df$DoY == 354 & df$Hour > 10,]$Year = 2022

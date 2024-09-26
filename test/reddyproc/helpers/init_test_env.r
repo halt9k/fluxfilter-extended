@@ -6,7 +6,7 @@ gc()
 cat("\014")
 
 # break into debug on error
-options(error = browser)
+# options(error = browser)
 
 # interactive() ?
 # on_debug = function() {	cat("\014")	browser()}
