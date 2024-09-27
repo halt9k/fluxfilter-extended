@@ -101,7 +101,10 @@ calc_averages <- function(df_full){
     df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_percent)
     df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_percent)
 
-    df_t <- df_means_t
+    df_means_t$Empty <- ''
+    colnames(df_means_t)[ncol(df_means_t)] <-  " "
+
+    df_t <- cbind(df_means_t, df_nna_t %>% select(-matches(unique_cols_t)))
     df_d <- merge_cols_aligning(df_means_d, df_nna_d, unique_cols_d, align_pair = c('*_f$', '*_sqc$'))
     df_m <- merge_cols_aligning(df_means_m, df_nna_m, unique_cols_m, align_pair = c('*_f$', '*_sqc$'))
     df_y <- merge_cols_aligning(df_means_y, df_nna_y, unique_cols_y, align_pair = c('*_f$', '*_sqc$'))

@@ -6,6 +6,7 @@
 каждый новый столбец вправо - новый месяц.
 csv-файл с суточными ходами, еще один аутпут
 
+add hourly averaging test
 
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
