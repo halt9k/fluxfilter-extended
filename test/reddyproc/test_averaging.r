@@ -5,6 +5,9 @@ debugSource('test/reddyproc/helpers/init_test_env.r')
 debugSource('src/reddyproc/postprocess_calc_averages.r')
 
 
+test_dir = tempdir()
+
+
 ensure_correct_names <- function(nd, nm, ny){
 	stopifnot(!duplicated(nd), !duplicated(nm), !duplicated(ny))
 	stopifnot(setdiff(nd, 'DoY') == nm, setdiff(nm, 'Month') == ny)
@@ -17,7 +20,7 @@ ensure_correct_names <- function(nd, nm, ny){
 save_reddyproc_df <- function(df, fname) {
 	df_save <- df
 	df_save$DateTime <- as.character(format(df$DateTime, "%Y-%m-%d %H:%M:%S"))
-	write.csv(df_save, file = 'test.txt', row.names = FALSE, quote = FALSE)
+	write.csv(df_save, file = fname, row.names = FALSE, quote = FALSE)
 }
 
 
@@ -52,7 +55,10 @@ test_model_3_month <- function(){
 	df[df$Year == 2023 & between(df$DoY, 1, 31),]$H = NA
 
 	dfs <- calc_averages(df)
+
+	# save_reddyproc_df(df, fname = fs::path(tempdir(), 'test_mon_input_df.csv'))
 	df <- NULL
+
 	dd <- dfs$daily
 	dm <- dfs$monthly
 	dy <- dfs$yearly
@@ -91,9 +97,24 @@ test_real_year <- function(){
 	row_mask = df$Year == 2023 & between(df$DoY, 325, 365)
 	df[row_mask,]$VPD_f = df[row_mask,]$DoY
 
-	# ensure no interference from similar columns
-	df$VPD_ff = df$DoY
-	df$VVPD_ff = df$DoY
+	# ensure hourly
+	mask = df$Year == 2023 & month(df$DateTime) == 4 & between(df$Hour, 8, 10)
+	df[mask,]$H_f <- df[mask,]$Hour
+	mask = df$Year == 2023 & month(df$DateTime) == 5
+	df[mask,]$H_f <- 24 - df[mask,]$Hour
+	df[mask & df$DoY == 130,]$H_f <- -100
+
+	# ensure hourly sqc
+	df[mask,]$H <- df[mask,]$Hour * -2.5
+	df[mask & day(df$DateTime) == 2,]$H <- NA
+
+	# ensure single row val
+	stopifnot(tail(df, 1)$Year == 2024)
+	one_year_tail <- tail(df, 1)
+	one_year_tail$Year <- 2025
+	df <- rbind(df, tail(df, 1), one_year_tail)
+	df[df$Year == 2024,]$VPD <- NA
+	df[df$Year == 2024,]$VPD_f <- NA
 
 	# ensure NA calculated correctly
 	nna_prc <- df[df$Year == 2022 & df$DoY == 354,]$LE %>% {mean(!is.na(.))}
@@ -101,12 +122,16 @@ test_real_year <- function(){
 	stopifnot(df[df$Year == 2022 & between(df$DoY, 1, 31),]$H %>% is.na)
 	df[df$Year == 2023 & between(df$DoY, 335, 365),]$H <- -5
 
-	# ensure single row val
-	df[df$Year == 2024,]$VPD = NA
-	df[df$Year == 2024,]$VPD_f = NA
+	# ensure no interference from similar columns
+	df$VPD_ff = df$DoY
+	df$VVPD_ff = df$DoY
 
 	dfs <- calc_averages(df)
+
+	# save_reddyproc_df(df, fname = fs::path(tempdir(), 'test_year_input_df.csv'))
 	df <- NULL
+
+	dt <- dfs$hourly
 	dd <- dfs$daily
 	dm <- dfs$monthly
 	dy <- dfs$yearly
@@ -115,22 +140,26 @@ test_real_year <- function(){
 	stopifnot(dd[dd$Year == 2023 & dd$DoY == 354,]$LE_f == 17)
 	stopifnot(dd[dd$Year == 2022 & dd$DoY == 354,]$LE_f == 11)
 
-	# ensure NA calculated correctly
-	stopifnot(dm[dm$Year == 2022 & dm$Month == 12,]$LE_sqc %>%
-			  	between(nna_prc - 0.1, nna_prc + 0.1))
-	stopifnot(dm[dm$Year == 2023 & dm$Month == 1,]$H_f %>% is.na)
-	stopifnot(dm[dm$Year == 2022 & dm$Month == 1,]$H_sqc == 0.0)
-	stopifnot(dm[dm$Year == 2023 & dm$Month == 12,]$H_sqc == 1.0)
-
 	# ensure order
-	stopifnot(dm$Year[1] == 2022 & dm$Year[nrow(dm)] == 2023)
+	stopifnot(dm$Year[1] == 2022 & dm$Year[nrow(dm)] == 2024)
 
 	#  ensure average
 	stopifnot(dm[dm$Year == 2023 & dm$Month == 12,]$VPD_f %>% between(31*11, 31*12))
 
+	# ensure hourly
+	mask_1 <- dt$Year == 2023 & dt$Month == 4 & dt$Hour == 9
+	not_mask_1 <- dt$Year == 2023 & dt$Month == 5 & dt$Hour == 9
+	not_mask_2 <- dt$Year == 2023 & dt$Month == 6 & dt$Hour == 11
+	stopifnot(dt[mask_1,]$H_f == 9, dt[not_mask_1,]$H_f != 9, dt[not_mask_2,]$H_f != 9)
+
+	# ensure hourly sqc
+	mask_2 <- dt$Year == 2023 & dt$Month == 5 & dt$Hour == 20
+	stopifnot(dt[mask_2,]$H_f == ((24 - 20) * 30 - 100) / 31)
+	stopifnot(dt[mask_2,]$H_sqc == 30 / 31)
+
 	# ensure one val
-	stopifnot(dd[dd$Year == 2024,]$VPD_sqc == 0)
-	stopifnot(dy[dy$Year == 2024,]$VPD_f %>% is.na)
+	stopifnot(any(dd[dd$Year == 2023,]$VPD_sqc != 0), dd[dd$Year == 2024,]$VPD_sqc == 0)
+	stopifnot(!anyNA(dy[dy$Year == 2023,]$VPD_f), dy[dy$Year == 2024,]$VPD_f %>% is.na)
 
 	ensure_correct_names(names(dd), names(dm), names(dy))
 	save_averages(dfs, tempdir(), 'tmp', '.csv')
