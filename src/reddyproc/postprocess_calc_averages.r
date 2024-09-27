@@ -40,7 +40,8 @@ source('src/reddyproc/r_helpers.r')
 
 
 calc_averages <- function(df_full){
-    # write.csv(df_full, file = '_test.txt', row.names = FALSE, quote=FALSE)
+    # save_reddyproc_df(df_full, 'test.csv')
+
     df <- .remove_too_short_years(df_full)
     df <- add_column(df, Month = month(df$DateTime), .after = 'Year')
 

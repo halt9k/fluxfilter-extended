@@ -37,7 +37,7 @@ load_csv_as_reddyproc_df <- function(fname, tz = 'UTC') {
 
 
 test_model_3_month <- function(){
-	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/3_months_long.txt', tz = 'GMT')
+	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/tm_3m_2y.csv', tz = 'GMT')
 
 	# ensure order and years are processed separately
 	df[df$Year == 2022 & df$DoY == 354 & df$Hour > 10,]$Year = 2023
@@ -86,7 +86,7 @@ test_model_3_month <- function(){
 
 
 test_real_year <- function(){
-	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/verify_model_2.txt')
+	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/unknown.csv')
 
 	# ensure order and years are processed separately
 	df[df$Year == 2023 & df$DoY == 354 & df$Hour > 10,]$Year = 2022

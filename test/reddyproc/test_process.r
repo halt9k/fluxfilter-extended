@@ -8,10 +8,6 @@ debugSource('src/reddyproc/web_tool_sources_adapted.r')
 debugSource('src/reddyproc/reddyproc_wrapper.r')
 
 
-# possibly copy all used files into temp dir and work only from it
-test_dir = tempdir()
-
-
 # duplicates cell code to run from pure R
 # avoiding R dupe here can be too complicated
 eddyproc_user_options <- list(
@@ -34,12 +30,24 @@ eddyproc_user_options <- list(
 
     temperature_data_variable = "Tair",
 
-    # input_file = "test\\reddyproc\\test_reddyproc_process_fixtures\\_test_3_years.txt",
-    # output_dir = test_dir
-
     input_file = "REddyProc.txt",
     output_dir = "output/reddyproc"
 )
 
 
-reddyproc_and_postprocess(eddyproc_user_options)
+test_reddyproc <- function(options) {
+    options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
+    reddyproc_and_postprocess(eddyproc_user_options)
+}
+
+
+test_3y <- function(options) {
+    # possibly copy all used files into temp dir and work only from it
+    test_dir = tempdir()
+
+    options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
+    options$output_dir <- test_dir
+    reddyproc_and_postprocess(options)
+}
+
+test_reddyproc(eddyproc_user_options)
