@@ -21,6 +21,7 @@ library(dplyr)
 
 
 merge_cols_aligning <- function(df, df_merge, expected_col_dupes, align_pair){
+    # example:
     # H_f LE_f U_f , H_sqc LE_sqc U_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
     # supports regex for align_pair '*_f$', '*_sqc$'
     # supports missing align_pair[[2]] columns
@@ -52,7 +53,6 @@ first_and_last <- function(vec){
     ret <- vec
     if (length(vec) > 2)
         ret <- c(vec[1], vec[length(vec)])
-
     return(ret)
 }
 
@@ -72,4 +72,35 @@ add_file_prefix <- function(fpath, prefix){
     base <- basename(fpath)
     stopifnot(str_right(prefix, 1) != '_' && str_left(base, 1) != '_')
     return(file.path(dir, paste0(prefix, '_', base)))
+}
+
+
+nna_ratio <- function(x) {
+    # 0 if all NA, 1 if all exist
+
+    return(mean(!is.na(x)))
+}
+
+
+mean_nna <- function(x, nna_threshold = NULL){
+    # mean skipping NA values,
+    # if enough values exist above threshold ratio
+
+    nna_mean <- mean(x, na.rm = TRUE)
+    if (is.null(nna_threshold)) {
+        return(nna_mean)
+    } else {
+        stopifnot(between(nna_threshold, 0, 1))
+        if (nna_ratio(x) > nna_threshold)
+            return(nna_mean)
+        else
+            return(NA)
+    }
+}
+
+
+fmt_hm <- function(fp_hour){
+    # formats time
+    # 6.5 -> 06:30
+    return(sprintf("%02i:%02i", trunc(fp_hour), trunc(fp_hour %% 1 * 60)))
 }

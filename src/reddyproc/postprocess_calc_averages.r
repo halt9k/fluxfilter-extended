@@ -39,22 +39,6 @@ source('src/reddyproc/r_helpers.r')
 }
 
 
-mean_nna <- function(x, th = NULL){
-    nna_mean <- mean(x, na.rm = TRUE)
-    if (is.null(th)) {
-        return(nna_mean)
-    } else {
-        stopifnot(between(th, 0, 1))
-        nna_ratio <- mean(!is.na(x))
-        if (nna_ratio > th)
-            return(nna_mean)
-        else
-            return(NA)
-    }
-}
-
-
-
 calc_averages <- function(df_full){
     # write.csv(df_full, file = '_test.txt', row.names = FALSE, quote=FALSE)
     df <- .remove_too_short_years(df_full)
@@ -62,21 +46,22 @@ calc_averages <- function(df_full){
 
     # indeed, R have no default list(str) better than %>% select
     cols_f <- colnames(df %>% select(ends_with("_f")))
-    cols_to_mean <- c(cols_f)
+    paired_cols_out <- setdiff(cols_f, 'GPP_f')
+    paired_cols_in <- gsub("_f", "", paired_cols_out)
+
+    cols_to_mean <- cols_f
     if ('Reco' %in% colnames(df))
         cols_to_mean <- c(cols_to_mean, 'Reco')
     cat('Columns picked for averaging (Reco added if possible): \n', cols_to_mean, '\n')
 
-    cols_nna_sqc <- gsub("_f", "_sqc", setdiff(cols_f, 'GPP_f'))
-    cols_to_nna <- gsub("_sqc", "", cols_nna_sqc)
-    cat('Columns picked for NA counts (GPP_f omitted): \n',cols_to_nna, '\n')
+    cat('Columns picked for NA counts (GPP_f omitted): \n',paired_cols_in, '\n')
 
-    missing = setdiff(cols_to_nna, colnames(df))
+    missing = setdiff(paired_cols_in, colnames(df))
     if (length(missing) > 0)
         stop(msg = paste('Expected columns are missing: \n', missing, '\n'))
 
     df_to_mean <- df[cols_to_mean]
-    df_to_nna <- df[cols_to_nna]
+    df_to_nna <- df[paired_cols_in]
 
     # i.e. mean and NA percent will be calculated between rows
     # for which unique_cols values are matching
@@ -85,21 +70,23 @@ calc_averages <- function(df_full){
     unique_cols_m <- c('Year', 'Month')
     unique_cols_y <- c('Year')
 
-    # mapply is less readable here
-    mean_nna_t <- function(x) mean_nna(x, th = 0.2)
-    df_means_t <- .aggregate_df(df_to_mean, by_col = df[unique_cols_t], mean_nna_t)
+    # hourly should also contain averages of columns before EProc
+    df_to_mean_t <- cbind(df[cols_to_mean], Separator = NA, df[paired_cols_in])
+
+    df_means_t <- .aggregate_df(df_to_mean_t, by_col = df[unique_cols_t], mean_nna)
     df_means_d <- .aggregate_df(df_to_mean, by_col = df[unique_cols_d], mean_nna)
     df_means_m <- .aggregate_df(df_to_mean, by_col = df[unique_cols_m], mean_nna)
     df_means_y <- .aggregate_df(df_to_mean, by_col = df[unique_cols_y], mean_nna)
 
     # renaming is easier before the actual calc
+    cols_nna_sqc <- gsub("_f", "_sqc", paired_cols_out)
     stopifnot(ncol(df_to_nna) == length(cols_nna_sqc) - length(missing))
     names(df_to_nna) <- cols_nna_sqc
-    nna_percent <- function(x) return(mean(!is.na(x)))
-    df_nna_t <- .aggregate_df(df_to_nna, by_col = df[unique_cols_t], nna_percent)
-    df_nna_d <- .aggregate_df(df_to_nna, by_col = df[unique_cols_d], nna_percent)
-    df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_percent)
-    df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_percent)
+
+    df_nna_t <- .aggregate_df(df_to_nna, by_col = df[unique_cols_t], nna_ratio)
+    df_nna_d <- .aggregate_df(df_to_nna, by_col = df[unique_cols_d], nna_ratio)
+    df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_ratio)
+    df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_ratio)
 
     df_t <- cbind(df_means_t, ' '='', df_nna_t %>% select(-matches(unique_cols_t)))
     df_d <- merge_cols_aligning(df_means_d, df_nna_d, unique_cols_d, align_pair = c('*_f$', '*_sqc$'))
@@ -107,12 +94,6 @@ calc_averages <- function(df_full){
     df_y <- merge_cols_aligning(df_means_y, df_nna_y, unique_cols_y, align_pair = c('*_f$', '*_sqc$'))
 
     return(list(hourly = df_t, daily = df_d, monthly = df_m, yearly = df_y))
-}
-
-
-fmt_hm <- function(fp_hour){
-    # 6.5 -> 06:30
-    return(sprintf("%02i:%02i", trunc(fp_hour), trunc(fp_hour %% 1 * 60)))
 }
 
 
