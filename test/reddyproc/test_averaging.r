@@ -133,6 +133,7 @@ test_real_year <- function(){
 	stopifnot(dy[dy$Year == 2024,]$VPD_f %>% is.na)
 
 	ensure_correct_names(names(dd), names(dm), names(dy))
+	save_averages(dfs, tempdir(), 'tmp', '.csv')
 	cat('Test test_real_year ok \n\n')
 }
 
