@@ -39,6 +39,22 @@ source('src/reddyproc/r_helpers.r')
 }
 
 
+mean_nna <- function(x, th = NULL){
+    nna_mean <- mean(x, na.rm = TRUE)
+    if (is.null(th)) {
+        return(nna_mean)
+    } else {
+        stopifnot(between(th, 0, 1))
+        nna_ratio <- mean(!is.na(x))
+        if (nna_ratio > th)
+            return(nna_mean)
+        else
+            return(NA)
+    }
+}
+
+
+
 calc_averages <- function(df_full){
     # write.csv(df_full, file = '_test.txt', row.names = FALSE, quote=FALSE)
     df <- .remove_too_short_years(df_full)
@@ -70,9 +86,9 @@ calc_averages <- function(df_full){
     unique_cols_y <- c('Year')
 
     # mapply is less readable here
-    mean_nna <- function(x) mean(x, na.rm = TRUE)
+    mean_nna_t <- function(x) mean_nna(x, th = 0.2)
+    df_means_t <- .aggregate_df(df_to_mean, by_col = df[unique_cols_t], mean_nna_t)
     df_means_d <- .aggregate_df(df_to_mean, by_col = df[unique_cols_d], mean_nna)
-    df_means_t <- .aggregate_df(df_to_mean, by_col = df[unique_cols_t], mean_nna)
     df_means_m <- .aggregate_df(df_to_mean, by_col = df[unique_cols_m], mean_nna)
     df_means_y <- .aggregate_df(df_to_mean, by_col = df[unique_cols_y], mean_nna)
 
@@ -80,6 +96,7 @@ calc_averages <- function(df_full){
     stopifnot(ncol(df_to_nna) == length(cols_nna_sqc) - length(missing))
     names(df_to_nna) <- cols_nna_sqc
     nna_percent <- function(x) return(mean(!is.na(x)))
+    df_nna_t <- .aggregate_df(df_to_nna, by_col = df[unique_cols_t], nna_percent)
     df_nna_d <- .aggregate_df(df_to_nna, by_col = df[unique_cols_d], nna_percent)
     df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_percent)
     df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_percent)
@@ -93,17 +110,27 @@ calc_averages <- function(df_full){
 }
 
 
+fmt_hm <- function(fp_hour){
+    # 6.5 -> 06:30
+    return(sprintf("%02i:%02i", trunc(fp_hour), trunc(fp_hour %% 1 * 60)))
+}
+
+
 save_averages <- function(dfs, output_dir, output_unmask, ext){
     prename = file.path(output_dir, output_unmask)
+    h_name <- paste0(prename, '_hourly', ext)
     d_name <- paste0(prename, '_daily', ext)
     m_name <- paste0(prename, '_monthly', ext)
     y_name <- paste0(prename, '_yearly', ext)
 
-    write.csv(dfs$daily, file = d_name, row.names = FALSE)
-    write.csv(dfs$monthly, file = m_name, row.names = FALSE)
-    write.csv(dfs$yearly, file = y_name, row.names = FALSE)
+    dfs$hourly$Hour <- fmt_hm(dfs$hourly$Hour)
 
-    cat(sprintf('Saved summary stats to : \n %s \n %s \n %s \n',
-                d_name, m_name, y_name))
+    write.csv(dfs$hourly, file = h_name, row.names = FALSE, na = "-9999")
+    write.csv(dfs$daily, file = d_name, row.names = FALSE, na = "-9999")
+    write.csv(dfs$monthly, file = m_name, row.names = FALSE, na = "-9999")
+    write.csv(dfs$yearly, file = y_name, row.names = FALSE, na = "-9999")
+
+    cat(sprintf('Saved summary stats to : \n %s \n %s \n %s \n %s \n',
+                d_name, m_name, y_name, h_name))
 
 }
