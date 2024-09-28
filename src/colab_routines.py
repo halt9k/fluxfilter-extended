@@ -45,7 +45,8 @@ def colab_only_cell():
 
 
 @colab_only
-def no_scroll():
+def colab_no_scroll():
+    """ Tries to resize cell to avoid the very need of scrolling """
     output.no_vertical_scroll()
 
 
@@ -58,7 +59,7 @@ def move_progress_bar_to_top():
 
 
 @colab_only
-def add_download_button(fname, caption):
+def colab_add_download_button(fname, caption):
     def clicked(arg):
         files.download(fname)
         move_progress_bar_to_top()

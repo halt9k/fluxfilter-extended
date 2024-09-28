@@ -1,5 +1,4 @@
 + write that ustar_f cols dont actually exist придумал
-+ ensure legend is always same
 + remove all heatmap temp files? and options?
 + update ipynb description 
 
