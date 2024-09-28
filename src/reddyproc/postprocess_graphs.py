@@ -17,11 +17,11 @@ from src.helpers.io_helpers import tags_to_files, tag_to_fname
 from src.helpers.image_tools import crop_monocolor_borders, Direction, grid_images, remove_strip, \
     ungrid_image
 
-PostProcSuffixes = SimpleNamespace(LEGEND='_legend', MAP='_map', COMPACT='_compact')
+PostProcSuffixes = SimpleNamespace(LEGEND='legend', MAP='map', COMPACT='compact')
 EddyPrefixes = SimpleNamespace(HEAT_MAP='FP', FLUX='Flux', DIURNAL='DC', DAILY_SUM='DSum', DAILY_SUMU='DSumU')
 
 
-class EddyImgTagHandler:
+class EProcImgTagHandler:
     def __init__(self, main_path, eddy_loc_prefix, img_ext='.png'):
         self.main_path = Path(main_path)
         self.loc_prefix = eddy_loc_prefix
@@ -39,7 +39,7 @@ class EddyImgTagHandler:
 
         def remove_suffixes(s, suffixes):
             for sub in suffixes:
-                s = s.removesuffix(sub)
+                s = s.removesuffix('_' + sub)
             return s
 
         raw_with_dupes = [remove_suffixes(ex_tag, suffixes_list) for ex_tag in extended_tags]
@@ -110,17 +110,17 @@ class EddyImgPostProcess:
         fixed = grid_images([c_title] + rows[1: row_count], 1)
         return fixed
 
-    def process_heatmap(self, tag, path, map_postfix: str, legend_postfix: str):
+    def process_heatmap(self, tag, path):
         img = Image.open(path)
 
         maps, legends = self.ungrid_heatmap(img)
         cmap = crop_monocolor_borders(maps, sides='LR')
         clegend = crop_monocolor_borders(legends, sides='LR')
 
-        fname = replace_fname_end(path, tag, tag + map_postfix)
+        fname = replace_fname_end(path, tag, tag + '_' + PostProcSuffixes.MAP)
         cmap.save(fname)
 
-        fname_legend = replace_fname_end(path, tag, tag + legend_postfix)
+        fname_legend = replace_fname_end(path, tag, tag + '_' + PostProcSuffixes.LEGEND)
         clegend.save(fname_legend)
 
         self.raw_img_duplicates += [path, fname_legend]
@@ -144,7 +144,7 @@ class EddyImgPostProcess:
     def process_flux(self, tag, path, postfix):
         img = Image.open(path)
         fixed = self.compact_title_row(img, self.total_years + 1)
-        fname = replace_fname_end(path, tag, tag + postfix)
+        fname = replace_fname_end(path, tag, tag + '_' + postfix)
         fixed.save(fname)
 
         self.raw_img_duplicates += [path]
@@ -152,13 +152,13 @@ class EddyImgPostProcess:
     def process_diurnal_cycle(self, tag, path, postfix):
         img = Image.open(path)
         fixed = self.compact_title_row(img, 5)
-        fname = replace_fname_end(path, tag, tag + postfix)
+        fname = replace_fname_end(path, tag, tag + '_' + postfix)
         fixed.save(fname)
 
         self.raw_img_duplicates += [path]
 
 
-class EddyOutput:
+class EProcOutputGen:
     # output is declared as auto generated on each run list of image tags
     # tags mean unique suffixes of image file names,
     # i.e. for 'tv_fy4_22-14_21-24_FP_Rg_f.png' tag is 'FP_Rg_f'
@@ -166,6 +166,26 @@ class EddyOutput:
     # or custom order if to declare output list manually in the notebook cell
     # auto generation is nessesary because order depends on reddyproc options
 
+    @staticmethod
+    def hmap_compare_row(col_name, f_suffix) -> List[str]:
+        fp, cn, sf = EddyPrefixes.HEAT_MAP, col_name, f_suffix
+        sm, sl = PostProcSuffixes.MAP, PostProcSuffixes.LEGEND
+        return [f'{fp}_{cn}_{sm}', f'{fp}_{cn}_{sf}_{sm}', f'{fp}_{cn}_{sf}_{sl}']
+
+    @staticmethod
+    def diurnal_cycle_row(col_name, f_suffix) -> List[str]:
+        # for example, 'DC_NEE_uStar_f_compact'
+        dc, cn, sf, ct = EddyPrefixes.DIURNAL, col_name, f_suffix, PostProcSuffixes.COMPACT
+        return [f'{dc}_{cn}_{sf}_{ct}']
+
+    @staticmethod
+    def flux_compare_row(col_name, f_suffix) -> List[str]:
+        # for example, ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
+        fl, cn, sf, ct = EddyPrefixes.FLUX, col_name, f_suffix, PostProcSuffixes.COMPACT
+        return [f'{fl}_{cn}_{ct}', f'{fl}_{cn}_{sf}_{ct}']
+
+
+class EProcOutputHandler:
     def __init__(self, output_sequence, tag_handler, out_info):
         self.output_sequence = output_sequence
         self.tag_handler = tag_handler
@@ -173,23 +193,6 @@ class EddyOutput:
         total_years = out_info.end_year - out_info.start_year + 1
         assert total_years > 0
         self.img_proc = EddyImgPostProcess(total_years)
-
-    @staticmethod
-    def hmap_compare_row(col_name, suffix):
-        fp, cn, sf = EddyPrefixes.HEAT_MAP, col_name, suffix
-        return [f'{fp}_{cn}_map', f'{fp}_{cn}_{sf}_map', f'{fp}_{cn}_{sf}_legend']
-
-    @staticmethod
-    def diurnal_cycle_row(col_name, suffix):
-        # for example, 'DC_NEE_uStar_f_compact'
-        dc, cn, sf = EddyPrefixes.DIURNAL, col_name, suffix
-        return [f'{dc}_{cn}_{sf}_compact']
-
-    @staticmethod
-    def flux_compare_row(col_name, suffix):
-        # for example, ['Flux_NEE_compact', 'Flux_NEE_uStar_f_compact'],
-        fl, cn, sf = EddyPrefixes.FLUX, col_name, suffix
-        return [f'{fl}_{cn}_compact', f'{fl}_{cn}_{sf}_compact']
 
     def extended_tags(self):
         # in one list, exclude markdown text
@@ -200,7 +203,7 @@ class EddyOutput:
 
         tp = self.tag_handler.tags_to_img_fnames(heatmaps)
         for tag, path in tp.items():
-            self.img_proc.process_heatmap(tag, path, map_postfix='_map', legend_postfix='_legend')
+            self.img_proc.process_heatmap(tag, path)
 
         img_rows = [tag_list for tag_list in self.output_sequence if type(tag_list) is list]
         merges = [row for row in img_rows if row[0].startswith(EddyPrefixes.HEAT_MAP)]
@@ -213,11 +216,11 @@ class EddyOutput:
 
         tp = self.tag_handler.tags_to_img_fnames(fluxes)
         for tag, path in tp.items():
-            self.img_proc.process_flux(tag, path, postfix='_compact')
+            self.img_proc.process_flux(tag, path, postfix=PostProcSuffixes.COMPACT)
 
         tp = self.tag_handler.tags_to_img_fnames(diurnal)
         for tag, path in tp.items():
-            self.img_proc.process_diurnal_cycle(tag, path, postfix='_compact')
+            self.img_proc.process_diurnal_cycle(tag, path, postfix=PostProcSuffixes.COMPACT)
 
     def display_images(self):
         for output_step in self.output_sequence:

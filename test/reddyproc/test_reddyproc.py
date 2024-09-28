@@ -20,7 +20,7 @@ def use_r_from_python_env():
 
 
 def test_process(use_r_from_python_env):
-    ig.ias_output_prefix = 'tv_fy4_22-14'
+    ig.ias_output_prefix = 'tv_fy4'
 
     import src.cells_mirror.cell_reddyproc_process  # noqa: F401
     # import src.cells_mirror.cell_reddyproc_draw  # noqa: F401
@@ -30,7 +30,7 @@ def test_draw():
     ig.eddyproc = SimpleNamespace()
     ig.eddyproc.out_info = SimpleNamespace()
     ig.eddyproc.options = SimpleNamespace(is_to_apply_u_star_filtering=True)
-    ig.eddyproc.out_info.fnames_prefix = 'TestSiteID_99-00'
+    ig.eddyproc.out_info.fnames_prefix = 'tv_fy4_99-00'
     ig.eddyproc.out_info.start_year = 1999
     ig.eddyproc.out_info.end_year = 2000
     # ensure_empty_dir('output/reddyproc')
