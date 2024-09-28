@@ -3,14 +3,14 @@
 library(dplyr)
 
 
-.combine_cols_alternating <- function(df, df_merge, expected_col_dupes){
+.combine_cols_alternating <- function(df, df_add, expected_col_dupes){
     # not tested
 
-    stopifnot(all(df[expected_col_dupes] == df_merge[expected_col_dupes]))
-    stopifnot(nrows(df) == nrows(df_merge))
+    stopifnot(all(df[expected_col_dupes] == df_add[expected_col_dupes]))
+    stopifnot(nrows(df) == nrows(df_add))
 
     df_ma <- df %>% select(-any_of(expected_col_dupes))
-    df_mb <- df_merge %>% select(-any_of(expected_col_dupes))
+    df_mb <- df_add %>% select(-any_of(expected_col_dupes))
 
     neworder <- order(c(2 * (seq_along(df_ma) - 1) + 1,
                         2 * seq_along(df_mb)))
@@ -20,32 +20,34 @@ library(dplyr)
 }
 
 
-merge_cols_aligning <- function(df, df_merge, expected_col_dupes, align_pair){
-    # example:
-    # H_f LE_f U_f , H_sqc LE_sqc U_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
-    # supports regex for align_pair '*_f$', '*_sqc$'
-    # supports missing align_pair[[2]] columns
+merge_cols_aligning <- function(df, df_add, expected_col_dupes, f_align_rule){
+    # f_align_rule:
+    #     function to propose best column insert position:
+    #     function(<df_add_col_name>) -> <df_col_name>
+    #     if returns NULL or df_column is missing, just adds df_add column to the right of df
+    #
+    #     for example, if f_align_rule is: function(cn) gsub('*_f$', '_sqc', cn)
+    #     merge will be: H_f LE_f H_sqc LE_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
 
-    stopifnot(df[expected_col_dupes] == df_merge[expected_col_dupes])
-    df_unique_merge <- df_merge %>% select(-matches(expected_col_dupes))
+    stopifnot(df[expected_col_dupes] == df_add[expected_col_dupes])
+    df_unique_add <- df_add %>% select(-matches(expected_col_dupes))
 
-    mask_a <- align_pair[[1]]
-    mask_b <- align_pair[[2]]
-    df_unmasks <- sub(mask_a, '', colnames(df))
-    merge_unmasks <- sub(mask_b, '', colnames(df_unique_merge))
+    colnames_df <- colnames(df)
+    colnames_df_add <- colnames(df_unique_add)
+    align_target <- f_align_rule(colnames_df_add)
+    align_target[!align_target %in% colnames_df] <- NULL
 
-    if (anyDuplicated(merge_unmasks) || anyDuplicated(df_unmasks))
-        stop('\n Cannot merge columns due to duplicate names for align patterns \n')
+    colnames_df_add_unpaired <- colnames_df_add[is.null(align_target)]
 
-    names <- c(colnames(df), colnames(df_unique_merge))
-    unmasks <- c(df_unmasks, merge_unmasks)
+    col_or_paired <- function(cn) c(cn, colnames_df_add[align_target == cn])
+    tgt_col_order <- c(unlist(Map(col_or_paired, colnames_df)), colnames_df_add_unpaired)
 
-    unique_unmasks <- unique(unmasks)
-    reordered_colnames <- unlist(Map(function(.) {names[unmasks == .]}, unique_unmasks))
-    stopifnot(length(reordered_colnames) == ncol(merge))
-    stopifnot(!duplicated(reordered_colnames))
+    df_res <- cbind(df, df_unique_add)
 
-    return(cbind(df, df_unique_merge)[reordered_colnames])
+    stopifnot(ncol(tgt_col_order) == ncol(df_res))
+    stopifnot(tgt_col_order %in% colnames(df_res) %>% all)
+
+    return(df_res[tgt_col_order])
 }
 
 
