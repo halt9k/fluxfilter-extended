@@ -1,28 +1,30 @@
+from typing import List, Tuple, Union
+
 import src.ipynb_globals as ig
 from src.reddyproc.postprocess import create_archive
-from src.reddyproc.postprocess_graphs import EddyOutput, EddyImgTagHandler
+from src.reddyproc.postprocess_graphs import EProcOutputHandler, EProcImgTagHandler, EProcOutputGen
 from src.colab_routines import add_download_button, no_scroll
 
 is_ustar = ig.eddyproc.options.is_to_apply_u_star_filtering
-usuffix = 'uStar_f' if is_ustar else 'f'
-output_sequence = (
+f_suffix = 'uStar_f' if is_ustar else 'f'
+output_sequence: Tuple[Union[List[str], str], ...] = (
     "## Тепловые карты",
-    EddyOutput.hmap_compare_row('NEE', usuffix),
-    EddyOutput.hmap_compare_row('LE', 'f'),
-    EddyOutput.hmap_compare_row('H', 'f'),
+    EProcOutputGen.hmap_compare_row('NEE', f_suffix),
+    EProcOutputGen.hmap_compare_row('LE', 'f'),
+    EProcOutputGen.hmap_compare_row('H', 'f'),
     "## Суточный ход",
-    EddyOutput.diurnal_cycle_row('NEE', usuffix),
-    EddyOutput.diurnal_cycle_row('LE', 'f'),
-    EddyOutput.diurnal_cycle_row('H', 'f'),
+    EProcOutputGen.diurnal_cycle_row('NEE', f_suffix),
+    EProcOutputGen.diurnal_cycle_row('LE', 'f'),
+    EProcOutputGen.diurnal_cycle_row('H', 'f'),
     "## 30-минутные потоки",
-    EddyOutput.flux_compare_row('NEE', usuffix),
-    EddyOutput.flux_compare_row('LE', 'f'),
-    EddyOutput.flux_compare_row('H', 'f')
+    EProcOutputGen.flux_compare_row('NEE', f_suffix),
+    EProcOutputGen.flux_compare_row('LE', 'f'),
+    EProcOutputGen.flux_compare_row('H', 'f')
 )
 
-tag_handler = EddyImgTagHandler(main_path='output/reddyproc',
-                                eddy_loc_prefix=ig.eddyproc.out_info.fnames_prefix, img_ext='.png')
-eio = EddyOutput(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
+tag_handler = EProcImgTagHandler(main_path='output/reddyproc',
+                                 eddy_loc_prefix=ig.eddyproc.out_info.fnames_prefix, img_ext='.png')
+eio = EProcOutputHandler(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
 eio.prepare_images()
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=ig.eddyproc.out_info.fnames_prefix + '.zip',
