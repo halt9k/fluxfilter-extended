@@ -27,7 +27,7 @@ eio.prepare_images()
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=ig.eddyproc.out_info.fnames_prefix + '.zip',
                           include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eio.img_proc.raw_img_duplicates)
-add_download_button(arc_path, 'Download all images')
+add_download_button(arc_path, 'Download outputs')
 
 no_scroll()
 eio.display_images()
