@@ -5,25 +5,24 @@ from src.reddyproc.postprocess import create_archive
 from src.reddyproc.postprocess_graphs import EProcOutputHandler, EProcImgTagHandler, EProcOutputGen
 from src.colab_routines import add_download_button, no_scroll
 
-is_ustar = ig.eddyproc.options.is_to_apply_u_star_filtering
-f_suffix = 'uStar_f' if is_ustar else 'f'
+tag_handler = EProcImgTagHandler(main_path='output/reddyproc', eproc_options=ig.eddyproc, img_ext='.png')
+eog = EProcOutputGen(tag_handler)
+
 output_sequence: Tuple[Union[List[str], str], ...] = (
     "## Тепловые карты",
-    EProcOutputGen.hmap_compare_row('NEE', f_suffix),
-    EProcOutputGen.hmap_compare_row('LE', 'f'),
-    EProcOutputGen.hmap_compare_row('H', 'f'),
+    eog.hmap_compare_row('NEE_*'),
+    eog.hmap_compare_row('LE_f'),
+    eog.hmap_compare_row('H_f'),
     "## Суточный ход",
-    EProcOutputGen.diurnal_cycle_row('NEE', f_suffix),
-    EProcOutputGen.diurnal_cycle_row('LE', 'f'),
-    EProcOutputGen.diurnal_cycle_row('H', 'f'),
+    eog.diurnal_cycle_row('NEE_*'),
+    eog.diurnal_cycle_row('LE_f'),
+    eog.diurnal_cycle_row('H_f'),
     "## 30-минутные потоки",
-    EProcOutputGen.flux_compare_row('NEE', f_suffix),
-    EProcOutputGen.flux_compare_row('LE', 'f'),
-    EProcOutputGen.flux_compare_row('H', 'f')
+    eog.flux_compare_row('NEE_*'),
+    eog.flux_compare_row('LE_f'),
+    eog.flux_compare_row('H_f')
 )
 
-tag_handler = EProcImgTagHandler(main_path='output/reddyproc',
-                                 eddy_loc_prefix=ig.eddyproc.out_info.fnames_prefix, img_ext='.png')
 eio = EProcOutputHandler(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
 eio.prepare_images()
 
