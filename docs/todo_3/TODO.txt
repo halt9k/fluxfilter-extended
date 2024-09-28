@@ -1,12 +1,4 @@
-+ Было бы еще хорошо вывести суточные ходы в виде отдельного численного аутпута, 
-еще одну csv-шку, сверху вниз от 0:00 до 23:30, переменная_месяц, для каждой переменной 12 колонок будет.
-
-Может, лучше в разных файлах каждую переменную. 
-Название файла NEE_courses и в файле табличку сверху вниз от 00:00 до 23:30, 
-каждый новый столбец вправо - новый месяц.
-csv-файл с суточными ходами, еще один аутпут
-
-+ write that ustar_f cols dont exist
++ write that ustar_f cols dont actually exist придумал
 
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
@@ -22,6 +14,10 @@ csv-файл с суточными ходами, еще один аутпут
 		либо пропатчить  REddyProc полноценно в либе или во время одной из функций
 	само применение фильтра - 
 		см пример в Excel
+	Ustar can fail for multiple reasons, should I fallback on any possible reason or only on known?
+		check 2y model
+	Ustar can fail on WithinYear, but work on Continious
+
 
 + Telegram QA
 + Pack soures file in archive too
