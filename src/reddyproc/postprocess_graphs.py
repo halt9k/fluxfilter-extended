@@ -120,10 +120,10 @@ class EddyImgPostProcess:
         fname = replace_fname_end(path, tag, tag + map_postfix)
         cmap.save(fname)
 
-        fname = replace_fname_end(path, tag, tag + legend_postfix)
-        clegend.save(fname)
+        fname_legend = replace_fname_end(path, tag, tag + legend_postfix)
+        clegend.save(fname_legend)
 
-        self.raw_img_duplicates += [path]
+        self.raw_img_duplicates += [path, fname_legend]
 
     def merge_heatmap(self, tag_paths, del_postfix, postfix):
         if len(tag_paths) != 3:

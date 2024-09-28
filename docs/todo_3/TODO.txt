@@ -1,4 +1,6 @@
 + write that ustar_f cols dont actually exist придумал
++ ensure legend is always same
++ update ipynb description 
 
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
