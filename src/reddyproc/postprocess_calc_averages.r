@@ -72,7 +72,7 @@ calc_averages <- function(df_full){
     unique_cols_y <- c('Year')
 
     # hourly should also contain averages of columns before EProc
-    df_to_mean_t <- cbind(df[cols_to_mean], Separator = NA, df[paired_cols_in])
+    df_to_mean_t <- cbind(df[cols_to_mean], df[paired_cols_in])
 
     df_means_t <- .aggregate_df(df_to_mean_t, by_col = df[unique_cols_t], mean_nna)
     df_means_d <- .aggregate_df(df_to_mean, by_col = df[unique_cols_d], mean_nna)
@@ -89,10 +89,14 @@ calc_averages <- function(df_full){
     df_nna_m <- .aggregate_df(df_to_nna, by_col = df[unique_cols_m], nna_ratio)
     df_nna_y <- .aggregate_df(df_to_nna, by_col = df[unique_cols_y], nna_ratio)
 
-    df_t <- cbind(df_means_t, ' '='', df_nna_t %>% select(-matches(unique_cols_t)))
-    df_d <- merge_cols_aligning(df_means_d, df_nna_d, unique_cols_d, align_pair = c('*_f$', '*_sqc$'))
-    df_m <- merge_cols_aligning(df_means_m, df_nna_m, unique_cols_m, align_pair = c('*_f$', '*_sqc$'))
-    df_y <- merge_cols_aligning(df_means_y, df_nna_y, unique_cols_y, align_pair = c('*_f$', '*_sqc$'))
+    align_raw_sqc <- function(cn) gsub('*_sqc$', '', cn)
+    df_t <- merge_cols_aligning(df_means_t, df_nna_t, unique_cols_t, align_raw_sqc)
+    df_t <- add_column(df_t, ' ' = ' ', .after = tail(cols_to_mean, 1))
+
+    align_f_sqc <- function(cn) gsub('*_sqc$', '_f', cn)
+    df_d <- merge_cols_aligning(df_means_d, df_nna_d, unique_cols_d, align_f_sqc)
+    df_m <- merge_cols_aligning(df_means_m, df_nna_m, unique_cols_m, align_f_sqc)
+    df_y <- merge_cols_aligning(df_means_y, df_nna_y, unique_cols_y, align_f_sqc)
 
     return(list(hourly = df_t, daily = df_d, monthly = df_m, yearly = df_y))
 }

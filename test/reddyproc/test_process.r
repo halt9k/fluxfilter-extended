@@ -36,8 +36,10 @@ eddyproc_user_options <- list(
 
 
 test_reddyproc <- function(options) {
-    options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
+    # options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
     reddyproc_and_postprocess(eddyproc_user_options)
+
+    # stopifnot(...)
 }
 
 
@@ -48,6 +50,8 @@ test_3y <- function(options) {
     options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
     options$output_dir <- test_dir
     reddyproc_and_postprocess(options)
+
+    # stopifnot(...)
 }
 
 test_reddyproc(eddyproc_user_options)
