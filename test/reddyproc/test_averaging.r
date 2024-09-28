@@ -86,7 +86,8 @@ test_model_3_month <- function(){
 
 
 test_real_year <- function(){
-	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/unknown.csv')
+	# df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/unknown.csv')
+	df = load_csv_as_reddyproc_df('test/reddyproc/test_averaging_fixtures/vm2.csv')
 
 	# ensure order and years are processed separately
 	df[df$Year == 2023 & df$DoY == 354 & df$Hour > 10,]$Year = 2022
@@ -126,6 +127,15 @@ test_real_year <- function(){
 	df$VPD_ff = df$DoY
 	df$VVPD_ff = df$DoY
 
+	# ensure length
+	iso_mon <- month(ISOdate(year = df$Year, month = 1, day = 1) + days(df$DoY - 1))
+	stopifnot(month(df$DateTime) == iso_mon)
+
+	expected_years = n_distinct(df$Year)
+	expected_months = n_distinct(cbind(df$Year, iso_mon))
+	expected_days = n_distinct(cbind(df$Year, df$DoY))
+	expected_hours = n_distinct(cbind(df$Year, iso_mon, df$Hour))
+
 	dfs <- calc_averages(df)
 
 	# save_reddyproc_df(df, fname = fs::path(tempdir(), 'test_year_input_df.csv'))
@@ -160,6 +170,12 @@ test_real_year <- function(){
 	# ensure one val
 	stopifnot(any(dd[dd$Year == 2023,]$VPD_sqc != 0), dd[dd$Year == 2024,]$VPD_sqc == 0)
 	stopifnot(!anyNA(dy[dy$Year == 2023,]$VPD_f), dy[dy$Year == 2024,]$VPD_f %>% is.na)
+
+	# ensure length
+	stopifnot(nrow(dy) == expected_years - 1)
+	stopifnot(nrow(dm) == expected_months - 1)
+	stopifnot(nrow(dd) == expected_days - 1)
+	stopifnot(nrow(dt) == expected_hours - 1)
 
 	ensure_correct_names(names(dd), names(dm), names(dy))
 	save_averages(dfs, tempdir(), 'tmp', '.csv')
