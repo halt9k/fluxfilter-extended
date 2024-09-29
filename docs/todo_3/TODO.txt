@@ -1,8 +1,12 @@
-- Было бы еще хорошо вывести суточные ходы в виде отдельного численного аутпута, еще одну csv-шку, сверху вниз от 0:00 до 23:30, переменная_месяц, для каждой переменной 12 колонок будет.
++ both ustar failure conditions?
 
-- Telegram QA
++ ERpoc adds GMT to time if file is 3 mon short? that's the bug?
+	why Reco was required?
+	why not equal on load?
+	why attributes changed?
+	why GMT suddenly there? EProc?
 
-REddyProc в некоторых случаях сбоит на ustarFiltering, тогда: 
++ REddyProc в некоторых случаях сбоит на ustarFiltering, тогда: 
 	можно параметр попытаться пропатчить на ручной параметр
 	можно параметр совсем слепо выбрать по типу экосистемы трава \ лес
 	дальше его нужно применить каким-то способомв какой-то момент: 
@@ -10,18 +14,26 @@ REddyProc в некоторых случаях сбоит на ustarFiltering, �
 		либо пропатчить  REddyProc полноценно в либе или во время одной из функций
 	само применение фильтра - 
 		см пример в Excel
+	Ustar can fail for multiple reasons, should I fallback on any possible reason or only on known?
+		check 2y model
+	Ustar can fail on WithinYear, but work on Continious
 
 
---- MAYBE
++ Telegram QA
++ Pack soures input file in archive too
++ beyond compare compare images
 
-- настроить сравнивалку для блокнотов exe, SO answer, другим
+>>>>> MAYBE
 
-- Commit to RProc fixes? or share notebook
++ pdf and copy text also with png
++ настроить сравнивалку для блокнотов exe, SO answer, другим
+
++ Commit to RProc fixes? or share notebook
 	- random 2 last column output 1.3.3?!
 	- output size not wrapped in the end
 	- stdout and stderr are mixed
 	- auto ustar fallback option
 
---- LATER
+>>>>> LATER
 
 Git action который автоматически генерирует compare?
