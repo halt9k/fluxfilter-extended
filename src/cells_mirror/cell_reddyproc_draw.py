@@ -1,35 +1,36 @@
+from typing import List, Tuple, Union
+
 import src.ipynb_globals as ig
 from src.reddyproc.postprocess import create_archive
-from src.reddyproc.postprocess_graphs import EddyOutput, EddyImgTagHandler
-from src.colab_routines import add_download_button, no_scroll
+from src.reddyproc.postprocess_graphs import EProcOutputHandler, EProcImgTagHandler, EProcOutputGen
+from src.colab_routines import colab_add_download_button, colab_no_scroll
 
-is_ustar = ig.eddyproc.options.is_to_apply_u_star_filtering
-usuffix = 'uStar_f' if is_ustar else 'f'
-output_sequence = (
+tag_handler = EProcImgTagHandler(main_path='output/reddyproc', eproc_options=ig.eddyproc, img_ext='.png')
+eog = EProcOutputGen(tag_handler)
+
+output_sequence: Tuple[Union[List[str], str], ...] = (
     "## Тепловые карты",
-    EddyOutput.hmap_compare_row('NEE', usuffix),
-    EddyOutput.hmap_compare_row('LE', 'f'),
-    EddyOutput.hmap_compare_row('H', 'f'),
+    eog.hmap_compare_row('NEE_*'),
+    eog.hmap_compare_row('LE_f'),
+    eog.hmap_compare_row('H_f'),
     "## Суточный ход",
-    EddyOutput.diurnal_cycle_row('NEE', usuffix),
-    EddyOutput.diurnal_cycle_row('LE', 'f'),
-    EddyOutput.diurnal_cycle_row('H', 'f'),
+    eog.diurnal_cycle_row('NEE_*'),
+    eog.diurnal_cycle_row('LE_f'),
+    eog.diurnal_cycle_row('H_f'),
     "## 30-минутные потоки",
-    EddyOutput.flux_compare_row('NEE', usuffix),
-    EddyOutput.flux_compare_row('LE', 'f'),
-    EddyOutput.flux_compare_row('H', 'f')
+    eog.flux_compare_row('NEE_*'),
+    eog.flux_compare_row('LE_f'),
+    eog.flux_compare_row('H_f')
 )
 
-tag_handler = EddyImgTagHandler(main_path='output/reddyproc',
-                                eddy_loc_prefix=ig.eddyproc.out_info.fnames_prefix, img_ext='.png')
-eio = EddyOutput(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
+eio = EProcOutputHandler(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
 eio.prepare_images()
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=ig.eddyproc.out_info.fnames_prefix + '.zip',
                           include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eio.img_proc.raw_img_duplicates)
-add_download_button(arc_path, 'Download all images')
+colab_add_download_button(arc_path, 'Download outputs')
 
-no_scroll()
+colab_no_scroll()
 eio.display_images()
 
 tag_handler.display_tag_info(eio.extended_tags())

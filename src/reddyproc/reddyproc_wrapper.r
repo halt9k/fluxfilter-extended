@@ -128,7 +128,11 @@ OUTPUT_DIR <- NULL
 .reddyproc_ustar_fallback_wrapper <- function(eddyproc_config){
     res <- .reddyproc_io_wrapper(eddyproc_config)
 
-    if (!is.null(res$err$call) && res$err$call[[1]][[3]] == 'sMDSGapFillAfterUstar') {
+    if (is.null(res$err$call))
+        return(res)
+
+
+    if (grepl('sMDSGapFillAfterUstar', res$err$call, fixed = TRUE) %>% any) {
         if (eddyproc_config$isToApplyUStarFiltering != TRUE)
             stop('Unexpected option: ustar failed while disabled.')
         warning('\n\n\n OPTION FAILURE: uStar filtering failed. Fallback attempt ',
@@ -152,7 +156,7 @@ reddyproc_and_postprocess <- function(user_options){
     # display warnings immidiately; REddyProc web tool uses this
     options(warn = 1)
 
-    options(max.print = 80)
+    options(max.print = 50)
     message("Output of R is truncated to improve rpy2 output.")
 
     INPUT_FILE <<- user_options$input_file
