@@ -1,4 +1,4 @@
-+ write that ustar_f cols dont actually exist придумал
++ both ustar failure conditions?
 
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
@@ -21,6 +21,7 @@
 
 + Telegram QA
 + Pack soures input file in archive too
++ beyond compare compare images
 
 >>>>> MAYBE
 
