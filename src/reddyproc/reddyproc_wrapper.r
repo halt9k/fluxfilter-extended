@@ -128,7 +128,11 @@ OUTPUT_DIR <- NULL
 .reddyproc_ustar_fallback_wrapper <- function(eddyproc_config){
     res <- .reddyproc_io_wrapper(eddyproc_config)
 
-    if (!is.null(res$err$call) && 'sMDSGapFillAfterUstar' %in% paste(res$err$call)) {
+    if (is.null(res$err$call))
+        return(res)
+
+
+    if (grepl('sMDSGapFillAfterUstar', res$err$call, fixed = TRUE) %>% any) {
         if (eddyproc_config$isToApplyUStarFiltering != TRUE)
             stop('Unexpected option: ustar failed while disabled.')
         warning('\n\n\n OPTION FAILURE: uStar filtering failed. Fallback attempt ',
