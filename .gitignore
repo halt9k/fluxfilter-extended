@@ -1,6 +1,6 @@
-.ipynb_checkpoints/FluxFilterExtended-checkpoint.ipynb
-output/output.txt
-output/
+/output/
+/FluxFilterExtended.py
+
+.ipynb_checkpoints/
 .Rhistory
 .RData
-FluxFilterExtended.py
