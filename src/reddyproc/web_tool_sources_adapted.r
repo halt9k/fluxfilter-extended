@@ -386,7 +386,7 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
         paste(capture.output(df), collapse = '\n')
 
     warning('\n\nREddyProc uStar filter have not automatically detected thresholds for some values.\n',
-            'They will be replaced with fixed value, before:\n',
+            'They were replaced with fixed fallback values. Before:\n',
             printed_df(before), '\nAfter: \n', printed_df(EProc$sUSTAR_SCEN), '\n')
 }
 
