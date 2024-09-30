@@ -1,6 +1,7 @@
-# This specific file is kindly provided by REddyProc authors
+# This specific file was kindly provided by REddyProc authors
 # Original file name is runEddyProcFunctions.R
-# Contains minimal changes and is similar to online tool https://www.bgc-jena.mpg.de/REddyProc/ui/REddyProc.php
+# Contains minimal changes and is similar to online tool
+# https://www.bgc-jena.mpg.de/REddyProc/ui/REddyProc.php
 
 
 readInputData <- function(dataFileName, input_format) {
@@ -88,14 +89,18 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
     } else if (eddyProcConfiguration$uStarSeasoning == "User") {
         if (is.null(EProc$sDATA$season))
             stop("Missing column season for user-specifid seasons for ", "u* Threshold estimation.")
+
         as.factor(EProc$sDATA$season)
-    } else stop("unknown value of eddyProcConfiguration$uStarSeasoning")
+    } else
+        stop("unknown value of eddyProcConfiguration$uStarSeasoning")
 
     uStarRes <- if (isTRUE(eddyProcConfiguration$isBootstrapUStar)) {
         EProc$sEstUstarThresholdDistribution(seasonFactor = seasonFactor, nSample = nSample)
     } else {
-        # EProc$trace(sEstUstarThold, browser); #EProc$untrace(sEstUstarThold) trace(usEstUstarThreshold, recover);
-        # #untrace(usEstUstarThreshold) trace(REddyProc:::usGetValidUstarIndices, recover); #untrace(usGetValidUstarIndices)
+        # EProc$trace(sEstUstarThold, browser);
+        # EProc$untrace(sEstUstarThold) trace(usEstUstarThreshold, recover);
+        # #untrace(usEstUstarThreshold) trace(REddyProc:::usGetValidUstarIndices, recover);
+        # untrace(usGetValidUstarIndices)
         EProc$sEstUstarThold(seasonFactor = seasonFactor)
     }
 
@@ -110,7 +115,8 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
     }
 
     uStarTh <- EProc$sGetUstarScenarios()
-    list(StarTh = EProc$sGetUstarScenarios(), seasonFactor = seasonFactor, suffixes = get_ustar_suffixes(EProc))
+    list(StarTh = EProc$sGetUstarScenarios(), seasonFactor = seasonFactor,
+         suffixes = get_ustar_suffixes(EProc))
 }
 
 
@@ -301,13 +307,17 @@ partitionAndPlotFluxesOrError <- function(eddyProcConfiguration, ...) {
 }
 
 
-## << if equals 'onlinetool' then for backward compatibility the columns '*_ustar_*' are renamed to '*_*' in the generated
-## output file
-writeProcessingResultsToFile <- function(inputData, EProc, outputFileName, isIncludeOnlyFilledBootColumns = TRUE, output_format = "onlinetool") {
+writeProcessingResultsToFile <- function(inputData, EProc, outputFileName,
+                                         isIncludeOnlyFilledBootColumns = TRUE,
+                                         output_format = "onlinetool") {
+    ## output_format << if equals 'onlinetool' then for backward compatibility
+    ##     the columns '*_ustar_*' are renamed to '*_*' in the generated output file
+
     processedEddyData <- EProc$sExportResults()
     if (isTRUE(isIncludeOnlyFilledBootColumns)) {
 
-        # remove all columns generated during bootstrap, unless the filled, which end with '_f' or start with Reco or start
+        # remove all columns generated during bootstrap, unless the filled,
+        # which end with '_f' or start with Reco or start
         # with GPP
         suffixes <- get_ustar_suffixes(EProc)
         suffixes_boot <- suffixes[!(suffixes %in% c("", "uStar"))]
@@ -360,8 +370,9 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
 }
 
 
-processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, outputFileName = file.path(OUTPUT_DIR, "output.txt"),
-    figureFormat = "pdf") {
+processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
+                            outputFileName = file.path(OUTPUT_DIR, "output.txt"),
+                            figureFormat = "pdf") {
     caught_error <- NULL
 
 
@@ -407,10 +418,10 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE, ou
 
     df_output <- writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName,
                                               output_format = eddyProcConfiguration$output_format)
-
     ## value<< list of describe<< << string binary code 0/1 if UstarFiltering, GapFilling, FluxPartitioning was used <<
     ## string of size of the inputFile '<nrow>,<col>' << NULL or error object caught but not stopped << to end up in dump so
     ## that maybe debugged end<<
+
     return(list(mode = encodeEddyProcTasks(eddyProcConfiguration),
                 inputSize = paste(dim(inputData), collapse = ","),
                 err = caught_error, EProc = EProc, df_output = df_output))
