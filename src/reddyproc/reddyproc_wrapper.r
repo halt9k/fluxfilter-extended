@@ -134,8 +134,6 @@ OUTPUT_DIR <- NULL
     if (is.null(res$err$call))
         return(res)
 
-    return(res)
-
     # full fallback to ustar disabled, possibly not nessesary anymore?
     if (grepl('sMDSGapFillAfterUstar', res$err$call, fixed = TRUE) %>% any) {
         if (eddyproc_config$isToApplyUStarFiltering != TRUE)
