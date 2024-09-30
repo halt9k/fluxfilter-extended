@@ -21,6 +21,8 @@ OUTPUT_DIR <- NULL
     siteId = 'yourSiteID',
 
     isToApplyUStarFiltering = TRUE,
+    # custom, not from default package
+    ustar_fallback_value = 0.1,
 
     uStarSeasoning = factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
     uStarMethod = factor("RTw", levels = "RTw"),
@@ -67,6 +69,7 @@ OUTPUT_DIR <- NULL
     merge$siteId <- user_opts$site_id
 
     merge$isToApplyUStarFiltering <- user_opts$is_to_apply_u_star_filtering
+    merge$ustar_fallback_value <- user_opts$ustar_fallback_value
     merge$uStarSeasoning <- factor(user_opts$u_star_seasoning)
     merge$uStarMethod <- factor(user_opts$u_star_method)
 
@@ -131,7 +134,9 @@ OUTPUT_DIR <- NULL
     if (is.null(res$err$call))
         return(res)
 
+    return(res)
 
+    # full fallback to ustar disabled, possibly not nessesary anymore?
     if (grepl('sMDSGapFillAfterUstar', res$err$call, fixed = TRUE) %>% any) {
         if (eddyproc_config$isToApplyUStarFiltering != TRUE)
             stop('Unexpected option: ustar failed while disabled.')

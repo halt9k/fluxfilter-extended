@@ -370,6 +370,27 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
 }
 
 
+.ustarThresholdFallback <- function(eddyProcConfiguration, EProc) {
+    if (!anyNA(EProc$sUSTAR_SCEN$uStar))
+        return()
+
+    if (!is.null(eddyProcConfiguration$ustar_fallback_value))
+        warning('\n REddyProc uStar filter have not detected some thresholds.\n',
+                'No fallback value is provided either. Gap fill failure ois expected.\n')
+
+    before <- EProc$sUSTAR_SCEN
+    EProc$sUSTAR_SCEN$uStar[is.na(EProc$sUSTAR_SCEN$uStar)] <-
+        eddyProcConfiguration$ustar_fallback_value
+
+    printed_df <- function(df)
+        paste(capture.output(df), collapse = '\n')
+
+    warning('\n\nREddyProc uStar filter have not automatically detected thresholds for some values.\n',
+            'They will be replaced with fixed value, before:\n',
+            printed_df(before), '\nAfter: \n', printed_df(EProc$sUSTAR_SCEN), '\n')
+}
+
+
 processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
                             outputFileName = file.path(OUTPUT_DIR, "output.txt"),
                             figureFormat = "pdf") {
@@ -402,6 +423,8 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
         if (!length(caught_error) && inherits(ans, "error"))
             caught_error <- ans
     }
+
+    .ustarThresholdFallback(eddyProcConfiguration, EProc)
 
     if (eddyProcConfiguration$isToApplyGapFilling) {
         ans <- gapFillAndPlotDataVariablesOrError(eddyProcConfiguration, EProc, dataVariablesToFill)
