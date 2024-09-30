@@ -1,20 +1,3 @@
-ommit: f86b563564d133bc685c14486af6ca8042c3c127 [f86b563]
-Parents: 7a77c6d1eb
-Author: halt9k <49090368+halt9k@users.noreply.github.com>
-Date: 14 August 2024 02:40:52
-Committer: halt9k
-initial
-	online tool dig
-
-
-a309626c6f07a46e8fe9d9138e5d17be76236fdc [a309626]
-Parents: 1bced2ef27
-Author: halt9k <49090368+halt9k@users.noreply.github.com>
-Date: 31 August 2024 11:12:45
-Committer: halt9k
-all tests work
-	extract R
-
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
 	why not equal on load?
@@ -37,7 +20,27 @@ all tests work
 + Telegram QA
 + beyond compare compare images
 
++ MERGE
+	ommit: f86b563564d133bc685c14486af6ca8042c3c127 [f86b563]
+	Parents: 7a77c6d1eb
+	Author: halt9k <49090368+halt9k@users.noreply.github.com>
+	Date: 14 August 2024 02:40:52
+	Committer: halt9k
+	initial
+		online tool dig
+
+
+	a309626c6f07a46e8fe9d9138e5d17be76236fdc [a309626]
+	Parents: 1bced2ef27
+	Author: halt9k <49090368+halt9k@users.noreply.github.com>
+	Date: 31 August 2024 11:12:45
+	Committer: halt9k
+	all tests work
+		extract R
+
 >>>>> MAYBE
+
+How can I specify the same color palette for different fingerprint plots (#colorpalette)
 
 + pdf and copy text also with png
 + настроить сравнивалку для блокнотов exe, SO answer, другим
