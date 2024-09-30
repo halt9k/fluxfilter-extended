@@ -374,9 +374,12 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
     if (!anyNA(EProc$sUSTAR_SCEN$uStar))
         return()
 
-    if (!is.null(eddyProcConfiguration$ustar_fallback_value))
-        warning('\n REddyProc uStar filter have not detected some thresholds.\n',
-                'No fallback value is provided either. Gap fill failure ois expected.\n')
+    if (is.null(eddyProcConfiguration$ustar_fallback_value) ||
+        eddyProcConfiguration$ustar_fallback_value <= 0) {
+        warning('\n\nREddyProc uStar filter have not detected some thresholds.\n',
+                'Fallback value is not provided or zero. Gap fill failure ois expected.\n')
+        return()
+    }
 
     before <- EProc$sUSTAR_SCEN
     EProc$sUSTAR_SCEN$uStar[is.na(EProc$sUSTAR_SCEN$uStar)] <-

@@ -14,7 +14,7 @@ eddyproc_user_options <- list(
     site_id = 'TestSiteID',
 
     is_to_apply_u_star_filtering = TRUE,
-    ustar_fallback_value = 0.1,
+    ustar_fallback_value = 0,
 
     u_star_seasoning =  factor("WithinYear", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
