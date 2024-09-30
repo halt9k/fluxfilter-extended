@@ -14,8 +14,9 @@ eddyproc_user_options <- list(
     site_id = 'TestSiteID',
 
     is_to_apply_u_star_filtering = TRUE,
+    ustar_fallback_value = 0,
 
-    u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
+    u_star_seasoning =  factor("WithinYear", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
 
     is_bootstrap_u_star = FALSE,
@@ -36,7 +37,6 @@ eddyproc_user_options <- list(
 
 
 test_reddyproc <- function(options) {
-    # options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
     reddyproc_and_postprocess(eddyproc_user_options)
 
     # stopifnot(...)
@@ -47,7 +47,7 @@ test_3y <- function(options) {
     # possibly copy all used files into temp dir and work only from it
     test_dir = tempdir()
 
-    options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\vm2.txt"
+    options$input_file <- "test\\reddyproc\\test_reddyproc_process_fixtures\\test_3_years.txt"
     options$output_dir <- test_dir
     reddyproc_and_postprocess(options)
 

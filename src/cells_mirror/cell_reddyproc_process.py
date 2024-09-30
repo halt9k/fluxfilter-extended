@@ -9,9 +9,10 @@ ig.eddyproc.options = SimpleNamespace(
     site_id=ias_output_prefix,
 
     is_to_apply_u_star_filtering=True,
+    ustar_fallback_value=0,
 
     # uStarSeasoning = "WithinYear", "Continuous" , "User"
-    u_star_seasoning="Continuous",
+    u_star_seasoning="WithinYear",
     u_star_method="RTw",
 
     is_bootstrap_u_star=False,
