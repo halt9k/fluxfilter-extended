@@ -8,14 +8,14 @@
 	можно параметр попытаться пропатчить на ручной параметр
 	можно параметр совсем слепо выбрать по типу экосистемы трава \ лес
 	дальше его нужно применить каким-то способомв какой-то момент: 
-		либо до REddyProc
-		либо пропатчить  REddyProc полноценно в либе или во время одной из функций
 	само применение фильтра - 
 		см пример в Excel
 	Ustar can fail for multiple reasons, should I fallback on any possible reason or only on known?
 		check 2y model
 	Ustar can fail on WithinYear, but work on Continious
 
++ remove code to fallback ustar option (already disabled, but in repo)
+	may not be needded with just fallback value
 
 + Telegram QA
 + beyond compare compare images
