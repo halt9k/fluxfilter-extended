@@ -39,6 +39,8 @@ all tests work
 
 >>>>> MAYBE
 
+How can I specify the same color palette for different fingerprint plots (#colorpalette)
+
 + pdf and copy text also with png
 + настроить сравнивалку для блокнотов exe, SO answer, другим
 
