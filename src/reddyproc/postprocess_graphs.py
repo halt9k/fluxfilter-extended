@@ -12,6 +12,7 @@ from IPython.display import display
 from PIL import Image
 
 import src.helpers.os_helpers  # noqa: F401
+from src.helpers.py_helpers import catch
 from src.ipynb_helpers import display_image_row
 from src.helpers.io_helpers import replace_fname_end
 from src.helpers.io_helpers import tags_to_files, tag_to_fname
@@ -237,6 +238,13 @@ class EProcOutputHandler:
                 if len(check) != 1:
                     warn(f'Unrecognized tag: {tag}')
 
+    def on_missing_file(self, e):
+        print(str(e))
+
+    def prepare_images_safe(self):
+        with catch(self.on_missing_file, FileNotFoundError):
+            self.prepare_images()
+
     def display_images(self):
         for output_step in self.output_sequence:
             if type(output_step) is str:
@@ -247,3 +255,7 @@ class EProcOutputHandler:
                 display_image_row(list(paths.values()))
             else:
                 raise Exception("Wrong OUTPUT_HEADERS contents")
+
+    def display_images_safe(self):
+        with catch(self.on_missing_file, FileNotFoundError):
+            self.display_images()
