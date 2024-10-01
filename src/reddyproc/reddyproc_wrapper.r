@@ -69,7 +69,7 @@ OUTPUT_DIR <- NULL
     merge$siteId <- user_opts$site_id
 
     merge$isToApplyUStarFiltering <- user_opts$is_to_apply_u_star_filtering
-    merge$ustar_fallback_value <- numeric(user_opts$ustar_fallback_value)
+    merge$ustar_fallback_value <- as.numeric(user_opts$ustar_fallback_value)
     merge$uStarSeasoning <- factor(user_opts$u_star_seasoning)
     merge$uStarMethod <- factor(user_opts$u_star_method)
 
@@ -79,9 +79,9 @@ OUTPUT_DIR <- NULL
     merge$isToApplyPartitioning <- user_opts$is_to_apply_partitioning
 
     merge$partitioningMethods <- user_opts$partitioning_methods
-    merge$latitude <- numeric(user_opts$latitude)
-    merge$longitude <- numeric(user_opts$longitude)
-    merge$timezone <- numeric(user_opts$timezone)
+    merge$latitude <- as.numeric(user_opts$latitude)
+    merge$longitude <- as.numeric(user_opts$longitude)
+    merge$timezone <- as.numeric(user_opts$timezone)
 
     merge$temperatureDataVariable <- user_opts$temperature_data_variable
 
