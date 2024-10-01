@@ -14,6 +14,8 @@ class Direction(Enum):
 
 
 def crop_monocolor_borders(img, sides='LTRB', col=None, margin=10):
+    """ Removes empty space on image sides """
+
     img_rgb = img.convert("RGB")
     w, h = img_rgb.size
 
@@ -43,22 +45,12 @@ def crop_monocolor_borders(img, sides='LTRB', col=None, margin=10):
     return img.crop(bbox_final)
 
 
-def split_image(img: Image, direction: Direction, n):
-    assert n > 0
-    w, h = img.size
-
-    # crop: left, upper, right, lower
-    imgs = []
-    if direction == Direction.HORIZONTAL:
-        imgs = [img.crop((w * i / n, 0, w * (i + 1) / n, h)) for i in range(n)]
-    elif direction == Direction.VERTICAL:
-        imgs = [img.crop((0, h * i / n, w, h * (i + 1) / n)) for i in range(n)]
-
-    return imgs
-
-
 def ungrid_image(img: PIL.Image, nx=1, ny=1, flatten=False):
-    """  Without flatten=True returns row major [tile_j][tile_i]: PIL.Image """
+    """
+    For example, to split image on left and right parts:
+        ungrid_image(img, nx=2, True)
+    Without flatten=True returns row major [tile_j][tile_i]: PIL.Image
+    """
 
     w, h = img.size
     assert w >= nx > 0 and h >= ny > 0
@@ -76,7 +68,7 @@ def ungrid_image(img: PIL.Image, nx=1, ny=1, flatten=False):
 
 
 def grid_images(images, max_horiz=np.iinfo(int).max):
-    # combines images in row or column depending on max_horiz arg
+    """ Combines images in row or column depending on max_horiz arg """
 
     n_images = len(images)
     n_horiz = min(n_images, max_horiz)
@@ -94,7 +86,7 @@ def grid_images(images, max_horiz=np.iinfo(int).max):
 
 
 def remove_strip(img: np.array, strip_axis: Direction, percent_at, margin=10):
-    # cuts an image on two and crops space from cut side on both
+    """ Cuts an image on two parts and crops space from cut side on both parts """
 
     w, h = img.size
     assert 0 <= percent_at <= 1
