@@ -273,7 +273,7 @@ class EProcOutputHandler:
                 paths = self.tag_handler.tags_to_img_fnames(output_step)
                 display_image_row(list(paths.values()))
             else:
-                raise Exception("Wrong OUTPUT_HEADERS contents")
+                raise Exception("Wrong ig.output_sequence contents")
 
     def display_images_safe(self):
         with catch(self.on_missing_file, FileNotFoundError):

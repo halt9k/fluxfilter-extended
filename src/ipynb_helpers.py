@@ -3,11 +3,10 @@ Unlike colab_routines.py, this file is expected to be used under local runs too.
 However, output may be auto replaced with text.
 """
 import io
-from pathlib import Path
 from warnings import warn
 
 from IPython import get_ipython
-from IPython.display import Markdown, HTML, display
+from IPython.display import HTML, display
 from PIL import Image
 from ipywidgets import widgets, HBox
 

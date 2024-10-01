@@ -72,13 +72,7 @@ def colab_add_download_button(fname, caption):
     display(button_box)
 
 
-""" examples:
-from google.colab.output import eval_js
-eval_js('''
-let sh = google.colab.output.getActiveOutputArea().scrollHeight;
-google.colab.output.setIframeHeight(sh);
-''')
-
+""" unused:
 from IPython.display import HTML, display, Javascript, display_javascript
 js1 = Javascript('''
 async function resize_output() {
