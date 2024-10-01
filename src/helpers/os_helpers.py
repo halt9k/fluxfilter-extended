@@ -5,8 +5,8 @@ from sys import path
 
 """
  This module is intended to be imported before all other user modules.
- Allows to keep consistent imports root src.* when runnning from different dirs. 
- I.e. cmd */run_main.bat, ./main.py, tests start ./test/test_main.py, etc
+ ch_project_root_dir() allows to keep consistent imports root src.* when runnning from different dirs: 
+    cmd: */run_main.bat, py: ./main.py, py tests: ./test/test_main.py, etc
 
  Import with autorun of declared functions without warning:
  from src.helpers import os_helpers  # noqa: F401
