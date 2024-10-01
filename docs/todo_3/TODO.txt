@@ -1,4 +1,5 @@
 + Update description of ipynb on threshold fallback
++ fallback on noe, not on 0
 
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
