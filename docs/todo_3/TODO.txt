@@ -1,5 +1,6 @@
-+ Update description of ipynb on threshold fallback
-+ fallback on noe, not on 0
++ Telegram QA
+
+>>>>> MAYBE
 
 + ERpoc adds GMT to time if file is 3 mon short? that's the bug?
 	why Reco was required?
@@ -7,20 +8,9 @@
 	why attributes changed?
 	why GMT suddenly there? EProc?
 
-+ REddyProc в некоторых случаях сбоит на ustarFiltering, тогда: 
-	можно параметр попытаться пропатчить на ручной параметр
-	можно параметр совсем слепо выбрать по типу экосистемы трава \ лес
-	дальше его нужно применить каким-то способомв какой-то момент: 
-	само применение фильтра - 
-		см пример в Excel
-	Ustar can fail for multiple reasons, should I fallback on any possible reason or only on known?
-		check 2y model
-	Ustar can fail on WithinYear, but work on Continious
++   Ustar can fail for multiple reasons, should I fallback on any possible reason or only on known?
+		fail on WithinYear, but work on Continious
 
-+ remove code to fallback ustar option (already disabled, but in repo)
-	may not be needded with just fallback value
-
-+ Telegram QA
 + beyond compare compare images
 
 + MERGE
@@ -40,8 +30,6 @@
 	Committer: halt9k
 	all tests work
 		extract R
-
->>>>> MAYBE
 
 How can I specify the same color palette for different fingerprint plots (#colorpalette)
 
