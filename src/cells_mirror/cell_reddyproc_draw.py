@@ -24,13 +24,13 @@ output_sequence: Tuple[Union[List[str], str], ...] = (
 )
 
 eio = EProcOutputHandler(output_sequence=output_sequence, tag_handler=tag_handler, out_info=ig.eddyproc.out_info)
-eio.prepare_images()
+eio.prepare_images_safe()
 
 arc_path = create_archive(dir='output/reddyproc', arc_fname=ig.eddyproc.out_info.fnames_prefix + '.zip',
                           include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=eio.img_proc.raw_img_duplicates)
 colab_add_download_button(arc_path, 'Download outputs')
 
 colab_no_scroll()
-eio.display_images()
+eio.display_images_safe()
 
 tag_handler.display_tag_info(eio.extended_tags())

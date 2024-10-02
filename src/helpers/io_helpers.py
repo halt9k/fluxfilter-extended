@@ -3,24 +3,15 @@ from typing import List, Union
 from warnings import warn
 
 
-def tag_to_fname(dir: Path, prefix, tag, ext):
-    return dir / (prefix + '_' + tag + ext)
-
-
-def tags_to_files(dir, prefix, tags, ext, exclude_missing=True, warn_if_missing=True):
+def tag_to_fname(dir: Path, prefix, tag, ext, must_exist):
     # meaning of tags here is unique file name endings
     # Test_site_2024_Hd_f.png -> tag is Hd_f
 
-    res = {}
-    for tag in tags:
-        fname = Path(tag_to_fname(dir, prefix, tag, ext))
-        if not fname.exists():
-            if warn_if_missing:
-                warn(f"Image is missing: {fname}")
-            if exclude_missing:
-                continue
-        res[tag] = fname
-    return res
+    fname = dir / (prefix + '_' + tag + ext)
+    if must_exist and not fname.exists():
+        return None
+    else:
+        return fname
 
 
 def replace_fname_end(path: Path, tag: str, new_tag: str):
