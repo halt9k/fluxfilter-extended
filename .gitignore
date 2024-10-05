@@ -1,7 +1,7 @@
-/output/
+/output/*.zip
+/output/reddyproc/
 /FluxFilterExtended.py
 
 .ipynb_checkpoints/
 .Rhistory
 .RData
-REddyProc.txt
