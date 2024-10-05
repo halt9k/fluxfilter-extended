@@ -10,7 +10,7 @@ test_dir = tempdir()
 
 ensure_correct_names <- function(nd, nm, ny){
 	stopifnot(!duplicated(nd), !duplicated(nm), !duplicated(ny))
-	stopifnot(setdiff(nd, 'DoY') == nm, setdiff(nm, 'Month') == ny)
+	stopifnot(setdiff(nd, c('DoY', 'DoM')) == nm, setdiff(nm, 'Month') == ny)
 
 	# no with .1 in name
 	stopifnot(!any(contains(match = '.1', vars = c(nd, nm, ny))))
