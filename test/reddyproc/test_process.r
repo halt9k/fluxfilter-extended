@@ -32,7 +32,7 @@ eddyproc_user_options <- list(
 
     temperature_data_variable = "Tair",
 
-    input_file = "REddyProc.txt",
+    input_file = "output/REddyProc.txt",
     output_dir = "output/reddyproc"
 )
 
