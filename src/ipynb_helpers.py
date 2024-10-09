@@ -6,20 +6,23 @@ import io
 from warnings import warn
 
 from IPython import get_ipython
-from IPython.display import HTML, display
+from IPython.display import HTML, display, display_png
+from IPython.display import Image as IImage
 from PIL import Image
 from ipywidgets import widgets, HBox
 
+from src.helpers.image_tools import grid_images
+
 
 def display_image_row(paths):
-    img_widgets = []
-    for path in paths:
-        byte_arr = io.BytesIO()
-        Image.open(path).save(byte_arr, format='PNG')
-        img_widgets += [widgets.Image(value=byte_arr.getvalue(), format="PNG")]
+    imgs = [Image.open(path) for path in paths]
+    img_combined = grid_images(imgs, 3)
 
-    hbox = HBox(img_widgets)
-    display(hbox)
+    byte_arr = io.BytesIO()
+    img_combined.save(byte_arr, format='PNG')
+
+    img = IImage(data=byte_arr.getvalue(), width=img_combined.width, height=img_combined.height, unconfined=True)
+    display(img)
 
 
 def ipython_only(func):
