@@ -6,23 +6,41 @@ import io
 from warnings import warn
 
 from IPython import get_ipython
-from IPython.display import HTML, display, display_png
-from IPython.display import Image as IImage
+from IPython.display import display, HTML
 from PIL import Image
 from ipywidgets import widgets, HBox
 
 from src.helpers.image_tools import grid_images
 
 
-def display_image_row(paths):
-    imgs = [Image.open(path) for path in paths]
-    img_combined = grid_images(imgs, 3)
+def display_image_row(paths):  
+    imgs = []
+    for path in paths:
+        try:
+            img = Image.open(path)
+        except:
+            continue
+        imgs += [img]
+    # TODO check paths exist where?
+    if len(imgs) < 1:
+            return
 
-    byte_arr = io.BytesIO()
-    img_combined.save(byte_arr, format='PNG')
+    img_combined = grid_images(imgs, len(imgs))
+    # byte_arr = io.BytesIO()
+    # img_combined.save(byte_arr, format='PNG')
+    # from IPython.display import Image as IImage
+    # IImage(data=byte_arr.getvalue(), width=img_combined.width, unconfined=True)
 
-    img = IImage(data=byte_arr.getvalue(), width=img_combined.width, height=img_combined.height, unconfined=True)
-    display(img)
+    # widgets.Image is not persistent on Colab load
+    # display(byte_arr) does not have horisonal scroll,
+    #     if vertical scroll is disabled on Colab
+    # Hbox(widgets.Output(display(byte_arr))) works fluently
+
+    out = widgets.Output(layout={'border': '1px solid black'})
+    with out:
+        display(img_combined)
+    hbox = HBox([out])
+    display(hbox)
 
 
 def ipython_only(func):
