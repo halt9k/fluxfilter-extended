@@ -1,4 +1,4 @@
-
+update ipynb from 8-9 oct
 
  ? add commit sha on colab after first launch?!
 
