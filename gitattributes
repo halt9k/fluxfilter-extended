@@ -1,3 +1,2 @@
-src/* linguist-vendored=false
-test/* linguist-vendored=false
-tools/* linguist-vendored=false
+*.ipynb linguist-vendored
+misc\ipynb_versions\*.ipynb linguist-vendored
