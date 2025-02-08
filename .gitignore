@@ -1,4 +1,9 @@
+!misc/colab_version_samples/**/*.log
 /output/*.zip
+/output/*.csv
+/output/*.txt
+/output/*.log
+/TODO/**
 /output/reddyproc/
 /FluxFilterExtended.py
 
