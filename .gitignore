@@ -1,8 +1,7 @@
 .ipynb_checkpoints/
 .Rhistory
 .RData
-/output/**
-!/output/*REddyProc*.txt
+/output/reddyproc/*.png
 
 
 # dev

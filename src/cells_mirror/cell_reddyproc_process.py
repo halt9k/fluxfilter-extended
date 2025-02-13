@@ -17,7 +17,7 @@ ig.eddyproc.options = SimpleNamespace(
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
     u_star_seasoning="Continuous",
 
-    is_to_apply_partitioning=True,
+    is_to_apply_partitioning=False,
 
     # partitioning_methods: one or both of "Reichstein05", "Lasslop10"
     partitioning_methods=["Reichstein05", "Lasslop10"],
