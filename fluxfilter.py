@@ -73,7 +73,9 @@ Original file is located at
 # from google.colab import userdata
 # key = userdata.get('registry_key')
 
-!mkdir output
+# !mkdir output
+from src.helpers.io_helpers import ensure_empty_dir
+ensure_empty_dir('output')
 
 # Commented out IPython magic to ensure Python compatibility.
 # %pip install plotly-resampler dateparser >> /dev/null
@@ -95,8 +97,8 @@ pio.renderers.default = "colab"
 from IPython.display import display
 
 
-from google.colab import output
-output.enable_custom_widget_manager()
+# from google.colab import output
+# output.enable_custom_widget_manager()
 
 from plotly.subplots import make_subplots
 import plotly.express as px
@@ -111,13 +113,13 @@ import re
 # import bglabutils.boosting as bb
 # import textwrap
 
-from google.colab import output
-output.no_vertical_scroll()
+# from google.colab import output
+# output.no_vertical_scroll()
 
 # %load_ext autoreload
 # %autoreload 2
 
-logging.basicConfig(level=logging.INFO, filename="/content/output/log.log", filemode="w", force=True)
+logging.basicConfig(level=logging.INFO, filename="output/log.log", filemode="w", force=True)
 logging.info("START")
 
 """## Функции для отрисовки"""
@@ -1149,11 +1151,11 @@ https://drive.google.com/file/d/1fGhmvra0evNzM0xkM2nu5T-N_rSPoXUB/view?usp=shari
 
 # Загрузка файла full output
 # https://drive.google.com/file/d/1CGJmXyFu_pmzTLitG5aU8fwY8gW3CI1n/view?usp=sharing
-!gdown 1CGJmXyFu_pmzTLitG5aU8fwY8gW3CI1n
+# !gdown 1CGJmXyFu_pmzTLitG5aU8fwY8gW3CI1n
 
 # Загрузка файла biomet
 # https://drive.google.com/file/d/19XsOw5rRJMVMyG1ntRpibfkUpRAP2H4k/view?usp=sharing
-!gdown 19XsOw5rRJMVMyG1ntRpibfkUpRAP2H4k
+# !gdown 19XsOw5rRJMVMyG1ntRpibfkUpRAP2H4k
 
 data, time = bg.load_df(config)
 data = data[next(iter(data))]  #т.к. изначально у нас словарь
@@ -1846,8 +1848,8 @@ except ImportError:
     class StopExecution(Exception):
         def _render_traceback_(self):
             return ['Colab env not detected. Current cell is only for Colab.']
-    raise StopExecution()
 
+'''
 cur_dir = %pwd
 assert cur_dir == '/content'
 
@@ -1863,7 +1865,7 @@ assert cur_dir == '/content'
 
 # %cd /content
 !cp -r src/repo1/src .
-
+'''
 # 1.3.2 vs 1.3.3 have slightly different last columns
 # alternative for windows
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
@@ -1879,6 +1881,16 @@ sink(stdout(), type = "message")
 install_if_missing("REddyProc", "1.3.3", repos = 'http://cran.rstudio.com/')
 sink()
 """
+
+def use_r_from_python_env():
+    import sys
+    from pathlib import Path
+    env_folder = os.path.dirname(sys.executable)
+    r_folder = str(Path(env_folder) / "Lib/R")
+    assert Path(r_folder).exists()
+    os.environ['R_HOME'] = r_folder
+use_r_from_python_env()
+
 from rpy2 import robjects
 robjects.r(setup_colab_r_code)
 
