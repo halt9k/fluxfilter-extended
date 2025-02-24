@@ -17,28 +17,30 @@ The following objects are masked from 'package:base':
 
     date, intersect, setdiff, union
 
-Output of R is truncated to improve rpy2 output.
-List of 19
- $ siteId                 : chr "tv_fy4"
- $ isToApplyUStarFiltering: logi TRUE
- $ ustar_fallback_value   : num 0
- $ uStarSeasoning         : Factor w/ 1 level "Continuous": 1
- $ uStarMethod            : Factor w/ 1 level "RTw": 1
- $ isBootstrapUStar       : logi FALSE
- $ isToApplyGapFilling    : logi TRUE
- $ isToApplyPartitioning  : logi TRUE
- $ partitioningMethods    : chr [1:2] "Reichstein05" "Lasslop10"
- $ latitude               : num 56.5
- $ longitude              : num 32.6
- $ timezone               : num 3
- $ temperatureDataVariable: chr "Tair"
- $ isCatchingErrorsEnabled: logi TRUE
- $ input_format           : chr "onlinetool"
- $ output_format          : chr "onlinetool"
- $ useDevelopLibraryPath  : logi FALSE
- $ debugFlags             : chr ""
- $ figureFormat           : chr "png"
-Loaded file REddyProc.txt with the following variables (units):
+
+REP EXT: Max length of R output is reduced to improve rpy2 output.
+List of 20
+ $ siteId                    : chr "tv_fy4"
+ $ isToApplyUStarFiltering   : logi TRUE
+ $ ustar_fallback_value      : num NaN
+ $ ustar_allow_skip_rg_filter: logi TRUE
+ $ uStarSeasoning            : Factor w/ 1 level "Continuous": 1
+ $ uStarMethod               : Factor w/ 1 level "RTw": 1
+ $ isBootstrapUStar          : logi FALSE
+ $ isToApplyGapFilling       : logi TRUE
+ $ isToApplyPartitioning     : logi TRUE
+ $ partitioningMethods       : chr [1:2] "Reichstein05" "Lasslop10"
+ $ latitude                  : num 56.5
+ $ longitude                 : num 32.6
+ $ timezone                  : num 3
+ $ temperatureDataVariable   : chr "Tair"
+ $ isCatchingErrorsEnabled   : logi TRUE
+ $ input_format              : chr "onlinetool"
+ $ output_format             : chr "onlinetool"
+ $ useDevelopLibraryPath     : logi FALSE
+ $ debugFlags                : chr ""
+ $ figureFormat              : chr "png"
+Loaded file output/REddyProc_tv_fy4_2023.txt with the following variables (units):
  *** Year(-) DoY(-) Hour(-) NEE(umolm-2s-1) LE(Wm-2) H(Wm-2) Rg(Wm-2) Tair(degC) rH(%) VPD(hPa) Ustar(ms-1)
 Number of '-9999' convertered to NA: 28813
 Converted time format 'YDH' to POSIX with column name 'DateTime'.
@@ -106,11 +108,10 @@ isUsingOneBigSeasonOnFewRecords
 2            year       2023   <NA>    NA
 Warning in .self$sSetUstarScenarios(uStarMap) :
   Provided non-finite uStarThreshold for some periods. All values in corresponding period will be marked as gap.
-Warning in .ustarThresholdFallback(eddyProcConfiguration, EProc) :
+Warning in .ustar_threshold_fallback(eddyProcConfiguration, EProc) :
   
-
-REddyProc uStar filter have not detected some thresholds.
-Fallback value is not provided or zero. Gap fill failure is expected.
+REP EXT: uStar patch: option is NA, skipping user threshold.
+Fallback value is NaN. Gap fill failure is expected.
 
 [1] "------------- Gapfilling ---------------"
 [1] "Error during GapFilling: must provide finite uStarThresholds"
@@ -118,34 +119,33 @@ Fallback value is not provided or zero. Gap fill failure is expected.
 [1] "Error during partitioning: sMRFluxPartition:::fCheckColNames::: Missing specified columns in dataset: NEE_uStar_f, NEE_uStar_fqc, Tair_f, Tair_fqc!"
 Number of NA convertered to '-9999': 28813
 Wrote tab separated textfile: output/reddyproc/filled.txt
-Warning in .reddyproc_ustar_fallback_wrapper(eddyproc_config) :
+Warning in .run_reddyproc_via_ustar_fallback_wrapper(eddyproc_config) :
   
+REP EXT: uStar patch: filtering failed. 
+Fallback attempt to eddyproc_config$isToApplyUStarFiltering = FALSE 
 
-
- OPTION FAILURE: uStar filtering failed. Fallback attempt to eddyproc_config$isToApplyUStarFiltering = FALSE 
-
-
-List of 19
- $ siteId                 : chr "tv_fy4"
- $ isToApplyUStarFiltering: logi FALSE
- $ ustar_fallback_value   : num 0
- $ uStarSeasoning         : Factor w/ 1 level "Continuous": 1
- $ uStarMethod            : Factor w/ 1 level "RTw": 1
- $ isBootstrapUStar       : logi FALSE
- $ isToApplyGapFilling    : logi TRUE
- $ isToApplyPartitioning  : logi TRUE
- $ partitioningMethods    : chr [1:2] "Reichstein05" "Lasslop10"
- $ latitude               : num 56.5
- $ longitude              : num 32.6
- $ timezone               : num 3
- $ temperatureDataVariable: chr "Tair"
- $ isCatchingErrorsEnabled: logi TRUE
- $ input_format           : chr "onlinetool"
- $ output_format          : chr "onlinetool"
- $ useDevelopLibraryPath  : logi FALSE
- $ debugFlags             : chr ""
- $ figureFormat           : chr "png"
-Loaded file REddyProc.txt with the following variables (units):
+List of 20
+ $ siteId                    : chr "tv_fy4"
+ $ isToApplyUStarFiltering   : logi FALSE
+ $ ustar_fallback_value      : num NaN
+ $ ustar_allow_skip_rg_filter: logi TRUE
+ $ uStarSeasoning            : Factor w/ 1 level "Continuous": 1
+ $ uStarMethod               : Factor w/ 1 level "RTw": 1
+ $ isBootstrapUStar          : logi FALSE
+ $ isToApplyGapFilling       : logi TRUE
+ $ isToApplyPartitioning     : logi TRUE
+ $ partitioningMethods       : chr [1:2] "Reichstein05" "Lasslop10"
+ $ latitude                  : num 56.5
+ $ longitude                 : num 32.6
+ $ timezone                  : num 3
+ $ temperatureDataVariable   : chr "Tair"
+ $ isCatchingErrorsEnabled   : logi TRUE
+ $ input_format              : chr "onlinetool"
+ $ output_format             : chr "onlinetool"
+ $ useDevelopLibraryPath     : logi FALSE
+ $ debugFlags                : chr ""
+ $ figureFormat              : chr "png"
+Loaded file output/REddyProc_tv_fy4_2023.txt with the following variables (units):
  *** Year(-) DoY(-) Hour(-) NEE(umolm-2s-1) LE(Wm-2) H(Wm-2) Rg(Wm-2) Tair(degC) rH(%) VPD(hPa) Ustar(ms-1)
 Number of '-9999' convertered to NA: 28813
 Converted time format 'YDH' to POSIX with column name 'DateTime'.
@@ -245,7 +245,7 @@ Mean diurnal course with window size of 7 days: .
 .......665
 Mean diurnal course with window size of 14 days: .
 98
-Finished gap filling of 'NEE' in 6 seconds. Artificial gaps filled: 17520, real gaps filled: 4282, unfilled (long) gaps: 0.
+Finished gap filling of 'NEE' in 7 seconds. Artificial gaps filled: 17520, real gaps filled: 4282, unfilled (long) gaps: 0.
 Initialized variable 'LE' with 3902 real gaps for gap filling of all 17520 values (to estimate uncertainties).
 Full MDS algorithm for gap filling of 'LE' with LUT(Rg, VPD, Tair) and MDC.
 Look up table with window size of 7 days with Rg VPD Tair
@@ -361,7 +361,7 @@ Mean diurnal course with window size of 7 days: .
 ......653
 Mean diurnal course with window size of 14 days: .
 34
-Finished gap filling of 'H' in 5 seconds. Artificial gaps filled: 17520, real gaps filled: 4684, unfilled (long) gaps: 0.
+Finished gap filling of 'H' in 6 seconds. Artificial gaps filled: 17520, real gaps filled: 4684, unfilled (long) gaps: 0.
 Initialized variable 'Rg' with 8987 real gaps for gap filling.
 Restriced MDS algorithm for gap filling of 'Rg' with no meteo conditions and hence only MDC.
 Mean diurnal course with window size of 0 days: .
@@ -616,12 +616,12 @@ Saved plot to: output/reddyproc/tv_fy4_2023_FP_Reco_DT.png
 Saved plot to: output/reddyproc/tv_fy4_2023_FP_GPP_DT.png
 Number of NA convertered to '-9999': 614193
 Wrote tab separated textfile: output/reddyproc/filled.txt
-Averages: last row excluded due to too short year 
-Columns picked for averaging (Reco added if possible): 
- NEE_f LE_f H_f Rg_f VPD_f rH_f Tair_f GPP_f Reco 
-Columns picked for NA counts (GPP_f omitted): 
+REP MEANS:  last row excluded due to too short year 
+REP MEANS:  Columns picked for NA counts (GPP_f omitted): 
  NEE LE H Rg VPD rH Tair 
-Saved summary stats to : 
+REP MEANS:  Columns picked for averaging (Reco added if possible): 
+ NEE_f LE_f H_f Rg_f VPD_f rH_f Tair_f GPP_f Reco 
+REP MEANS:  Saved summary stats to : 
  output/reddyproc/tv_fy4_2023_daily.csv 
  output/reddyproc/tv_fy4_2023_monthly.csv 
  output/reddyproc/tv_fy4_2023_yearly.csv 
