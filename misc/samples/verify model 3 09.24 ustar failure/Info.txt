@@ -1,1 +1,4 @@
-ustar fails on [Continuous, WithinYear]
+Info
+	tests if ustar fallback with "Continuous" option happened correctly
+Also
+	ustar fails with this data on [Continuous, WithinYear]
