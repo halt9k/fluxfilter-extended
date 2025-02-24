@@ -3,6 +3,24 @@
 library(dplyr)
 
 
+is.not.null <- function(x) !is.null(x)
+`%ni%` <- Negate(`%in%`)
+
+
+assert <- function(x, msg){
+    if (x != TRUE)
+        stop('Assertion failure: ', msg)
+}
+
+
+insert_row <- function(df, row, r) {
+    df <- rbind(df, row)
+    df <- df[order(c(1:(nrow(df)-1), r-0.5)),]
+    row.names(df) <- 1:nrow(df)
+    return(df)
+}
+
+
 .combine_cols_alternating <- function(df, df_add, expected_col_dupes){
     # not tested
 

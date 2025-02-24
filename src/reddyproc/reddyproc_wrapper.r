@@ -16,7 +16,7 @@ INPUT_FILE <- NULL
 OUTPUT_DIR <- NULL
 
 
-# corresponds 06.2024 run
+# corresponds 06.2024 run, only types are important !
 .eddyproc_all_required_options <- list(
     siteId = 'yourSiteID',
 
@@ -39,6 +39,10 @@ OUTPUT_DIR <- NULL
     timezone = +3,
 
     temperatureDataVariable = "Tair",
+    daily_sums_units = list(NEE_f = 'gC/m2/day', NEE_uStar_f = 'gC/m2/day',
+                            LE_f = 'Wm-2', H_f = 'Wm-2', Rg_f = 'Wm-2',
+                            Tair_f = 'degC', Tsoil_f = 'degC',
+                            rH_f = '%', VPD_f = 'hPa', Ustar_f = 'ms-1', CH4flux_f = 'mg_m-2_d-1'),
 
     isCatchingErrorsEnabled = TRUE,
 
@@ -86,6 +90,7 @@ OUTPUT_DIR <- NULL
     merge$timezone <- as.numeric(user_opts$timezone)
 
     merge$temperatureDataVariable <- user_opts$temperature_data_variable
+    merge$dailySumsUnits <- user_opts$daily_sums_units
 
     return(c(merge, extra_opts))
 }
@@ -136,16 +141,28 @@ OUTPUT_DIR <- NULL
     if (is.null(res$err$call))
         return(res)
 
-    # full fallback to ustar disabled, possibly not nessesary anymore?
-    if (grepl('sMDSGapFillAfterUstar', res$err$call, fixed = TRUE) %>% any) {
-        if (eddyproc_config$isToApplyUStarFiltering != TRUE)
-            stop('Unexpected option: ustar failed while disabled.')
-        warning('\n\n\n OPTION FAILURE: uStar filtering failed. Fallback attempt ',
-                'to eddyproc_config$isToApplyUStarFiltering = FALSE \n\n')
+    do_fallback <- FALSE
+
+    # if REddypoc in ignore errors mode, stop will happend not on ustar failure, but later
+    # res$err$message == 'must provide finite uStarThresholds', ..., ?
+    if (grepl('sMDSGapFillAfterUstar', res$err$call, fixed = TRUE) %>% any)
+        do_fallback <- TRUE
+
+    # fallback if Rg (solar radiation) is missing, but required
+    if (grepl('EProc$sEstUstarThold', res$err$call, fixed = TRUE) %>% any &&
+        res$err$message == 'Missing columns in dataset: Rg')
+        do_fallback <- TRUE
+
+    if (do_fallback) {
+        assert(eddyproc_config$isToApplyUStarFiltering, 'ustar failed while disabled.')
+        warning('\n\nOPTION FAILURE: uStar filtering failed. \n',
+                'Fallback attempt to eddyproc_config$isToApplyUStarFiltering = FALSE \n')
+
         eddyproc_config$isToApplyUStarFiltering <- FALSE
         res <- .reddyproc_io_wrapper(eddyproc_config)
         res$changed_config <- eddyproc_config
     }
+
 
     return(res)
 }
