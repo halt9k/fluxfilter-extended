@@ -3,6 +3,11 @@
 library(dplyr)
 
 
+RE <- '\nREP EXT: '
+RM <- 'REP MEANS: '
+RU <- 'uStar patch: '
+
+
 is.not.null <- function(x) !is.null(x)
 `%ni%` <- Negate(`%in%`)
 
@@ -14,10 +19,21 @@ assert <- function(x, msg){
 
 
 insert_row <- function(df, row, r) {
-    df <- rbind(df, row)
-    df <- df[order(c(1:(nrow(df)-1), r-0.5)),]
-    row.names(df) <- 1:nrow(df)
-    return(df)
+    nrows <- nrow(df)
+
+    if (is.null(nrows)) {
+        warning(RE, 'Attempt to insert a row in the empty df canceled.')
+        return()
+    }
+    if (r > nrows) {
+        warning(RE, 'Attempt to insert a row outside of df, inserting as last.')
+        r <- nrows
+    }
+
+    res <- df
+    res[seq(r + 1, nrow(df) + 1), ] <- df[seq(r, nrow(df)), ]
+    res[r,] <- row
+    res
 }
 
 
@@ -44,7 +60,7 @@ merge_cols_aligning <- function(df, df_add, expected_col_dupes, f_align_rule){
     #     function(<df_add_col_name>) -> <df_col_name>
     #     if returns NULL or df_column is missing, just adds df_add column to the right of df
     #
-    #     for example, if f_align_rule is: function(cn) gsub('*_f$', '_sqc', cn)
+    #     for example, if f_align_rule is: function(cn) sub('_f$', '_sqc', cn)
     #     merge will be: H_f LE_f H_sqc LE_sqc -> H_f H_sqc U_f U_sqc LE_f LE_sqc
 
     stopifnot(df[expected_col_dupes] == df_add[expected_col_dupes])

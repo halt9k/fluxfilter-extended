@@ -3,11 +3,12 @@
 
 setwd(dirname(dirname(dirname(rstudioapi::getSourceEditorContext()$path))))
 debugSource('test/reddyproc/helpers/init_test_env.r')
+devtools::load_all(file.path(Sys.getenv('DEV'), '/R/REddyProc-1.3.3'), reset = TRUE)
 debugSource('src/reddyproc/postprocess_calc_averages.r')
 debugSource('src/reddyproc/web_tool_sources_adapted.r')
 debugSource('src/reddyproc/reddyproc_wrapper.r')
+debugSource('src/reddyproc/reddyproc_extensions.r')
 debugSource('src/reddyproc/r_helpers.r')
-
 
 # duplicates cell code to run from pure R
 # avoiding R dupe here can be too complicated
@@ -15,8 +16,11 @@ eddyproc_user_options <- list(
     site_id = 'tv_fy4',
 
     is_to_apply_u_star_filtering = TRUE,
-    # NaN or double
+    # NaN to disable or double
     ustar_fallback_value = 0.01,
+    # TODO remove all after python Rg guess implemented
+    # experimental option to apply uStar to all data (instead of only nights) when Rg is missing
+    ustar_allow_skip_rg_filter = TRUE,
 
     u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
@@ -24,7 +28,7 @@ eddyproc_user_options <- list(
     is_bootstrap_u_star = FALSE,
 
     is_to_apply_gap_filling = TRUE,
-    is_to_apply_partitioning = TRUE,
+    is_to_apply_partitioning = FALSE,
 
     partitioning_methods = c("Reichstein05", "Lasslop10"),
     latitude = 56.5,
@@ -52,9 +56,10 @@ test_reddyproc <- function(options, input_file = NULL) {
     reddyproc_and_postprocess(options)
 
     # stopifnot(...)
-    if (is.not.null(input_file))
+    if (is.not.null(input_file)) {
         message('Test dir is: ', test_dir)
         utils::browseURL(test_dir)
+    }
 }
 
 

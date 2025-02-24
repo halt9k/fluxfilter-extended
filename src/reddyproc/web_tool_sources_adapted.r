@@ -5,7 +5,7 @@
 
 
 source('src/reddyproc/r_helpers.r')
-source('src/reddyproc/plot_patches.r')
+source('src/reddyproc/reddyproc_extensions.r')
 
 
 readInputData <- function(dataFileName, input_format) {
@@ -124,17 +124,19 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
 }
 
 
-estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
+estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
+    thres_call <- function() { .estUStarThreshold(eddyProcConfiguration, EProc) }
+    wrap_call <- function() { est_ustar_threshold_fixes(thres_call, eddyProcConfiguration, EProc) }
+
     ans <- if (eddyProcConfiguration$isCatchingErrorsEnabled) {
-        tryCatch({
-            .estUStarThreshold(eddyProcConfiguration, ...)
-        }, error = function(e) {
+        tryCatch(
+        	wrap_call()
+        , error = function(e) {
             print(paste("Error during GapFilling:", e$message))
             return(e)
         })
-    } else {
-        .estUStarThreshold(eddyProcConfiguration, ...)
-    }
+    } else
+    	wrap_call()
 }
 
 
@@ -150,8 +152,16 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
     for (dataVariable in dataVariablesToFill) {
         if (eddyProcConfiguration$isToApplyUStarFiltering && dataVariable == "NEE") {
 
+            isFilterDayTime <- get_ustar_daytime_filter_option(eddyProcConfiguration, dataVariablesWithoutUncertainty)
+
             # only uStar bootstrap to NEE gapfilling, not to the other variables
-            EProc$sMDSGapFillUStarScens(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty), isVerbose = TRUE)
+            if (is.null(isFilterDayTime))
+                EProc$sMDSGapFillUStarScens(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty),
+                                            isVerbose = TRUE)
+            else
+                EProc$sMDSGapFillUStarScens(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty),
+                                            isVerbose = TRUE, isFilterDayTime = isFilterDayTime)
+
 
             # EProc$sMDSGapFillAfterUStarDistr(dataVariable \t\t, uStarTh = uStarRes$uStarTh \t\t, uStarSuffixes =
             # uStarRes$suffixes \t\t, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty) \t\t, isVerbose = T)
@@ -191,6 +201,22 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
 }
 
 
+.plotFilledDataVariable <- function(eddyProcConfiguration, EProc, processedEddyData, baseNameVal, baseNameSdVal) {
+    EProc$sPlotFingerprint(baseNameVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+    EProc$sPlotDiurnalCycle(baseNameVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+
+    table_unit <- attr(processedEddyData[, baseNameVal], "units")
+    dsum_unit = get_patched_daily_sum_unit(eddyProcConfiguration, baseNameVal, table_unit)
+    with_patch(s4 = EProc, closure_name = '.sxSetTitle',
+              patched_closure = patch_daily_sums_plot_name, extra_args = baseNameVal, code = {
+        EProc$sPlotDailySums(baseNameVal, VarUnc = baseNameSdVal, Dir = OUTPUT_DIR,
+                             Format = eddyProcConfiguration$figureFormat, unit = dsum_unit)
+    })
+
+    EProc$sPlotHHFluxes(baseNameVal, Dir = OUTPUT_DIR, Format = eddyProcConfiguration$figureFormat)
+}
+
+
 .plotFilledDataVariables <- function(eddyProcConfiguration, EProc, dataVariablesToFill) {
     processedEddyData <- EProc$sExportResults()
     vars_amend <- if ("NEE" %in% dataVariablesToFill)
@@ -203,21 +229,7 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, ...) {
 
         if (baseNameVal %ni% colnames(processedEddyData))
             next
-
-        # TODO report bug in REddyProc ?
-        table_unit <- attr(processedEddyData[, baseNameVal], "units")
-
-        EProc$sPlotFingerprint(baseNameVal, Dir = OUTPUT_DIR,
-                               Format = eddyProcConfiguration$figureFormat)
-        EProc$sPlotDiurnalCycle(baseNameVal, Dir = OUTPUT_DIR,
-                                Format = eddyProcConfiguration$figureFormat)
-
-        dsum_unit = get_patched_daily_sum_unit(eddyProcConfiguration, baseNameVal, table_unit)
-        EProc$sPlotDailySums(baseNameVal, VarUnc = baseNameSdVal, Dir = OUTPUT_DIR,
-                             Format = eddyProcConfiguration$figureFormat, unit = dsum_unit)
-
-        EProc$sPlotHHFluxes(baseNameVal, Dir = OUTPUT_DIR,
-                            Format = eddyProcConfiguration$figureFormat)
+        .plotFilledDataVariable(eddyProcConfiguration, EProc, processedEddyData, baseNameVal, baseNameSdVal)
     }
 }
 
@@ -386,29 +398,6 @@ encodeEddyProcTasks <- function(eddyProcConfiguration) {
 }
 
 
-.ustarThresholdFallback <- function(eddyProcConfiguration, EProc) {
-    if (!anyNA(EProc$sUSTAR_SCEN$uStar))
-        return()
-
-    if (is.na(eddyProcConfiguration$ustar_fallback_value)) {
-        warning('\n\nREddyProc uStar filter have not detected some thresholds.\n',
-                'Fallback value is NaN. Gap fill failure is expected.\n')
-        return()
-    }
-
-    before <- EProc$sUSTAR_SCEN
-    EProc$sUSTAR_SCEN$uStar[is.na(EProc$sUSTAR_SCEN$uStar)] <-
-        eddyProcConfiguration$ustar_fallback_value
-
-    printed_df <- function(df)
-        paste(capture.output(df), collapse = '\n')
-
-    warning('\n\nREddyProc uStar filter have not automatically detected thresholds for some values.\n',
-            'They were replaced with fixed fallback values. Before:\n',
-            printed_df(before), '\nAfter: \n', printed_df(EProc$sUSTAR_SCEN), '\n')
-}
-
-
 processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
                             outputFileName = file.path(OUTPUT_DIR, "output.txt"),
                             figureFormat = "pdf") {
@@ -441,8 +430,6 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
         if (!length(caught_error) && inherits(ans, "error"))
             caught_error <- ans
     }
-
-    .ustarThresholdFallback(eddyProcConfiguration, EProc)
 
     if (eddyProcConfiguration$isToApplyGapFilling) {
         ans <- gapFillAndPlotDataVariablesOrError(eddyProcConfiguration, EProc, dataVariablesToFill)
