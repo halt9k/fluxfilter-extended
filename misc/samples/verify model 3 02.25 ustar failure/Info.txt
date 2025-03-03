@@ -1,5 +1,0 @@
-Info
-	tests if ustar fallback with "Continuous" option happened correctly
-	sample from 09.24
-Also
-	ustar fails with this data on [Continuous, WithinYear]
