@@ -1,4 +1,4 @@
-Year DoY Hour NEE LE H R_g Tair rH VPD Ustar
+Year DoY Hour NEE LE H Rg Tair rH VPD Ustar
 - - - umol_m-2_s-1 Wm-2 Wm-2 Wm-2 degC % hPa ms-1
 2023 1 0.5 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0
 2023 1 1.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0 -9999.0
