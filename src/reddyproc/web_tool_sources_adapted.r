@@ -405,6 +405,9 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
     str(eddyProcConfiguration)
 
     inputData <- readInputData(dataFileName, eddyProcConfiguration$input_format)
+    # inputData$NEE[(inputData$UStar < 5) & (is.na(inputData$Rg) | (inputData$Rg < 10)) ] <- NA
+    inputData$NEE[(inputData$Ustar < 0.3840525 | is.na(inputData$Ustar)) & (is.na(inputData$Rg) | (inputData$Rg < 10))] <- NA
+    # inputData$NEE[(inputData$Ustar < 0.3840525 ) & (is.na(inputData$Rg) | (inputData$Rg < 10))] <- NA
     str(inputData)
     EddyDataWithPosix <- validateInputData(inputData)
 
