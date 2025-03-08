@@ -10,14 +10,14 @@ ig.eddyproc.options = SimpleNamespace(
 
     is_to_apply_u_star_filtering=True,
     # if default REP cannot detect threshold, this value may be used instead; None to disable
-    ustar_threshold_fallback=None,
+    ustar_threshold_fallback=0.3472714,
     # default REP detects nights by Rg; when Rg is missing, this is experimental fallback to apply uStar over all data
     ustar_allowed_on_days=True,
 
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
-    u_star_seasoning="Continuous",
+    u_star_seasoning="WithinYear",
 
-    is_to_apply_partitioning=True,
+    is_to_apply_partitioning=False,
 
     # partitioning_methods: one or both of "Reichstein05", "Lasslop10"
     partitioning_methods=["Reichstein05", "Lasslop10"],

@@ -1,0 +1,216 @@
+REddyProc version:  1.3.3 
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'lubridate'
+
+The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union
+
+REddyProc Extended: Max length of R output is reduced to improve rpy2 output.
+List of 20
+ $ siteId                  : chr "tv_fy4"
+ $ isToApplyUStarFiltering : logi TRUE
+ $ ustar_threshold_fallback: num 0.347
+ $ ustar_allowed_on_days   : logi TRUE
+ $ uStarSeasoning          : Factor w/ 1 level "WithinYear": 1
+ $ uStarMethod             : Factor w/ 1 level "RTw": 1
+ $ isBootstrapUStar        : logi FALSE
+ $ isToApplyGapFilling     : logi TRUE
+ $ isToApplyPartitioning   : logi FALSE
+ $ partitioningMethods     : chr [1:2] "Reichstein05" "Lasslop10"
+ $ latitude                : num 56.5
+ $ longitude               : num 32.6
+ $ timezone                : num 3
+ $ temperatureDataVariable : chr "Tair"
+ $ isCatchingErrorsEnabled : logi TRUE
+ $ input_format            : chr "onlinetool"
+ $ output_format           : chr "onlinetool"
+ $ useDevelopLibraryPath   : logi FALSE
+ $ debugFlags              : chr ""
+ $ figureFormat            : chr "png"
+Loaded file output/REddyProc.txt with the following variables (units):
+ *** Year(-) DoY(-) Hour(-) NEE(umolm-2s-1) LE(Wm-2) H(Wm-2) CH4flux(Wm-2) Tair(degC) rH(%) VPD(hPa) Ustar(ms-1)
+Number of '-9999' convertered to NA: 37367
+Converted time format 'YDH' to POSIX with column name 'DateTime'.
+'data.frame':	17520 obs. of  12 variables:
+ $ DateTime: POSIXct, format: "2023-01-01 00:30:00" "2023-01-01 01:00:00" ...
+ $ Year    : int  2023 2023 2023 2023 2023 2023 2023 2023 2023 2023 ...
+  ..- attr(*, "varnames")= chr "Year"
+  ..- attr(*, "units")= chr "-"
+ $ DoY     : int  1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "varnames")= chr "DoY"
+  ..- attr(*, "units")= chr "-"
+ $ Hour    : num  0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 ...
+  ..- attr(*, "varnames")= chr "Hour"
+  ..- attr(*, "units")= chr "-"
+ $ NEE     : num  2.847 0.849 1.881 2.366 2.402 ...
+  ..- attr(*, "varnames")= chr "NEE"
+  ..- attr(*, "units")= chr "umolm-2s-1"
+ $ LE      : num  -20.46 -12.74 7.11 -6.28 -13.15 ...
+  ..- attr(*, "varnames")= chr "LE"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ H       : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "H"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ CH4flux : num  NA NA NA NA NA NA NA 0.0188 0.0052 NA ...
+  ..- attr(*, "varnames")= chr "CH4flux"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ Tair    : num  4.71 4.64 4.26 4.57 4.78 ...
+  ..- attr(*, "varnames")= chr "Tair"
+  ..- attr(*, "units")= chr "degC"
+ $ rH      : num  78.4 79.7 80.6 77.8 76.5 ...
+  ..- attr(*, "varnames")= chr "rH"
+  ..- attr(*, "units")= chr "%"
+ $ VPD     : num  1.87 1.75 1.62 1.9 2.04 ...
+  ..- attr(*, "varnames")= chr "VPD"
+  ..- attr(*, "units")= chr "hPa"
+ $ Ustar   : num  0.639 0.531 0.564 0.541 0.566 ...
+  ..- attr(*, "varnames")= chr "Ustar"
+  ..- attr(*, "units")= chr "ms-1"
+Warning in validateInputData(inputData) :
+  Columns H have no data. They are not included in processing.
+Data variables picked for gap filling (dataVariablesToFill):  NEE,LE,VPD,rH,Tair 
+No additional columns picked to keep in processing
+Warning in fCheckOutsideRange(Data.F, VarName.V.s[v.i], c("<", -50), SubCallFunc.s) :
+  sEddyProc.initialize:::fCheckColPlausibility:::fCheckOutsideRange::: Variable outside (plausible) range in 8 cases! Invalid values with 'NEE < -50': -50, -52, -53, -53, -52, -53, -52, -53 ...
+New sEddyProc class for site 'tv_fy4'
+[1] "------------- u* Threshold estimation ---------------"
+REddyProc Extended: uStar patch: Workaround for seasons detection will be applied
+
+REddyProc Extended: uStar patch: Thresholds not for all seasons were calculated automatically.
+REddyProc Extended: uStar patch: Fallback value from the user options will be used.
+Before:
+   season uStar
+1 2023003    NA
+2 2023006    NA
+3 2023009    NA
+4 2023012    NA
+After: 
+   season     uStar
+1 2023003 0.3472714
+2 2023006 0.3472714
+3 2023009 0.3472714
+4 2023012 0.3472714
+[1] "------------- Gapfilling ---------------"
+Warning in get_ustar_daytime_arg(rg_missing, default_arg, eddyProcConfiguration$ustar_allowed_on_days) :
+  REddyProc Extended: uStar patch: Rg is missing, uStar will be applied to both day and night
+Ustar filtering (u * Th_1 = 0.3472714), marked 49% of the data as gap
+Initialized variable 'NEE' with 9253 real gaps for gap filling of all 17520 values (to estimate uncertainties).
+Restriced MDS algorithm for gap filling of 'NEE.Ustar_uStar_fqc_0' with no meteo conditions and hence only MDC.
+Warning in sMDSGapFill(fluxVar, QFVar = attr(qfUStar, "varnames"), QFValue = 0,  :
+  sMDSGapFill::: No meteo available for MDS gap filling!
+Mean diurnal course with window size of 0 days: .
+............................................................
+.............................................................
+........................................................9756
+Mean diurnal course with window size of 1 days: .
+............................................................
+..................3845
+Mean diurnal course with window size of 2 days: .
+.......................................1205
+Mean diurnal course with window size of 7 days: .
+...........................1703
+Mean diurnal course with window size of 14 days: .
+..........833
+Mean diurnal course with window size of 21 days: .
+.173
+Mean diurnal course with window size of 28 days: .
+5
+Finished gap filling of 'NEE' in 1 seconds. Artificial gaps filled: 17520, real gaps filled: 9253, unfilled (long) gaps: 0.
+Initialized variable 'LE' with 2831 real gaps for gap filling of all 17520 values (to estimate uncertainties).
+Restriced MDS algorithm for gap filling of 'LE' with no meteo conditions and hence only MDC.
+Warning in EProc$sMDSGapFill(dataVariable, FillAll = !(dataVariable %in%  :
+  sMDSGapFill::: No meteo available for MDS gap filling!
+Mean diurnal course with window size of 0 days: .
+............................................................
+.............................................................
+........................................................14887
+Mean diurnal course with window size of 1 days: .
+..........................632
+Mean diurnal course with window size of 2 days: .
+....................267
+Mean diurnal course with window size of 7 days: .
+.................960
+Mean diurnal course with window size of 14 days: .
+.......774
+Finished gap filling of 'LE' in 1 seconds. Artificial gaps filled: 17520, real gaps filled: 2831, unfilled (long) gaps: 0.
+Initialized variable 'VPD' with 48 real gaps for gap filling.
+Restriced MDS algorithm for gap filling of 'VPD' with no meteo conditions and hence only MDC.
+Warning in EProc$sMDSGapFill(dataVariable, FillAll = !(dataVariable %in%  :
+  sMDSGapFill::: No meteo available for MDS gap filling!
+Mean diurnal course with window size of 0 days: .
+48
+Finished gap filling of 'VPD' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 48, unfilled (long) gaps: 0.
+Initialized variable 'rH' with 65 real gaps for gap filling.
+Restriced MDS algorithm for gap filling of 'rH' with no meteo conditions and hence only MDC.
+Warning in EProc$sMDSGapFill(dataVariable, FillAll = !(dataVariable %in%  :
+  sMDSGapFill::: No meteo available for MDS gap filling!
+Mean diurnal course with window size of 0 days: .
+64
+Mean diurnal course with window size of 1 days: .
+1
+Finished gap filling of 'rH' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 65, unfilled (long) gaps: 0.
+Initialized variable 'Tair' with 982 real gaps for gap filling.
+Restriced MDS algorithm for gap filling of 'Tair' with no meteo conditions and hence only MDC.
+Warning in EProc$sMDSGapFill(dataVariable, FillAll = !(dataVariable %in%  :
+  sMDSGapFill::: No meteo available for MDS gap filling!
+Mean diurnal course with window size of 0 days: .
+.........218
+Mean diurnal course with window size of 1 days: .
+.......746
+Mean diurnal course with window size of 2 days: .
+18
+Finished gap filling of 'Tair' in 0 seconds. Artificial gaps filled: 17520, real gaps filled: 982, unfilled (long) gaps: 0.
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_NEE.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_NEE.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_LE.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_LE.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_VPD.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_VPD.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_rH.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_rH.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_Tair.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_Tair.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DC_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DSumU_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DC_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DSumU_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DC_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DSum_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DC_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DSum_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_FP_Tair_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DC_Tair_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_DSum_Tair_f.png
+Saved plot to: output/reddyproc/tv_fy4_2023_Flux_Tair_f.png
+Number of NA convertered to '-9999': 307871
+Wrote tab separated textfile: output/reddyproc/filled.txt
+REddyProc Means:  Last row excluded due to too short year 
+REddyProc Means:  Columns picked for NA counts (GPP_f omitted): 
+ NEE LE VPD rH Tair 
+REddyProc Means:  Columns picked for averaging (Reco added if possible): 
+ NEE_f LE_f VPD_f rH_f Tair_f 
+REddyProc Means:  Saved summary stats to : 
+ output/reddyproc/tv_fy4_2023_daily.csv 
+ output/reddyproc/tv_fy4_2023_monthly.csv 
+ output/reddyproc/tv_fy4_2023_yearly.csv 
+ output/reddyproc/tv_fy4_2023_hourly.csv 

@@ -1,0 +1,4 @@
+Info
+	
+	tests if missing Rg works correctly and if CH4 passed to means
+	sample 03.25 - possibly with bug, missing Rg option always indirectly drops seasons to WithinYear?
