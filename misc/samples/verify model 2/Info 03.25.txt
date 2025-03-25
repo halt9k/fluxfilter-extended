@@ -1,4 +1,7 @@
 Info
+	this is default scenario of ipynb
+	colab vs local tv_fy4_2023_filled.txt:
+		for the small amount of rows results are different in the last 3 rows by 0.0001 (quite a lot)
 	sample added 09.24
-	updated and verified 03.25
+	replaced by similar 03.25
 Also

@@ -1,0 +1,4 @@
+Info
+	user seasons
+	ustar fails on [WithinYear, Continuous]
+	sample from 10.24 - not exactly known if good or bad
