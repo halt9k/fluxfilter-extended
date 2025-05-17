@@ -2015,8 +2015,8 @@ assert cur_dir == '/content'
 # !git -c init.defaultBranch=main init
 # !git sparse-checkout init
 # !git sparse-checkout set "src"
-# !git remote add origin https://github.com/PlaZMaD/climate.git
-# !git fetch --depth 1 origin main
+# !git remote add origin https://github.com/halt9k/fluxfilter-extended.git
+# !git fetch --depth 1 origin dev
 # !git -c advice.detachedHead=false checkout FETCH_HEAD
 
 # %cd /content
