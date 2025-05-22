@@ -23,13 +23,15 @@ rep_user_options <- list(
     # NA to disable or double
     ustar_threshold_fallback = 0.1,
     # TODO remove leftovers after python Rg guess implemented
+    # TODO RG_th_REP not in outputs
+    # TODO if to fill gaps in NEE, seasons crash? inputData$NEE[is.na(inputData$NEE)] <- 1.0
     # REP ustar requires Rg to detect nights; when real data is missing, 3 workarounds are possible
     # 'Rg_th_Py', 'Rg_th_REP' - estimate by theoretical algs,
     # "Rg" - by real data, '' - ignore Rg and filter both days and nights
-    ustar_rg_source = '',
+    ustar_rg_source = 'Rg_th_REP',
 
 
-    u_star_seasoning =  factor("User", levels = c("Continuous", "WithinYear", "User")),
+    u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
 
     is_bootstrap_u_star = FALSE,
@@ -60,12 +62,6 @@ run_rep <- function(options, input_file = NULL) {
         options$site_id <- input_finfo$site_id
     }
     reddyproc_and_postprocess(options)
-
-    # stopifnot(...)
-    if (is.not.null(input_file)) {
-        message('Test dir is: ', test_dir)
-        utils::browseURL(test_dir)
-    }
 }
 
 
