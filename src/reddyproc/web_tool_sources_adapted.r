@@ -413,6 +413,7 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
 
     inputData <- readInputData(dataFileName, eddyProcConfiguration$input_format)
     str(inputData)
+    inputData$NEE[is.na(inputData$NEE)] <- 1.0
     EddyDataWithPosix <- validateInputData(inputData)
 
     dataVariablesToFill <- getDataVariablesToFill(colnames(EddyDataWithPosix), eddyProcConfiguration)
