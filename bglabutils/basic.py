@@ -55,8 +55,12 @@ def load_df(d_config, sheet_name=None):
     tmp_config['header'] = None
     # tmp_config['engine'] = 'openpyxl'
     df_dict = None
-    with open(file_name, encoding='utf8', errors='backslashreplace') as f:
-        df_dict = load_func(f, **tmp_config)
+
+    if ext == 'csv':
+        with open(file_name, encoding='utf8', errors='backslashreplace') as f:
+            df_dict = load_func(f, **tmp_config)
+    else:
+        df_dict = load_func(file_name, **tmp_config)
 
     if ext == 'csv':
         df_dict = {'default': df_dict}
@@ -82,9 +86,12 @@ def load_df(d_config, sheet_name=None):
             # else:
             #     pass
             #     # l_config['skiprows'] = None
+    if ext == 'csv':
+        with open(file_name, encoding='utf8', errors='backslashreplace') as f:
+            df_dict = load_func(f, **l_config)
+    else:
+        df_dict = load_func(file_name, **l_config)
 
-    with open(file_name, encoding='utf8', errors='backslashreplace') as f:
-        df_dict = load_func(f, **l_config)
     if ext == 'csv':
         df_dict = {'default': df_dict}
 

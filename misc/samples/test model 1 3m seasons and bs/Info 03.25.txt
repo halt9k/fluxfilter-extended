@@ -1,0 +1,8 @@
+Info
+	3m, switches years
+	ustar fails on [WithinYear], works on [Continious]
+	updated 06.25
+	Continious vs User: rep outputs are same, except 
+		2 years in Continious seasons vs 
+		just 1 yseason for User
+		if bootstrap, some randomness involved too including NEE_fsdu and NEE_fsdug
