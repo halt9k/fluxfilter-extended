@@ -3,7 +3,9 @@
 .RData
 /output/**
 !/output/*REddyProc*.txt
-
+*.csv
+*.xls
+*.xlsx
 
 # dev
 # FluxFilter.ipynb
