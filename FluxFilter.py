@@ -1019,7 +1019,7 @@ config_meteo['time']['converter'] = my_datetime_converter
 
 ###Запишите название Ваших файлов и путь к ним. Если файлы будут импортированы с google-диска
 ###через команду !gdown, то достаточно заменить название файла
-config_meteo['path'] = 'BiometFy4_2023.csv'#'BiometFy4_2016.csv'#'BiometNCT_2011-22.csv'
+config_meteo['path'] = 'tv_fy4_2022_v01.xlsx'#'BiometFy4_2016.csv'#'BiometNCT_2011-22.csv'
 
 # + [markdown] id="DtxFTNnEfENz"
 # ## Выбор колонок для графиков и фильтраций
@@ -1221,7 +1221,6 @@ madhampel_filter_config[ 'ppfd_1_1_1'] =  {'z': 8.0, 'hampel_window': 10}
 from src.data_import.eddypro_loader import load_eddypro_fulloutput
 from src.data_import.ias_loader import load_ias
 
-
 mode_str = config['mode']
 if mode_str == 'EDDYPRO_1':
     res = load_eddypro_fulloutput(config, config_meteo)
@@ -1237,7 +1236,20 @@ else:
 data, time, biomet_columns, data_freq, config_meteo = res
 
 
-points_per_day = int(pd.Timedelta('24H')/data_freq)
+# TODO remove, extract to test
+'''
+data = data.rename(columns={'vpd_1_1_1': 'vpd'}).drop('ppfd_1_1_1', axis='columns')
+from helpers.pd_helpers import df_get_unique_cols, df_intersect_cols
+config['mode'] = 'EDDYPRO_1'
+config['path'] = ['IAS_only_Ckd_FO_2015.csv']
+data1, time1, biomet_columns1, data_freq1, config_meteo1 = load_eddypro_fulloutput(config, config_meteo)
+data1.columns = data1.columns.str.lower()
+data1 = data1.drop(['filename', 'date', 'time', 'timestamp_1', 'tmp_datetime', 'datetime_meteo'], axis=1)
+d, d1 = df_get_unique_cols(data[1:], data1)
+d1 = d1[d.columns]
+test = pd.DataFrame.compare(d[d1.columns], d1, align_axis='columns')
+'''
+points_per_day = int(pd.Timedelta('24h')/data_freq)
 
 # + id="C8lLDYOWzH2d"
 data.columns = data.columns.str.lower()
