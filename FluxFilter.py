@@ -96,7 +96,7 @@
 # !git -c init.defaultBranch=main init
 # !git sparse-checkout init
 # !git sparse-checkout set "src"
-# !git remote add origin https://github.com/halt9k/fluxfilter-extended.git
+# !git remote add origin https://github.com/PlaZMaD/climate.git
 # !git fetch --depth 1 origin ias-draft
 # !git -c advice.detachedHead=false checkout FETCH_HEAD
 
