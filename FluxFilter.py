@@ -128,7 +128,10 @@ from src.ipynb_routines import setup_plotly
 # cur_dir = %pwd
 # assert cur_dir == '/content'
 out_dir = Path('output')
-out_dir.mkdir(exist_ok=True)
+# TODO is it ok to cleanup?
+from src.helpers.io_helpers import ensure_empty_dir
+ensure_empty_dir(out_dir)
+# out_dir.mkdir(exist_ok=True)
 
 colab_no_scroll()
 colab_enable_custom_widget_manager()
@@ -1236,7 +1239,7 @@ else:
 data, time, biomet_columns, data_freq, config_meteo = res
 
 
-points_per_day = int(pd.Timedelta('24H')/data_freq)
+points_per_day = int(pd.Timedelta('24h')/data_freq)
 
 # + id="C8lLDYOWzH2d"
 data.columns = data.columns.str.lower()
