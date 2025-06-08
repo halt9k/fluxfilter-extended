@@ -23,7 +23,7 @@ COLS_EDDYPRO_TO_IAS = {
 	"Tau": "TAU_1_1_1", "qc_Tau": "TAU_SSITC_TEST_1_1_1",
 	"co2_strg": "SC_1_1_1", "co2_mole_fraction": "CO2_1_1_1",
 	"h2o_mole_fraction": "H2O_1_1_1", "sonic_temperature": "T_SONIC_1_1_1",
-	"Ta_1_1_1": "TA_1_1_1", "Pa_1_1_1": "PA_1_1_1",
+	"Pa_1_1_1": "PA_1_1_1",
 	"Swin_1_1_1": "SW_IN_1_1_1", "Swout_1_1_1": "SW_OUT_1_1_1",
 	"Lwin_1_1_1": "LW_IN_1_1_1", "Lwout_1_1_1": "LW_OUT_1_1_1",
 	"Rn_1_1_1": "NETRAD_1_1_1", "MWS_1_1_1": "WS_1_1_1",
@@ -34,8 +34,9 @@ COLS_EDDYPRO_TO_IAS = {
 	"x_peak": "FETCH_MAX_1_1_1", "x_70%": "FETCH_70_1_1_1", "x_90%": "FETCH_90_1_1_1",
 	"ch4_flux": "FCH4_1_1_1", "qc_ch4_flux": "FCH4_SSITC_TEST_1_1_1", "ch4_mole_fraction": "CH4_1_1_1",
 	"ch4_strg": "SCH4_1_1_1", "ch4_signal_strength": "CH4_RSSI_1_1_1", "co2_signal_strength": "CO2_STR_1_1_1",
-
-	# TODO are they correct?
+	# TODO 1 add fixes from the tool
+	# TODO are they correct, i.e. if conversion/rename happens as expected in the notebook?
+	"Ta_1_1_1": "TA_1_1_1",
 	"u*": "USTAR_1_1_1",
 	"PPFD_1_1_1": "PPFD_IN_1_1_1",
 	"Rh_1_1_1": "RH_1_1_1", "VPD_1_1_1": "VPD_1_1_1",
@@ -51,6 +52,8 @@ COLS_NS_IAS = [
 	# NS = Not Supported by script yet, but should be kept during save-load
 	'ALB_1_1_1',
 	# TODO P_1_1_1, P_RAIN are supported
+	# TODO problem: previously p_1_1_1 was not droppoing to outputs because it may be generated during script col
+	# currently, it will because all these cols are included; what to do?
 	'FH2O_1_1_1', 'P_1_1_1',
 	'TS_1_2_1', 'TS_1_3_1', 'TS_1_4_1',
 	'T_DP_1_1_1', 'U_SIGMA_1_1_1', 'VPD_PI_1_1_1', 'V_SIGMA_1_1_1', 'WD_1_1_1', 'WTD_1_1_1', 'W_SIGMA_1_1_1'

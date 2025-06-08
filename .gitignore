@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 /output/**
-!/output/*REddyProc*.txt
+# !/output/*REddyProc*.txt
 
 
 # dev
