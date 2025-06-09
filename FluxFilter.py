@@ -1723,6 +1723,7 @@ if config_meteo ['use_biomet']:
   eddy_df['rH'] = eddy_df['rh_1_1_1'].fillna(-9999)
   eddy_df['VPD'] = eddy_df['vpd_1_1_1'].fillna(-9999)
 else:
+  # TODO when Ta_1_1_1 is used, it will not drop to rep file then. Is this intended?
   eddy_df['Tair'] = (eddy_df['air_temperature'] - 273.15).fillna(-9999)
   eddy_df['rH'] = eddy_df['rh'].fillna(-9999)
   eddy_df['VPD'] = eddy_df['vpd'].fillna(-9999)
@@ -1793,6 +1794,8 @@ if config_meteo['use_biomet']:
 	ias_df = new_time.join(ias_df, how='left')
 	ias_df[time] = ias_df.index
 
+    # TODO 1 incorrect DTime at the end, test myltiyear
+    # TODO 1 ias load multyear
 	ias_df['TIMESTAMP_START'] = ias_df[time].dt.strftime('%Y%m%d%H%M')
 	time_end = ias_df[time] + pd.Timedelta(0.5, "h")
 	ias_df['TIMESTAMP_END'] = time_end.dt.strftime('%Y%m%d%H%M')

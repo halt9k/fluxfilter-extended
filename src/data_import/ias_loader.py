@@ -51,6 +51,8 @@ COLS_NS_IAS = [
 	# NS = Not Supported by script yet, but should be kept during save-load
 	'ALB_1_1_1',
 	# TODO P_1_1_1, P_RAIN are supported
+	# TODO problem: previously p_1_1_1 was not droppoing to outputs because it may be generated during script col
+	# currently, it will because all these cols are included; what to do?
 	'FH2O_1_1_1', 'P_1_1_1',
 	'TS_1_2_1', 'TS_1_3_1', 'TS_1_4_1',
 	'T_DP_1_1_1', 'U_SIGMA_1_1_1', 'VPD_PI_1_1_1', 'V_SIGMA_1_1_1', 'WD_1_1_1', 'WTD_1_1_1', 'W_SIGMA_1_1_1'
