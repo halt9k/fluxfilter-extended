@@ -1,0 +1,718 @@
+REddyProc version:  1.3.3 
+
+Attaching package: 'dplyr'
+
+The following objects are masked from 'package:stats':
+
+    filter, lag
+
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: 'lubridate'
+
+The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union
+
+REddyProc Extended: Max length of R output is reduced to improve rpy2 output.
+List of 20
+ $ siteId                  : chr "tv_fy4"
+ $ isToApplyUStarFiltering : logi TRUE
+ $ ustar_threshold_fallback: num 0.01
+ $ ustar_rg_source         : chr "Rg"
+ $ uStarSeasoning          : Factor w/ 1 level "Continuous": 1
+ $ uStarMethod             : Factor w/ 1 level "RTw": 1
+ $ isBootstrapUStar        : logi TRUE
+ $ isToApplyGapFilling     : logi TRUE
+ $ isToApplyPartitioning   : logi FALSE
+ $ partitioningMethods     : chr [1:2] "Reichstein05" "Lasslop10"
+ $ latitude                : num 64.2
+ $ longitude               : num 100
+ $ timezone                : num 7
+ $ temperatureDataVariable : chr "Tair"
+ $ isCatchingErrorsEnabled : logi TRUE
+ $ input_format            : chr "onlinetool"
+ $ output_format           : chr "onlinetool"
+ $ useDevelopLibraryPath   : logi FALSE
+ $ debugFlags              : chr ""
+ $ figureFormat            : chr "png"
+Loaded file output/REddyProc_tv_fy4_3m_ok.txt with the following variables (units):
+ *** Year(-) DoY(-) Hour(-) NEE(umol_m-2_s-1) LE(Wm-2) H(Wm-2) Rg(Wm-2) Tair(degC) rH(%) VPD(hPa) Ustar(ms-1) _season(-)
+Number of '-9999' convertered to NA: 18082
+Converted time format 'YDH' to POSIX with column name 'DateTime'.
+'data.frame':	4416 obs. of  13 variables:
+ $ DateTime: POSIXct, format: "2022-12-16 00:00:00" "2022-12-16 00:30:00" ...
+ $ Year    : int  2022 2022 2022 2022 2022 2022 2022 2022 2022 2022 ...
+  ..- attr(*, "varnames")= chr "Year"
+  ..- attr(*, "units")= chr "-"
+ $ DoY     : int  350 350 350 350 350 350 350 350 350 350 ...
+  ..- attr(*, "varnames")= chr "DoY"
+  ..- attr(*, "units")= chr "-"
+ $ Hour    : num  0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 ...
+  ..- attr(*, "varnames")= chr "Hour"
+  ..- attr(*, "units")= chr "-"
+ $ NEE     : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "NEE"
+  ..- attr(*, "units")= chr "umol_m-2_s-1"
+ $ LE      : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "LE"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ H       : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "H"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ Rg      : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "Rg"
+  ..- attr(*, "units")= chr "Wm-2"
+ $ Tair    : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "Tair"
+  ..- attr(*, "units")= chr "degC"
+ $ rH      : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "rH"
+  ..- attr(*, "units")= chr "%"
+ $ VPD     : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "VPD"
+  ..- attr(*, "units")= chr "hPa"
+ $ Ustar   : num  NA NA NA NA NA NA NA NA NA NA ...
+  ..- attr(*, "varnames")= chr "Ustar"
+  ..- attr(*, "units")= chr "ms-1"
+ $ _season : int  1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "varnames")= chr "_season"
+  ..- attr(*, "units")= chr "-"
+Data variables picked for gap filling (dataVariablesToFill):  NEE,LE,H,Rg,VPD,rH,Tair 
+No additional columns picked to keep in processing
+Warning in fCheckHHTimeSeries(Data[[ColPOSIXTime]], DTS = DTS, "sEddyProc.initialize") :
+  sEddyProc.initialize:::fCheckHHTimeSeries::: Time stamp of first data row is not at the end of the first half-hour: 00:00 instead of 00:30!
+Warning in fCheckHHTimeSeries(Data[[ColPOSIXTime]], DTS = DTS, "sEddyProc.initialize") :
+  sEddyProc.initialize:::fCheckHHTimeSeries::: The last time stamp is not midnight: 0:00!
+Warning in fCheckOutsideRange(Data.F, VarName.V.s[v.i], c("<", 0), SubCallFunc.s) :
+  sEddyProc.initialize:::fCheckColPlausibility:::fCheckOutsideRange::: Variable outside (plausible) range in 343 cases! Invalid values with 'Rg < 0': -0.03, -0.18, -0.23, -0.20, -0.15, -0.05, -0.06, -0.02, -0.13, -0.05, -0.12, -0.07, -0.09, -0.03, -0.12, -0.15, -0.22, -0.19, -0.08, -0.19, -0.24, -0.21, -0.18, -0.10, -0.10, -0.12, -0.07, -0.01, -0.01, -0.06, -0.35, -0.49, -0.94, -0.38, -0.25, -0.73, -0.60, -0.26, -0.31, -0.44, -0.31, -0.95, -0.09, -0.62, -1.01, -1.85, -1.58, -1.90, -1.58, -2.90 ...
+New sEddyProc class for site 'tv_fy4'
+[1] "------------- u* Threshold estimation ---------------"
+Warning in .estimateUStarSeason(...) :
+  sEstUstarThreshold: too few finite records within season (n = 129). Need at least n = 160. Returning NA for this Season.
+
+Estimated UStar distribution of:
+       uStar         5%       50%       95%
+1 0.1060118 0.06962917 0.1076737 0.1490452 
+by using  200 bootstrap samples and controls:
+                       taClasses                    UstarClasses 
+                              7                              20 
+                          swThr            minRecordsWithinTemp 
+                             10                             100 
+         minRecordsWithinSeason            minRecordsWithinYear 
+                            160                            3000 
+isUsingOneBigSeasonOnFewRecords 
+                              1 
+  aggregationMode seasonYear season     uStar         5%       50%       95%
+2            year       2023   <NA> 0.1060118 0.06962917 0.1076737 0.1490452
+[1] "------------- Gapfilling ---------------"
+Ustar filtering (u * Th_1 = 0.106011833333333), marked 50% of the data as gap
+Initialized variable 'NEE' with 3085 real gaps for gap filling of all 4416 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'NEE.Ustar_uStar_fqc_0' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................1854
+Look up table with window size of 14 days with Rg VPD Tair
+.........................8
+Look up table with window size of 7 days with Rg
+.........................822
+Mean diurnal course with window size of 0 days: .
+.................6
+Mean diurnal course with window size of 1 days: .
+.................585
+Mean diurnal course with window size of 2 days: .
+...........605
+Look up table with window size of 21 days with Rg VPD Tair
+.....0
+Look up table with window size of 28 days with Rg VPD Tair
+.....0
+Look up table with window size of 35 days with Rg VPD Tair
+.....0
+Look up table with window size of 42 days with Rg VPD Tair
+.....0
+Look up table with window size of 49 days with Rg VPD Tair
+.....0
+Look up table with window size of 56 days with Rg VPD Tair
+.....0
+Look up table with window size of 63 days with Rg VPD Tair
+.....0
+Look up table with window size of 70 days with Rg VPD Tair
+.....0
+Look up table with window size of 14 days with Rg
+.....0
+Look up table with window size of 21 days with Rg
+.....0
+Look up table with window size of 28 days with Rg
+.....0
+Look up table with window size of 35 days with Rg
+.....0
+Look up table with window size of 42 days with Rg
+.....0
+Look up table with window size of 49 days with Rg
+.....0
+Look up table with window size of 56 days with Rg
+.....0
+Look up table with window size of 63 days with Rg
+.....0
+Look up table with window size of 70 days with Rg
+.....0
+Mean diurnal course with window size of 7 days: .
+.....536
+Finished gap filling of 'NEE' in 2 seconds. Artificial gaps filled: 4416, real gaps filled: 3085, unfilled (long) gaps: 0.
+Ustar filtering (u * Th_1 = 0.0696291666666667), marked 46% of the data as gap
+Initialized variable 'NEE' with 2950 real gaps for gap filling of all 4416 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'NEE.Ustar_U05_fqc_0' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................1927
+Look up table with window size of 14 days with Rg VPD Tair
+........................13
+Look up table with window size of 7 days with Rg
+........................744
+Mean diurnal course with window size of 0 days: .
+.................6
+Mean diurnal course with window size of 1 days: .
+.................615
+Mean diurnal course with window size of 2 days: .
+...........605
+Look up table with window size of 21 days with Rg VPD Tair
+.....0
+Look up table with window size of 28 days with Rg VPD Tair
+.....0
+Look up table with window size of 35 days with Rg VPD Tair
+.....0
+Look up table with window size of 42 days with Rg VPD Tair
+.....0
+Look up table with window size of 49 days with Rg VPD Tair
+.....0
+Look up table with window size of 56 days with Rg VPD Tair
+.....0
+Look up table with window size of 63 days with Rg VPD Tair
+.....0
+Look up table with window size of 70 days with Rg VPD Tair
+.....0
+Look up table with window size of 14 days with Rg
+.....0
+Look up table with window size of 21 days with Rg
+.....0
+Look up table with window size of 28 days with Rg
+.....0
+Look up table with window size of 35 days with Rg
+.....0
+Look up table with window size of 42 days with Rg
+.....0
+Look up table with window size of 49 days with Rg
+.....0
+Look up table with window size of 56 days with Rg
+.....0
+Look up table with window size of 63 days with Rg
+.....0
+Look up table with window size of 70 days with Rg
+.....0
+Mean diurnal course with window size of 7 days: .
+.....506
+Finished gap filling of 'NEE' in 2 seconds. Artificial gaps filled: 4416, real gaps filled: 2950, unfilled (long) gaps: 0.
+Ustar filtering (u * Th_1 = 0.107673716666667), marked 50% of the data as gap
+Initialized variable 'NEE' with 3089 real gaps for gap filling of all 4416 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'NEE.Ustar_U50_fqc_0' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................1849
+Look up table with window size of 14 days with Rg VPD Tair
+.........................8
+Look up table with window size of 7 days with Rg
+.........................827
+Mean diurnal course with window size of 0 days: .
+.................6
+Mean diurnal course with window size of 1 days: .
+.................585
+Mean diurnal course with window size of 2 days: .
+...........605
+Look up table with window size of 21 days with Rg VPD Tair
+.....0
+Look up table with window size of 28 days with Rg VPD Tair
+.....0
+Look up table with window size of 35 days with Rg VPD Tair
+.....0
+Look up table with window size of 42 days with Rg VPD Tair
+.....0
+Look up table with window size of 49 days with Rg VPD Tair
+.....0
+Look up table with window size of 56 days with Rg VPD Tair
+.....0
+Look up table with window size of 63 days with Rg VPD Tair
+.....0
+Look up table with window size of 70 days with Rg VPD Tair
+.....0
+Look up table with window size of 14 days with Rg
+.....0
+Look up table with window size of 21 days with Rg
+.....0
+Look up table with window size of 28 days with Rg
+.....0
+Look up table with window size of 35 days with Rg
+.....0
+Look up table with window size of 42 days with Rg
+.....0
+Look up table with window size of 49 days with Rg
+.....0
+Look up table with window size of 56 days with Rg
+.....0
+Look up table with window size of 63 days with Rg
+.....0
+Look up table with window size of 70 days with Rg
+.....0
+Mean diurnal course with window size of 7 days: .
+.....536
+Finished gap filling of 'NEE' in 2 seconds. Artificial gaps filled: 4416, real gaps filled: 3089, unfilled (long) gaps: 0.
+Ustar filtering (u * Th_1 = 0.149045175), marked 58% of the data as gap
+Initialized variable 'NEE' with 3335 real gaps for gap filling of all 4416 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'NEE.Ustar_U95_fqc_0' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................1839
+Look up table with window size of 14 days with Rg VPD Tair
+.........................10
+Look up table with window size of 7 days with Rg
+.........................835
+Mean diurnal course with window size of 0 days: .
+.................5
+Mean diurnal course with window size of 1 days: .
+.................482
+Mean diurnal course with window size of 2 days: .
+............587
+Look up table with window size of 21 days with Rg VPD Tair
+......0
+Look up table with window size of 28 days with Rg VPD Tair
+......0
+Look up table with window size of 35 days with Rg VPD Tair
+......0
+Look up table with window size of 42 days with Rg VPD Tair
+......0
+Look up table with window size of 49 days with Rg VPD Tair
+......0
+Look up table with window size of 56 days with Rg VPD Tair
+......0
+Look up table with window size of 63 days with Rg VPD Tair
+......0
+Look up table with window size of 70 days with Rg VPD Tair
+......0
+Look up table with window size of 14 days with Rg
+......0
+Look up table with window size of 21 days with Rg
+......0
+Look up table with window size of 28 days with Rg
+......0
+Look up table with window size of 35 days with Rg
+......0
+Look up table with window size of 42 days with Rg
+......0
+Look up table with window size of 49 days with Rg
+......0
+Look up table with window size of 56 days with Rg
+......0
+Look up table with window size of 63 days with Rg
+......0
+Look up table with window size of 70 days with Rg
+......0
+Mean diurnal course with window size of 7 days: .
+......652
+Mean diurnal course with window size of 14 days: .
+6
+Finished gap filling of 'NEE' in 2 seconds. Artificial gaps filled: 4416, real gaps filled: 3335, unfilled (long) gaps: 0.
+Initialized variable 'LE' with 2415 real gaps for gap filling of all 4416 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'LE' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................1904
+Look up table with window size of 14 days with Rg VPD Tair
+.........................8
+Look up table with window size of 7 days with Rg
+.........................785
+Mean diurnal course with window size of 0 days: .
+.................6
+Mean diurnal course with window size of 1 days: .
+.................713
+Mean diurnal course with window size of 2 days: .
+..........636
+Look up table with window size of 21 days with Rg VPD Tair
+...0
+Look up table with window size of 28 days with Rg VPD Tair
+...0
+Look up table with window size of 35 days with Rg VPD Tair
+...0
+Look up table with window size of 42 days with Rg VPD Tair
+...0
+Look up table with window size of 49 days with Rg VPD Tair
+...0
+Look up table with window size of 56 days with Rg VPD Tair
+...0
+Look up table with window size of 63 days with Rg VPD Tair
+...0
+Look up table with window size of 70 days with Rg VPD Tair
+...0
+Look up table with window size of 14 days with Rg
+...0
+Look up table with window size of 21 days with Rg
+...0
+Look up table with window size of 28 days with Rg
+...0
+Look up table with window size of 35 days with Rg
+...0
+Look up table with window size of 42 days with Rg
+...0
+Look up table with window size of 49 days with Rg
+...0
+Look up table with window size of 56 days with Rg
+...0
+Look up table with window size of 63 days with Rg
+...0
+Look up table with window size of 70 days with Rg
+...0
+Mean diurnal course with window size of 7 days: .
+...364
+Finished gap filling of 'LE' in 1 seconds. Artificial gaps filled: 4416, real gaps filled: 2415, unfilled (long) gaps: 0.
+Initialized variable 'H' with 2008 real gaps for gap filling of all 4416 values (to estimate uncertainties).
+Full MDS algorithm for gap filling of 'H' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+............................................1982
+Look up table with window size of 14 days with Rg VPD Tair
+........................6
+Look up table with window size of 7 days with Rg
+........................709
+Mean diurnal course with window size of 0 days: .
+.................7
+Mean diurnal course with window size of 1 days: .
+.................820
+Mean diurnal course with window size of 2 days: .
+........592
+Look up table with window size of 21 days with Rg VPD Tair
+...0
+Look up table with window size of 28 days with Rg VPD Tair
+...0
+Look up table with window size of 35 days with Rg VPD Tair
+...0
+Look up table with window size of 42 days with Rg VPD Tair
+...0
+Look up table with window size of 49 days with Rg VPD Tair
+...0
+Look up table with window size of 56 days with Rg VPD Tair
+...0
+Look up table with window size of 63 days with Rg VPD Tair
+...0
+Look up table with window size of 70 days with Rg VPD Tair
+...0
+Look up table with window size of 14 days with Rg
+...0
+Look up table with window size of 21 days with Rg
+...0
+Look up table with window size of 28 days with Rg
+...0
+Look up table with window size of 35 days with Rg
+...0
+Look up table with window size of 42 days with Rg
+...0
+Look up table with window size of 49 days with Rg
+...0
+Look up table with window size of 56 days with Rg
+...0
+Look up table with window size of 63 days with Rg
+...0
+Look up table with window size of 70 days with Rg
+...0
+Mean diurnal course with window size of 7 days: .
+...300
+Finished gap filling of 'H' in 1 seconds. Artificial gaps filled: 4416, real gaps filled: 2008, unfilled (long) gaps: 0.
+Initialized variable 'Rg' with 1716 real gaps for gap filling.
+Restriced MDS algorithm for gap filling of 'Rg' with no meteo conditions and hence only MDC.
+Mean diurnal course with window size of 0 days: .
+.................22
+Mean diurnal course with window size of 1 days: .
+................939
+Mean diurnal course with window size of 2 days: .
+.......548
+Mean diurnal course with window size of 7 days: .
+..207
+Finished gap filling of 'Rg' in 0 seconds. Artificial gaps filled: 4416, real gaps filled: 1716, unfilled (long) gaps: 0.
+Initialized variable 'VPD' with 2409 real gaps for gap filling.
+Limited MDS algorithm for gap filling of 'VPD' with LUT(Rg only) and MDC.
+Look up table with window size of 7 days with Rg
+........................693
+Mean diurnal course with window size of 0 days: .
+.................17
+Mean diurnal course with window size of 1 days: .
+................723
+Mean diurnal course with window size of 2 days: .
+.........528
+Look up table with window size of 14 days with Rg
+....0
+Look up table with window size of 21 days with Rg
+....0
+Look up table with window size of 28 days with Rg
+....0
+Look up table with window size of 35 days with Rg
+....0
+Look up table with window size of 42 days with Rg
+....0
+Look up table with window size of 49 days with Rg
+....0
+Look up table with window size of 56 days with Rg
+....0
+Look up table with window size of 63 days with Rg
+....0
+Look up table with window size of 70 days with Rg
+....0
+Mean diurnal course with window size of 7 days: .
+....438
+Mean diurnal course with window size of 14 days: .
+10
+Finished gap filling of 'VPD' in 0 seconds. Artificial gaps filled: 4416, real gaps filled: 2409, unfilled (long) gaps: 0.
+Initialized variable 'rH' with 2407 real gaps for gap filling.
+Full MDS algorithm for gap filling of 'rH' with LUT(Rg, VPD, Tair) and MDC.
+Look up table with window size of 7 days with Rg VPD Tair
+........................4
+Look up table with window size of 14 days with Rg VPD Tair
+........................0
+Look up table with window size of 7 days with Rg
+........................687
+Mean diurnal course with window size of 0 days: .
+.................17
+Mean diurnal course with window size of 1 days: .
+................723
+Mean diurnal course with window size of 2 days: .
+.........528
+Look up table with window size of 21 days with Rg VPD Tair
+....0
+Look up table with window size of 28 days with Rg VPD Tair
+....0
+Look up table with window size of 35 days with Rg VPD Tair
+....0
+Look up table with window size of 42 days with Rg VPD Tair
+....0
+Look up table with window size of 49 days with Rg VPD Tair
+....0
+Look up table with window size of 56 days with Rg VPD Tair
+....0
+Look up table with window size of 63 days with Rg VPD Tair
+....0
+Look up table with window size of 70 days with Rg VPD Tair
+....0
+Look up table with window size of 14 days with Rg
+....0
+Look up table with window size of 21 days with Rg
+....0
+Look up table with window size of 28 days with Rg
+....0
+Look up table with window size of 35 days with Rg
+....0
+Look up table with window size of 42 days with Rg
+....0
+Look up table with window size of 49 days with Rg
+....0
+Look up table with window size of 56 days with Rg
+....0
+Look up table with window size of 63 days with Rg
+....0
+Look up table with window size of 70 days with Rg
+....0
+Mean diurnal course with window size of 7 days: .
+....438
+Mean diurnal course with window size of 14 days: .
+10
+Finished gap filling of 'rH' in 1 seconds. Artificial gaps filled: 4416, real gaps filled: 2407, unfilled (long) gaps: 0.
+Initialized variable 'Tair' with 2413 real gaps for gap filling.
+Limited MDS algorithm for gap filling of 'Tair' with LUT(Rg only) and MDC.
+Look up table with window size of 7 days with Rg
+........................697
+Mean diurnal course with window size of 0 days: .
+.................17
+Mean diurnal course with window size of 1 days: .
+................722
+Mean diurnal course with window size of 2 days: .
+.........526
+Look up table with window size of 14 days with Rg
+....0
+Look up table with window size of 21 days with Rg
+....0
+Look up table with window size of 28 days with Rg
+....0
+Look up table with window size of 35 days with Rg
+....0
+Look up table with window size of 42 days with Rg
+....0
+Look up table with window size of 49 days with Rg
+....0
+Look up table with window size of 56 days with Rg
+....0
+Look up table with window size of 63 days with Rg
+....0
+Look up table with window size of 70 days with Rg
+....0
+Mean diurnal course with window size of 7 days: .
+....441
+Mean diurnal course with window size of 14 days: .
+10
+Finished gap filling of 'Tair' in 0 seconds. Artificial gaps filled: 4416, real gaps filled: 2413, unfilled (long) gaps: 0.
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_NEE.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_NEE.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_LE.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_LE.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_H.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_H.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_Rg.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_Rg.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_VPD.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_VPD.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_rH.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_rH.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_Tair.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_Tair.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_NEE_uStar_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSumU_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_NEE_uStar_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_LE_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSumU_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_LE_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_H_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_H_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSumU_H_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_H_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_Rg_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_Rg_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSum_Rg_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_Rg_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_VPD_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSum_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_VPD_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_rH_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSum_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_rH_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_FP_Tair_f.png
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: April!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: May!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: June!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: July!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: August!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: September!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: October!
+Warning in .self$.sPlotDiurnalCycleM(Var, QFVar, QFValue, Month, Legend = F) :
+  .sPlotDiurnalCycleM::: No data available for month: November!
+Saved plot to: output/reddyproc/tv_fy4_22-23_DC_Tair_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_DSum_Tair_f.png
+Saved plot to: output/reddyproc/tv_fy4_22-23_Flux_Tair_f.png
+Number of NA convertered to '-9999': 78130
+Wrote tab separated textfile: output/reddyproc/filled.txt
+REddyProc Means:  Columns picked for means: 
+ NEE_f NEE_U05_f NEE_U50_f NEE_U95_f LE_f H_f Rg_f VPD_f rH_f Tair_f 
+REddyProc Means:  Columns picked for NA counts: 
+ NEE LE H Rg VPD rH Tair 
+REddyProc Means:  Saved summary stats to : 
+ output/reddyproc/tv_fy4_22-23_daily.csv 
+ output/reddyproc/tv_fy4_22-23_monthly.csv 
+ output/reddyproc/tv_fy4_22-23_yearly.csv 
+ output/reddyproc/tv_fy4_22-23_hourly.csv 
