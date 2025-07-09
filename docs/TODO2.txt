@@ -1,6 +1,0 @@
-What happens before REP at all - with respect to specific columns?
-
-New input: is IAS expected to be only single input file?
-
-Which cols are mandatory, which are optional or unrelated to script at all?
-

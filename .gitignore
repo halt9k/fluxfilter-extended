@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 /output/**
-!/output/*REddyProc*.txt
 *.csv
 *.xls
 *.xlsx
