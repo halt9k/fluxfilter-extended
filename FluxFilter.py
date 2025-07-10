@@ -1234,11 +1234,11 @@ madhampel_filter_config[ 'ppfd_1_1_1'] =  {'z': 8.0, 'hampel_window': 10}
 # + id="KMu4IqY45HG6"
 # Загрузка файла full output
 # https://drive.google.com/file/d/1CGJmXyFu_pmzTLitG5aU8fwY8gW3CI1n/view?usp=sharing
-# !gdown 1CGJmXyFu_pmzTLitG5aU8fwY8gW3CI1n
+# # !gdown 1CGJmXyFu_pmzTLitG5aU8fwY8gW3CI1n
 
 # Загрузка файла biomet
 # https://drive.google.com/file/d/19XsOw5rRJMVMyG1ntRpibfkUpRAP2H4k/view?usp=sharing
-# !gdown 19XsOw5rRJMVMyG1ntRpibfkUpRAP2H4k
+# # !gdown 19XsOw5rRJMVMyG1ntRpibfkUpRAP2H4k
 
 # + id="Xw5TapK10EhR"
 from src.data_io.eddypro_loader import load_eddypro_fulloutput
