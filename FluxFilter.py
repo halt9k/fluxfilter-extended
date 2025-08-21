@@ -105,13 +105,13 @@ pio.renderers.default = "colab"
 from IPython.display import display
 
 
-from google.colab import output
-output.enable_custom_widget_manager()
+# from google.colab import output
+# output.enable_custom_widget_manager()
 
 from plotly.subplots import make_subplots
 import plotly.express as px
 import plotly_resampler
-import dateparser
+# import dateparser
 
 import bglabutils.basic as bg
 import bglabutils.filters as bf
@@ -123,13 +123,13 @@ import sys
 # import bglabutils.boosting as bb
 # import textwrap
 
-from google.colab import output
-output.no_vertical_scroll()
+# from google.colab import output
+# output.no_vertical_scroll()
 
 # %load_ext autoreload
 # %autoreload 2
 
-logging.basicConfig(level=logging.INFO, filename="/content/output/log.log", filemode="w", force=True)
+logging.basicConfig(level=logging.INFO, filename="./output/log.log", filemode="w", force=True)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logging.info("START")
 
@@ -971,7 +971,7 @@ config['time']['converter'] = my_datetime_converter
 
 ###Запишите название Ваших файлов и путь к ним. Если файлы будут импортированы с google-диска
 ###через команду !gdown, то достаточно заменить название файла
-config['path'] = ['eddy_pro result_SSB 2023.csv']#['eddypro_GHG_biomet_CO2SS_Express_full_output_2023-03-29T020107_exp.csv']#['eddypro_noHMP_full_output_2014_1-5.csv', 'eddypro_noHMP_full_output_2014_5-12.csv']#['/content/eddypro_NCT_GHG_22-23dry_full_output.xlsx', '/content/eddypro_NCT_GHG_22wet_full_output.xlsx', '/content/eddypro_NCT_GHG_23wet_full output.xlsx']#'/content/new.csv'
+config['path'] = ['eddy_pro tv_fy4 2023.csv']#['eddypro_GHG_biomet_CO2SS_Express_full_output_2023-03-29T020107_exp.csv']#['eddypro_noHMP_full_output_2014_1-5.csv', 'eddypro_noHMP_full_output_2014_5-12.csv']#['/content/eddypro_NCT_GHG_22-23dry_full_output.xlsx', '/content/eddypro_NCT_GHG_22wet_full_output.xlsx', '/content/eddypro_NCT_GHG_23wet_full output.xlsx']#'/content/new.csv'
 # config['path'] = '/content/DT_Full output.xlsx'
 
 # %% [markdown] id="S2Qc-fltJLaF"
@@ -1998,16 +1998,16 @@ logging.info(f"New basic file saved to {os.path.join('output','output_summary.cs
 # %autoreload 2
 
 # def section_*(): + ipynb to py convert?
-try:
-    import google.colab
-except ImportError:
-    class StopExecution(Exception):
-        def _render_traceback_(self):
-            return ['Colab env not detected. Current cell is only for Colab.']
-    raise StopExecution()
+# try:
+#     import google.colab
+# except ImportError:
+#     class StopExecution(Exception):
+#         def _render_traceback_(self):
+#             return ['Colab env not detected. Current cell is only for Colab.']
+#     raise StopExecution()
 
 # cur_dir = %pwd
-assert cur_dir == '/content'
+# assert cur_dir == '/content'
 
 # !mkdir -p src/repo1/
 # %cd src/repo1/
@@ -2025,23 +2025,23 @@ assert cur_dir == '/content'
 # 1.3.2 vs 1.3.3 have slightly different last columns
 # alternative for windows
 # install.packages('https://cran.r-project.org/bin/windows/contrib/4.1/REddyProc_1.3.2.zip', repos = NULL, type = "binary")
-setup_colab_r_code = """
-install_if_missing <- function(package, version, repos) {
-    if (!require(package, character.only = TRUE)) {
-        remotes::install_version(package, version = version, upgrade = "never", repos = repos)
-        library(package, character.only = TRUE)
-    }
-}
-# sink redirect is required to improve ipynb output
-sink(stdout(), type = "message")
-install_if_missing("REddyProc", "1.3.3", repos = 'http://cran.rstudio.com/')
-sink()
-"""
-from rpy2 import robjects
-robjects.r(setup_colab_r_code)
+# setup_colab_r_code = """
+# install_if_missing <- function(package, version, repos) {
+#     if (!require(package, character.only = TRUE)) {
+#         remotes::install_version(package, version = version, upgrade = "never", repos = repos)
+#         library(package, character.only = TRUE)
+#     }
+# }
+# # sink redirect is required to improve ipynb output
+# sink(stdout(), type = "message")
+# install_if_missing("REddyProc", "1.3.3", repos = 'http://cran.rstudio.com/')
+# sink()
+# """
+# from rpy2 import robjects
+# robjects.r(setup_colab_r_code)
 
-from src.ipynb_helpers import enable_word_wrap
-enable_word_wrap()
+# from src.ipynb_helpers import enable_word_wrap
+# enable_word_wrap()
 # %% [markdown] id="034b04a5"
 # ## Фильтрация и заполнение пропусков
 #

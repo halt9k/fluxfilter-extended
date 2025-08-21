@@ -17,7 +17,7 @@ from typing import List
 
 # only site name like 'tv_fy4_22.14'
 # ias_output_prefix: str = 'tv_fy4_22-14'
-ias_output_prefix: str
+ias_output_prefix: str = 'tv_fy4'
 
 # all settings related to reddyproc integration
 eddyproc: SimpleNamespace
