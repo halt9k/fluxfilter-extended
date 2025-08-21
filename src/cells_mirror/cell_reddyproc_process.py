@@ -14,24 +14,24 @@ ig.rep.options = SimpleNamespace(
 
     is_to_apply_u_star_filtering=True,
     # if default REP cannot detect threshold, this value may be used instead; None to disable
-    ustar_threshold_fallback=0.01,
+    ustar_threshold_fallback=0.1038417,
     # REP ustar requires Rg to detect nights; when real data is missing, 3 workarounds are possible
     # "Rg_th_Py", "Rg_th_REP" - estimate by theoretical algs,
     # "Rg" - by real data, "" - ignore Rg and filter both days and nights
     # TODO 2 when fallback activated + (multuyear or bootstrap): test if all ok?
-    ustar_rg_source="Rg",
+    ustar_rg_source="",
     is_bootstrap_u_star=False,
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
-    u_star_seasoning="Continuous",
+    u_star_seasoning="WithinYear",
 
     is_to_apply_partitioning=True,
 
     # partitioning_methods: one or both of "Reichstein05", "Lasslop10"
     partitioning_methods=["Reichstein05", "Lasslop10"],
 
-    latitude=56.5,
-    longitude=32.6,
-    timezone=+3.0,
+    latitude=67.5,
+    longitude=86.4,
+    timezone=+7,
 
     # "Tsoil"
     temperature_data_variable="Tair",

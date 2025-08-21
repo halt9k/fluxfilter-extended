@@ -216,7 +216,7 @@ config['time']['converter'] = my_datetime_converter
 
 ###Запишите название Ваших файлов и путь к ним. Если файлы будут импортированы с google-диска
 ###через команду !gdown, то достаточно заменить название файла
-config['path'] = 'auto'  # ['eddypro_GHG_biomet_CO2SS_Express_full_output_2023-03-29T020107_exp.csv']#['eddypro_noHMP_full_output_2014_1-5.csv', 'eddypro_noHMP_full_output_2014_5-12.csv']#['/content/eddypro_NCT_GHG_22-23dry_full_output.xlsx', '/content/eddypro_NCT_GHG_22wet_full_output.xlsx', '/content/eddypro_NCT_GHG_23wet_full output.xlsx']#'/content/new.csv'
+config['path'] = ['Iga_15-23_FO_3m.csv']  # ['eddypro_GHG_biomet_CO2SS_Express_full_output_2023-03-29T020107_exp.csv']#['eddypro_noHMP_full_output_2014_1-5.csv', 'eddypro_noHMP_full_output_2014_5-12.csv']#['/content/eddypro_NCT_GHG_22-23dry_full_output.xlsx', '/content/eddypro_NCT_GHG_22wet_full_output.xlsx', '/content/eddypro_NCT_GHG_23wet_full output.xlsx']#'/content/new.csv'
 
 # config['path'] = '/content/DT_Full output.xlsx'
 
@@ -267,7 +267,7 @@ config_meteo['time']['converter'] = my_datetime_converter
 
 ###Запишите название Ваших файлов и путь к ним. Если файлы будут импортированы с google-диска
 ###через команду !gdown, то достаточно заменить название файла
-config_meteo['path'] = 'auto'  # 'BiometFy4_2016.csv'#'BiometNCT_2011-22.csv'
+config_meteo['path'] = 'Iga15-23_biomet_3m.csv'  # 'BiometFy4_2016.csv'#'BiometNCT_2011-22.csv'
 
 # + [markdown] id="DtxFTNnEfENz"
 # ## Выбор колонок для графиков и фильтраций
@@ -306,8 +306,8 @@ calc_nee = True
 
 # Индекс станции для названий выходных файлов, рисунков
 # TODO 1 that's just a site name, only ias version is ias specific
-ias_output_prefix = 'auto'
-ias_output_version = 'auto'
+ias_output_prefix = 'kr_iga'
+ias_output_version = 'v01'
 
 # + [markdown] id="5MK90gyzQryZ"
 # Параметры фильтрации по флагам качества. Данные с флагами в интервале (-inf, val] будут помечены как валидные, а данные с значением флага больше порога будут исключены.
@@ -343,23 +343,23 @@ meteo_filter_config = {}
 meteo_filter_config['CO2SS_min'] = 80.
 
 # Фильтры могут не понадобиться для систем закрытого типа
-meteo_filter_config['p_rain_limit'] = .1
-meteo_filter_config['rain_forward_flag'] = 2
+#meteo_filter_config['p_rain_limit'] = .1
+#meteo_filter_config['rain_forward_flag'] = 2
 # Фильтр влажности ниже: применять только тогда, когда нет CO2SS (образование конденсата) и диагностики анемометра
 # и данные не были отфильтрованы по этим показателям на этапе расчета в EddyPro
 # meteo_filter_config['RH_max'] = 98
 
 # Какие значения допускаются днем/ночью
-meteo_filter_config['use_day_filter'] = True
+meteo_filter_config['use_day_filter'] = False
 meteo_filter_config['use_night_filter'] = True
-meteo_filter_config['day_nee_max'] = 5
-meteo_filter_config['night_nee_min'] = -5
+meteo_filter_config['day_nee_max'] = 10
+meteo_filter_config['night_nee_min'] = 0
 meteo_filter_config['day_swin_limit'] = 10
 meteo_filter_config['night_h_limits'] = [-50, 20]
 meteo_filter_config['night_le_limits'] = [-50, 20]
 
 # Какие значения допускаются зимой. Для травянистых экосистем правый порог обычно ниже
-meteo_filter_config['winter_nee_limits'] = [0, 5]
+meteo_filter_config['winter_nee_limits'] = [0, 2]
 meteo_filter_config['winter_ch4_flux_limits'] = [-1, 1]
 meteo_filter_config['CH4SS_min'] = 20.
 
@@ -372,8 +372,8 @@ meteo_filter_config['CH4SS_min'] = 20.
 
 # + id="HQfIYFOd9uzi"
 min_max_config = {}
-min_max_config['co2_flux'] = [-40, 40]
-min_max_config['co2_strg'] = [-20, 20]
+min_max_config['co2_flux'] = [-30, 13.46]
+min_max_config['co2_strg'] = [-10, 10]
 min_max_config['h'] = [-100, 800]
 min_max_config['le'] = [-100, 1000]
 min_max_config['u_star'] = [0, 10]
@@ -396,11 +396,11 @@ min_max_config['ch4_flux'] = [-10, 10]
 window_filter_config = {}
 
 # Для систем закрытого типа фильтр может быть мягче (например, 3 sigma)
-window_filter_config['co2_flux'] = {'sigmas': 2, 'window': 10, 'min_periods': 4}
+window_filter_config['co2_flux'] = {'sigmas': 3, 'window': 10, 'min_periods': 4}
 window_filter_config['ch4_flux'] = {'sigmas': 2, 'window': 10, 'min_periods': 4}
 
 # Если удаляются надежные значения - нужно увеличить 'sigmas'
-window_filter_config['ta_1_1_1'] = {'sigmas': 4, 'window': 10, 'min_periods': 4}
+# window_filter_config['ta_1_1_1'] = {'sigmas': 4, 'window': 10, 'min_periods': 4}
 window_filter_config['u_star'] = {'sigmas': 4, 'window': 10, 'min_periods': 4}
 for col in ['h', 'le', 'rh_1_1_1', 'vpd_1_1_1']:
     window_filter_config[col] = {'sigmas': 7, 'window': 10, 'min_periods': 4}
@@ -412,7 +412,7 @@ for col in ['swin_1_1_1', 'ppfd_1_1_1']:
 
 # + id="asO_t2tZmiD0"
 quantile_filter_config = {}
-quantile_filter_config['co2_flux'] = [0.01, 0.99]
+quantile_filter_config['co2_flux'] = [0.002, 0.998]
 quantile_filter_config['ch4_flux'] = [0.01, 0.99]
 quantile_filter_config['co2_strg'] = [0.01, 0.99]
 
@@ -424,16 +424,16 @@ quantile_filter_config['co2_strg'] = [0.01, 0.99]
 madhampel_filter_config = {}
 
 # Более жесткая фильтрация: 'z'=4. Более мягкая: 'z'=7
-madhampel_filter_config['co2_flux'] = {'z': 5.5, 'hampel_window': 10}
+madhampel_filter_config['co2_flux'] = {'z': 6.0, 'hampel_window': 10}
 madhampel_filter_config['ch4_flux'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['le'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['h'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['co2_strg'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['ta_1_1_1'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['rh_1_1_1'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['vpd_1_1_1'] = {'z': 5.5, 'hampel_window': 10}
-madhampel_filter_config['swin_1_1_1'] = {'z': 8.0, 'hampel_window': 10}
-madhampel_filter_config['ppfd_1_1_1'] = {'z': 8.0, 'hampel_window': 10}
+madhampel_filter_config['le'] =  {'z': 5.5, 'hampel_window': 10}
+madhampel_filter_config['h'] =  {'z': 5.5, 'hampel_window': 10}
+madhampel_filter_config['co2_strg'] =  {'z': 5.5, 'hampel_window': 10}
+# madhampel_filter_config[ 'ta_1_1_1'] =  {'z': 3.5, 'hampel_window': 4}
+madhampel_filter_config[ 'rh_1_1_1'] =  {'z': 7, 'hampel_window': 10}
+madhampel_filter_config[ 'vpd_1_1_1'] =  {'z': 5.5, 'hampel_window': 10}
+madhampel_filter_config[ 'swin_1_1_1'] =  {'z': 10.0, 'hampel_window': 10}
+madhampel_filter_config[ 'ppfd_1_1_1'] =  {'z': 10.0, 'hampel_window': 10}
 
 # + [markdown] id="wVF1vDm4EauW"
 # # Загружаем данные
@@ -784,8 +784,7 @@ if ('winter_nee_limits' in meteo_filter_config.keys()) or ('winter_ch4_flux_limi
 if config_meteo['use_biomet']:
     unroll_filters_db = filters_db.copy()
     date_ranges = [
-        ['01.01.2023 00:00', '26.03.2023 00:00'],
-        ['13.11.2023 00:00', '31.12.2023 00:00'],
+      ['01.01.2023 00:00', '28.05.2023 23:30'],
     ]
     # date_ranges = []
     # date_ranges.append(['25.8.2014 00:00', '26.8.2014 00:00'])
@@ -1296,7 +1295,7 @@ ig.rep.options = SimpleNamespace(
 
     is_to_apply_u_star_filtering=True,
     # if default REP cannot detect threshold, this value may be used instead; None to disable
-    ustar_threshold_fallback=0.01,
+    ustar_threshold_fallback=0.05,
     # REP ustar requires Rg to detect nights; when real data is missing, 3 workarounds are possible
     # "Rg_th_Py", "Rg_th_REP" - estimate by theoretical algs,
     # "Rg" - by real data, "" - ignore Rg and filter both days and nights
@@ -1309,10 +1308,9 @@ ig.rep.options = SimpleNamespace(
 
     # partitioning_methods: one or both of "Reichstein05", "Lasslop10"
     partitioning_methods=["Reichstein05", "Lasslop10"],
-
-    latitude=56.5,
-    longitude=32.6,
-    timezone=+3.0,
+    latitude=67.5,
+    longitude=86.4,
+    timezone=+7.0,
 
     # "Tsoil"
     temperature_data_variable="Tair",
