@@ -2,21 +2,21 @@
 .Rhistory
 .RData
 /output/**
-*.csv
-*.xls
-*.xlsx
+/*.csv
+/*.xls
+/*.xlsx
 
 # dev
 # FluxFilter.ipynb
 # /src/**
 # /tools/**
 # /test/**
-# !/test/reddyproc/test_averaging_fixtures/**
+# !/test/reddyproc/test_means_fixtures/**
 # !/test/reddyproc/test_process_fixtures/**
 
 # dev-test
 # /bglabutils/**
-# /test/reddyproc/test_averaging_fixtures/**
+# /test/reddyproc/test_means_fixtures/**
 # /test/reddyproc/test_process_fixtures/**
 # /misc/samples/**
 # /misc/colab_version_samples/**
