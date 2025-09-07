@@ -1,10 +1,13 @@
 .ipynb_checkpoints/
 .Rhistory
 .RData
+.pyc
 /output/**
 /*.csv
 /*.xls
 /*.xlsx
+/*.yaml
+
 
 # dev
 # FluxFilter.ipynb
@@ -30,4 +33,3 @@
 # /misc/archive/**
 # .gitattributes
 # README.md
-*.pyc
