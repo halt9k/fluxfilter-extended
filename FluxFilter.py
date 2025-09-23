@@ -455,7 +455,7 @@ gl.points_per_day = int(pd.Timedelta('24h') / data_freq)
 # %% id="C8lLDYOWzH2d"
 data.columns = data.columns.str.lower()
 if not config.has_meteo:
-    data["rh_1_1_1"] = data['rh']
+    # data["rh_1_1_1"] = data['rh']
     data["vpd_1_1_1"] = data['vpd']
 
 # %% [markdown] id="ipknrLaeByCT"
@@ -607,7 +607,7 @@ for col in ['ch4_signal_strength_7700_mean', 'CH4SS'.lower()]:
         data = data.rename(columns={col: 'ch4_signal_strength'})
 
 if not config.has_meteo or 'ta_1_1_1' not in data.columns:
-    data['ta_1_1_1'] = data['air_temperature'] - 273.15
+    # data['ta_1_1_1'] = data['air_temperature'] - 273.15
     logging.info("No Ta_1_1_1 column found, replaced by 'air_temperature'")
 
 # %% [markdown] id="soyyX-MCbaXt"

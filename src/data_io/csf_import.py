@@ -87,5 +87,5 @@ def import_csf(config: FFConfig):
 
     df, biomet_cols_index = import_rename_csf_cols(df, time_col)
 
-    has_meteo = True
+    has_meteo = False
     return df, time_col, biomet_cols_index, df.index.freq, has_meteo
