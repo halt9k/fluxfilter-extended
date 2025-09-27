@@ -47,20 +47,22 @@
 # 7. Директория reddyproc содержит результаты заполнения переменных в таком же формате, что и оригинальный инструмент [REddyProcWeb](https://www.bgc-jena.mpg.de/5624929/Output-Format). Помимо этого, в директории output/reddyproc содержатся обобщающие файлы с индексами _hourly (суточные ходы оригинальных и заполненных переменных), _daily (средние суточные значения), _monthly (средние месячные значения) и _yearly (значения за год, если данных меньше - за весь период обработки).
 #
 # ## **Загрузка входных файлов**
-# Возможны два основных варианта загрузки, через браузер или через google-диск:  
+# Возможны два основных варианта загрузки:  
 #
-# Через браузер:
+# Через браузер:  
 # *   нажмите на кнопку директории (нижняя кнопка в левой панели под кнопкой "ключ")
-# *   перетащите один или несколько фалов (к примеру, из проводника Windows) в пустое пространство по директорией `sample data`
-#   
+# *   перетащите один или несколько фалов (к примеру, из проводника Windows) в пустое пространство под директорией `sample_data`
+# *   отключить две команды `!gdown` в разделе **Загружаем данные**  
+#
 # Через google-диск:  
 # *   загрузить на google-диск файлы full output, biomet, файл конфигурации и/или любые другие
 # *   открыть к ним доступ
-# *   в конфиге загрузки данных заменить названия входных файлов на импортируемые
-# *   в конфиге загрузки данных проверить формат входных даты и времени
-# *   скопировать часть публичной ссылки в раздел Загружаем данные в команду !gdown
-#
-# В варианте с браузером к названию файла может добавиться лишний индекс `_1`, который не влияет только на автоматический режим работы. Вариант google-диска оптимален, если в дальнейшем тетрадь будет отправлена другим пользователям (возможен закрытый доступ только отдельным аккаунтам Google).
+# *   скопировать часть публичной ссылки в раздел **Загружаем данные** в команду !gdown 
+# Вариант google-диска оптимален, если в дальнейшем тетрадь будет отправлена другим пользователям (возможен закрытый доступ только отдельным аккаунтам Google).  
+# 
+# После загрузки в разделе **Конфигурация загрузки данных** необходимо: 
+# *   если используется неавтоматический режим работы, то заменить названия входных файлов на импортируемые
+# *   проверить формат входных даты и времени 
 #
 # ## **Перед фильтрацией**
 # *   Можно загружать несколько файлов full output и biomet, они будут автоматически расположены по возрастанию дат-времени и слиты в одну таблицу
@@ -128,7 +130,7 @@ import bglabutils.basic as bg
 
 from src.colab_routines import colab_no_scroll, colab_enable_custom_widget_manager, colab_add_download_button
 from src.ffconfig import FFConfig, RepConfig, FFGlobals, InputFileType
-from src.helpers.py_helpers import init_logging
+from src.ff_logger import init_logging, ff_log
 from src.helpers.io_helpers import ensure_empty_dir, create_archive
 from src.helpers.env_helpers import setup_r_env
 from src.data_io.fat_export import export_fat
@@ -162,14 +164,14 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # %% [markdown] id="LV9FvvtnVqdN"
 # **Необходимо поменять:**
 #
-# Возможны два основных варианта загрузки файлов:  
-# - перетаскиванием или загрузкой через меню браузера  
-# - загрузкой с google-диска по ссылке  
+# Возможны два основных варианта загрузки файлов (см. введение: загрузка входных файлов):  
+# 1) перетаскиванием в браузер или загрузкой через меню Upload (правый клик под sample_data)  
+# 2) загрузкой с google-диска командой `!gdown ...` по ссылке  
 # 
-# В режиме браузера этот раздел не используется. Необходимо закомментировать или отключить две команды по умолчанию: поменять  
+# В варианте 1 необходимо вручную добавить файлы и отключить загрузку по умолчанию двух демонстрационных файлов: поменять  
 # `!gdown ...` на `# !gdown ...`.  
 # 
-# При загрузке с google-диска после !gdown вставьте символы после d/ и до следующего / из публичной ссылки на файл, лежащий на google-диске. К примеру, если ссылка
+# При загрузке с google-диска (вариант 2) после !gdown вставьте символы после d/ и до следующего / из публичной ссылки на файл, лежащий на google-диске. К примеру, если ссылка
 # https://drive.google.com/file/d/1fGhmvra0evNzM0xkM2nu5T-N_rSPoXUB/view?usp=sharing,
 # то команда будет записана как  
 # `!gdown 1fGhmvra0evNzM0xkM2nu5T-N_rSPoXUB`
@@ -194,14 +196,6 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # # Задаем параметры для загрузки и обработки данных
 
 # %% [markdown] id="ox0UplWMe7wn"
-# ## Файл конфигурации
-# Скрипт поддерживает два варианта задания опций:  
-# - без файла конфигурации, используются настройки из ячеек тетради  
-# - с файлом конфигурации, при этом настройки из ячеек не применяются  
-#
-# Пример файла конфигурации последнего запуска `config*.yaml` будет добавлен в выходной архив после завершения работы тетради.
-# Его можно отредактировать и использовать повторно, в том числе вместе с другими данными. Файл читается в этой ячейке автоматически, если загружен пользователем и назван по шаблону `config*.yaml`. Отключить загрузку или задать фиксированное название можно в параметре `load_path='auto'`.  
-#
 # ## Конфигурация загрузки данных
 # Здесь прописываются параметры входных файлов: названия, формат дат-времени и другие.  
 #
@@ -211,11 +205,19 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # - один файл ИАС
 # - один файл CSF
 #
-# В простых случаях (и если не загружены лишние файлы) тип фалов и их настройки будут определены автоматически. В сложных случаях или при ошибках можно попробовать вручную задать все настройки в ячейке.  
+# В простых случаях (и если не загружены лишние файлы) тип фалов и их настройки будут определены автоматически. В сложных случаях или при ошибках можно попробовать вручную задать все настройки в этой ячейке.  
+#
+# **Файл конфигурации**  
+# Скрипт поддерживает два варианта задания опций:  
+# - без файла конфигурации, используются настройки из ячеек тетради  
+# - с файлом конфигурации, при этом настройки из ячеек не применяются  
+#
+# Пример файла конфигурации последнего запуска `config*.yaml` будет добавлен в выходной архив после завершения работы тетради.
+# Его можно отредактировать и в дальнейшем загружать в скрипт вместе с данными. Файл читается в этой ячейке автоматически, если загружен пользователем и назван по шаблону `config*.yaml`. Отключить загрузку или задать фиксированное название можно в параметре `load_path='auto'`.  
 #
 # **Необходимо проверить:**
 #
-# В автоматическом режиме (по умолчанию) в логе ячейки будет подробная информация по импорту и режиму работы (один из `'EDDYPRO_FO'`, `'EDDYPRO_FO_AND_BIOMET'`, `'IAS'`, `'CSF'`).  Также необходимо проверить в логе правильность определения форматов даты-времени и других настроек. При неправильном определении можно задать вручную:  
+# В автоматическом режиме (по умолчанию) в логе работы ячейки **Импорт и проверка данных** будет контрольная информация по импорту и режиму работы (один из `'EDDYPRO_FO'`, `'EDDYPRO_FO_AND_BIOMET'`, `'IAS'`, `'CSF'`).  Также необходимо проверить в логе правильность определения форматов даты-времени и других настроек. При неправильном определении можно задать вручную:  
 #
 # В `config.input_files` должен быть либо путь до файла (`= ['1.csv']`) при имени файла 1.csv, либо список (list) путей в случае загрузки нескольких файлов (`= ['1.csv', '2.csv']`), либо словарь путей и типов файлов `= {'1.csv': InputFileType.EDDYPRO_FO}`.  
 # При импорте через !gdown файла с google-диска достаточно указать в одинарной кавычке *имя файла.расширение*. Не забывайте расширение .csv!  
@@ -233,10 +235,10 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # `config.*.repair_time` если `True`, то проверит колонку с датой-временем на пропуски и монотонность, проведет регенерацию по первой-последней точке с учетом предполагаемой длины шага (вычисляется по паре первых значений ряда).
 
 # %% id="tVJ_DRBrlpYd"
- 
+
 # init_debug=True: быстрый режим скрипта с обработкой только нескольких месяцев
 # load_path=None disables lookup, load_path='myconfig.yaml' sets fixed expected name without pattern lookup
-config = FFConfig.load_or_init(load_path='auto', 
+config = FFConfig.load_or_init(load_path='auto',
                                init_debug=False, init_version='1.0.0')
 
 if not config.from_file:
@@ -253,7 +255,7 @@ if not config.from_file:
     config.eddypro_fo.date_col = 'date'
     config.eddypro_fo.try_date_formats = ['%d.%m.%Y', '%d/%m/%Y', '%Y-%m-%d']
     config.eddypro_fo.repair_time = True
-
+    
     config.eddypro_biomet.missing_data_codes = ['-9999']
     config.eddypro_biomet.repair_time = True
     config.eddypro_biomet.datetime_col = 'TIMESTAMP_1'
@@ -296,7 +298,7 @@ if not config.from_file:
     
     # Индекс станции для названий выходных файлов, рисунков
     config.site_name = 'auto'
-    config.ias_output_version = 'auto'
+    config.ias_out_version = 'auto'
 
 # %% [markdown] id="5MK90gyzQryZ"
 # Параметры фильтрации по флагам качества. Данные с флагами в интервале (-inf, val] будут помечены как валидные, а данные со значением флага больше порога будут исключены.
@@ -357,7 +359,6 @@ filters_meteo['CH4SS_min'] = 20.
 if not config.from_file:
     config.filters.meteo = filters_meteo
 
-
 # %% [markdown] id="utUX7SA4qA_I"
 # ### Фильтрация статистическая
 
@@ -403,7 +404,7 @@ for col in ['h', 'le', 'rh_1_1_1', 'vpd_1_1_1']:
     filters_window[col] = {'sigmas': 7, 'window': 10, 'min_periods': 4}
 for col in ['swin_1_1_1', 'ppfd_1_1_1']:
     filters_window[col] = {'sigmas': 8, 'window': 10, 'min_periods': 4}
-    
+
 if not config.from_file:
     config.filters.window = filters_window
 
@@ -444,7 +445,7 @@ if not config.from_file:
 # # Импорт и проверка данных
 
 # %% id="Xw5TapK10EhR"
-config.input_files, config.import_mode, config.site_name, config.ias_output_version, config.has_meteo = try_auto_detect_input_files(
+config.input_files, config.import_mode, config.site_name, config.ias_out_version, config.has_meteo = try_auto_detect_input_files(
     config)
 data, time_col, meteo_cols, data_freq, config.has_meteo = import_data(config)
 
@@ -454,6 +455,7 @@ gl.points_per_day = int(pd.Timedelta('24h') / data_freq)
 data.columns = data.columns.str.lower()
 if not config.has_meteo:
     data["rh_1_1_1"] = data['rh']
+    # TODO QOA 1 different units? Elg biomet kPa, but mean 8.6 ?  
     data["vpd_1_1_1"] = data['vpd']
 
 # %% [markdown] id="ipknrLaeByCT"
@@ -472,7 +474,7 @@ for col in cols_2_check:
         continue
     error_positions = data[col].fillna(0).apply(pd.to_numeric, errors='coerce').isna()
     if error_positions.any():
-        logging.error(
+        ff_log.error(
             f"""Check input files for {col} column near:\n {error_positions[error_positions == True].index.strftime('%d-%m-%Y %H:%M').values} in {'biomet' if len(meteo_cols) > 0 and col in meteo_cols else 'data'} file"""
         )
         data_type_error_flag = True
@@ -511,7 +513,7 @@ for col in data.columns:
     if col in ['ch4_signal_strength_7700_mean', 'CH4SS'.lower()] or 'ch4_signal_strength' in col:
         print(f"renaming {col} to ch4_signal_strength")
         data = data.rename(columns={col: 'ch4_signal_strength'})
-
+    
     # Biomet renames
     if col == 'ppfd_in_1_1_1':
         print(f"renaming {col} to ppfd_1_1_1")
@@ -519,7 +521,7 @@ for col in data.columns:
     if col == 'sw_in_1_1_1':
         print(f"renaming {col} to swin_1_1_1")
         data = data.rename(columns={col: 'swin_1_1_1'})
-
+    
     if col == "rh_1_1_1":
         have_rh_flag = True
     if col == "vpd_1_1_1":
@@ -581,7 +583,7 @@ else:
     if not have_rh_flag:
         # TODO QOA 1 possibly an error
         # OA: check tg for the formula
-        print("calculating rh_1_1_1 from vpd_1_1_1 and air temperature")
+        print("estimating rh_1_1_1 from air temperature")
         data['rh_1_1_1'] = ehpa
 
 if not (have_par_flag or have_swin_flag):
@@ -606,7 +608,7 @@ for col in ['ch4_signal_strength_7700_mean', 'CH4SS'.lower()]:
 
 if not config.has_meteo or 'ta_1_1_1' not in data.columns:
     data['ta_1_1_1'] = data['air_temperature'] - 273.15
-    logging.info("No Ta_1_1_1 column found, replaced by 'air_temperature'")
+    ff_log.info("No Ta_1_1_1 column found, replaced by 'air_temperature'")
 
 # %% [markdown] id="soyyX-MCbaXt"
 # ## Получение NEE из потока CO2 и накопления
@@ -639,7 +641,7 @@ if config.calc_nee and 'co2_strg' in data.columns:
 # Решаем, суммировать ли исходный co2_flux и co2_strg_filtered_filled для получения NEE
 if not config.from_file:
     config.calc_with_strg = False  # В случае, если дальше работаем с NEE, оставить True.
-logging.info(f"config.calc_with_strg is set to {config.calc_with_strg}")
+ff_log.info(f"config.calc_with_strg is set to {config.calc_with_strg}")
 # Для того, чтобы работать дальше с co2_flux, игнорируя co2_strg, поставить False
 
 # %% id="ueuvsNxYdtgs"
@@ -651,7 +653,7 @@ if config.calc_nee and 'co2_strg' in data.columns:
     del tmp_data
     if 'nee' not in cols_to_investigate:
         cols_to_investigate.append('nee')
-        
+    
     if not config.from_file:
         for filter_config in [config.qc, config.filters.meteo, config.filters.min_max, config.filters.window,
                               config.filters.quantile,
@@ -746,7 +748,8 @@ if config.has_meteo:
         ]
     # date_ranges = []
     # date_ranges.append(['25.8.2014 00:00', '26.8.2014 00:00'])
-    plot_data, filters_db = winter_filter(plot_data, filters_db, config.filters.meteo, config.filters.winter_date_ranges)
+    plot_data, filters_db = winter_filter(plot_data, filters_db, config.filters.meteo,
+                                          config.filters.winter_date_ranges)
 
 # %% [markdown] id="iipFLxf6fu5Y"
 # Фильтрация по футпринту
@@ -819,10 +822,9 @@ for key, filters in filters_db.items():
             # print(filter_name, filtered_amount, len(pl_data.index) - old_val)
 fdf_df = pd.DataFrame(all_filters)
 
-print("Какая часть данных от общего количества (в %) была отфильтрована:")
-print(fdf_df.iloc[1] / len(plot_data) * 100)
-logging.info("Какая часть данных от общего количества (в %) была отфильтрована:")
-logging.info(fdf_df.iloc[1] / len(plot_data) * 100)
+ff_log.info("Какая часть данных от общего количества (в %) была отфильтрована:")
+df_stats = fdf_df.iloc[1] / len(plot_data) * 100
+ff_log.info('\n' + df_stats.to_string())
 
 # %% [markdown] id="gA_IPavss0bq"
 # # Отрисовка рядов
@@ -913,9 +915,8 @@ for column, filter in filters_db.items():
 gl.rep_level3_fpath = gl.out_dir / f"REddyProc_{config.site_name}_{int(plot_data[time_col].dt.year.median())}.txt"
 export_rep_level3(gl.rep_level3_fpath, rep_df, time_col, output_template, config, gl.points_per_day)
 
-# ## Файл для ИАС
-
 # %% [markdown] id="e50f7947"
+# ## Файл для ИАС
 # Файл уровня 2, записывается из первоначально введенных данных **без учета** фильтраций
 
 # %% id="yaLoIQmtzaYd"
@@ -924,8 +925,8 @@ if config.has_meteo:
     for column, filter in filters_db.items():
         filter = get_column_filter(ias_df, filters_db, column)
         ias_df.loc[~filter.astype(bool), column] = np.nan
-
-    export_ias(gl.out_dir, config.site_name, config.ias_output_version, ias_df, time_col=time_col,
+    
+    export_ias(gl.out_dir, config.site_name, config.ias_out_version, ias_df, time_col=time_col,
                data_swin_1_1_1=data['swin_1_1_1'])
 
 # %% [markdown] id="Pm8hiMrb_wRW"
@@ -942,12 +943,12 @@ if config.has_meteo:
         'PPFD': ['umol m-2 s-1'], 'Ta': ['oC'], 'VPD': ['kPa'], 'PPFD_gapfilling': ['umol m-2 s-1'],
         'Ta_gapfilling': ['oC'], 'VPD_gapfilling': ['kPa'], 'period': ['--']
     }
-
+    
     fat_df = plot_data.copy()
     for column, filter in filters_db.items():
         filter = get_column_filter(fat_df, filters_db, column)
         fat_df.loc[~filter.astype(bool), column] = np.nan
-
+    
     export_fat(fat_df, fat_output_template, time_col, gl, config)
     del fat_df
 
@@ -965,7 +966,7 @@ if 'time' in plot_data.columns:
 
 all_fpath = gl.out_dir / 'output_all.csv'
 plot_data.fillna(-9999).to_csv(all_fpath, index=None, columns=full_column_list)
-logging.info(f"Basic file saved to {all_fpath}")
+ff_log.info(f"Basic file saved to {all_fpath}")
 
 # %% [markdown] id="-MSrgUD0-19l"
 # ## Файл-резюме результатов фильтрации
@@ -1044,7 +1045,7 @@ basic_df = basic_df.fillna(-9999)
 
 summary_fpath = gl.out_dir / 'output_summary.csv'
 basic_df.to_csv(summary_fpath, index=None)
-logging.info(f"New basic file saved to {summary_fpath}")
+ff_log.info(f"New basic file saved to {summary_fpath}")
 # %% [markdown] id="775a473e"
 # # Обработка инструментом REddyProc
 # В этом блоке выполняется 1) фильтрация по порогу динамической скорости ветра (u* threshold), 2) заполнение пропусков в метеорологических переменных и 30-минутных потоках, 3) разделение NEE на валовую первичную продукцию (GPP) и экосистемное дыхание (Reco), 4) вычисление суточных, месячных, годовых средних и среднего суточного хода по месяцам.
@@ -1149,19 +1150,19 @@ config_reddyproc = RepConfig(
     is_bootstrap_u_star=False,
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
     u_star_seasoning="Continuous",
-
+    
     is_to_apply_partitioning=True,
-
+    
     # partitioning_methods: one or both of "Reichstein05", "Lasslop10"
     partitioning_methods=["Reichstein05", "Lasslop10"],
-
+    
     latitude=56.5,
     longitude=32.6,
     timezone=+3.0,
-
+    
     # "Tsoil"
     temperature_data_variable="Tair",
-
+    
     # do not change
     site_id=config.site_name,
     u_star_method="RTw",
@@ -1171,7 +1172,7 @@ config_reddyproc = RepConfig(
 )
 
 if not config.from_file:
-    config.reddyproc = config_reddyproc 
+    config.reddyproc = config_reddyproc
 
 prepare_rg(config.reddyproc)
 ensure_empty_dir(config.reddyproc.output_dir)
