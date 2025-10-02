@@ -41,7 +41,7 @@
 # *   Файл-пример full output можно скачать [здесь](https://drive.google.com/file/d/1TyuHYZ0uh5teRiRFAga0XIqfU4vYW4-N/view?usp=sharing)
 # *   Файл-пример biomet можно скачать [здесь](https://drive.google.com/file/d/1FjiBcSspDBlYlcg9Vzy71Sm49gOFZGBF/view?usp=sharing)
 # *   Файл-пример CSF можно скачать *[здесь]*
-# *   Файл конфигурации можно скачать *[здесь]*
+# *   Файл конфигурации можно скачать [здесь](https://raw.githubusercontent.com/PlaZMaD/climate/refs/tags/v1.0.2/misc/default_config.yaml)
 # *   В файле full output должны быть 3 строки заголовка и названия переменных должны быть записаны во 2-й строке
 # *   В файле biomet должны быть 2 строки заголовка и названия переменных должны быть записаны в 1-й строке. По умолчанию без проблем читаются файлы, у которых дата и время записаны в колонке TIMESTAMP_1 в формате yyyy-mm-dd HHMM
 #
@@ -52,15 +52,16 @@
 # 3. Входной файл для инструмента заполнения пропусков [Flux Analysis Tool](https://atmenv.envi.osakafu-u.ac.jp/staff/ueyama/softwares/) (M. Ueyama, Япония)
 # 4. Файл output_all – все исходные переменные и все флаги применения фильтров.
 # 5. Файл output_summary – запись для основных переменных исходных данных, отфильтрованных данных, флаг применения каждого фильтра, средние суточные ходы в окне 30 и 10 дней.
-# 6. Лог - записи в ходе работы скрипта, введенные для фильтрации параметры в данном пробеге.
-# 7. Директория reddyproc содержит результаты заполнения переменных в таком же формате, что и оригинальный инструмент [REddyProcWeb](https://www.bgc-jena.mpg.de/5624929/Output-Format). Помимо этого, в директории output/reddyproc содержатся обобщающие файлы с индексами _hourly (суточные ходы оригинальных и заполненных переменных), _daily (средние суточные значения), _monthly (средние месячные значения) и _yearly (значения за год, если данных меньше - за весь период обработки).
+# 6. Файл config*.yaml - конфигурация последнего запуска.
+# 7. Лог - записи в ходе работы скрипта, введенные для фильтрации параметры в данном пробеге.
+# 8. Директория reddyproc содержит результаты заполнения переменных в таком же формате, что и оригинальный инструмент [REddyProcWeb](https://www.bgc-jena.mpg.de/5624929/Output-Format). Помимо этого, в директории output/reddyproc содержатся обобщающие файлы с индексами _hourly (суточные ходы оригинальных и заполненных переменных), _daily (средние суточные значения), _monthly (средние месячные значения) и _yearly (значения за год, если данных меньше - за весь период обработки).
 #
 # ## **Загрузка входных файлов**
 # Возможны два основных варианта загрузки:  
 #
 # Через браузер:  
 # *   нажмите на кнопку директории (нижняя кнопка в левой панели под кнопкой "ключ")
-# *   перетащите один или несколько фалов (к примеру, из проводника Windows) в пустое пространство под директорией `sample_data`
+# *   перетащите один или несколько файлов (к примеру, из проводника Windows) в пустое пространство под директорией `sample_data`
 # *   закомментировать две команды `!gdown` в разделе **Загружаем данные**  
 #
 # Через google-диск:  
@@ -95,7 +96,7 @@
 
 # %% [markdown] id="sj6Z0gnhVM-R"
 # # Технический блок
-# Импорт библиотек и определение функций
+# Импорт библиотек, загрузка скриптов для ячеек из репозитория, определение функций
 
 # %% id="lZliIHxRJiqk"
 # from google.colab import userdata
@@ -103,7 +104,6 @@
 
 # %pip install pysolar
 # %pip install ruamel.yaml
-# %pip install deepdiff
 # %pip install plotly-resampler dateparser >> /dev/null
 # # %pip install --index-url https://public:{key}@gitlab.com/api/v4/projects/55331319/packages/pypi/simple --no-deps bglabutils==0.0.21 >> /dev/null
 # %pip install --index-url https://gitlab.com/api/v4/projects/55331319/packages/pypi/simple --no-deps bglabutils==0.0.21 >> /dev/null
@@ -114,7 +114,7 @@
 # !git sparse-checkout init
 # !git sparse-checkout set src locale
 # !git remote add origin https://github.com/halt9k/fluxfilter-extended.git
-# !git fetch --depth 1 origin ias-draft
+# !git fetch --depth 1 origin TEST/draft
 # !git -c advice.detachedHead=false checkout FETCH_HEAD
 
 # %% id="Ywv5kp0rzanK"
@@ -138,13 +138,14 @@ import bglabutils.basic as bg
 # import textwrap
 
 from src.colab_routines import colab_no_scroll, colab_enable_custom_widget_manager, colab_add_download_button
-from src.ffconfig import FFConfig, RepConfig, FFGlobals, InputFileType
+from src.ff_config import FFConfig, RepConfig, FFGlobals, InputFileType
 from src.ff_logger import init_logging, ff_log
 from src.helpers.io_helpers import ensure_empty_dir, create_archive
 from src.helpers.env_helpers import setup_r_env
 from src.data_io.fat_export import export_fat
 from src.data_io.rep_level3_export import export_rep_level3
-from src.data_io.data_import import try_auto_detect_input_files, import_data
+from src.data_io.data_import import import_data
+from src.data_io.detect_import import try_auto_detect_input_files
 from src.data_io.ias_io import export_ias
 from src.ipynb_routines import setup_plotly, ipython_enable_word_wrap, ipython_edit_function
 from src.filters import min_max_filter, qc_filter, std_window_filter, meteorological_rh_filter, \
@@ -212,9 +213,9 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # - один или несколько файлов EddyPro - full output
 # - один или несколько файлов EddyPro - full output и один или несколько файлов EddyPro - biomet
 # - один файл ИАС
-# - один файл CSF
+# - один файл CSF и один или несколько файлов EddyPro - biomet
 #
-# В простых случаях (и если не загружены лишние файлы) тип фалов и их настройки будут определены автоматически. В сложных случаях или при ошибках можно попробовать вручную задать все настройки в этой ячейке.  
+# В простых случаях (и если не загружены лишние файлы) тип файлов и их настройки будут определены автоматически. В сложных случаях или при ошибках можно попробовать вручную задать все настройки в этой ячейке.  
 #
 # **Файл конфигурации**  
 # Скрипт поддерживает два варианта задания опций:  
@@ -248,7 +249,7 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # init_debug=True: быстрый режим скрипта с обработкой только нескольких месяцев
 # load_path=None disables lookup, load_path='myconfig.yaml' sets fixed expected name without pattern lookup
 config = FFConfig.load_or_init(load_path='auto',
-                               init_debug=False, init_version='1.0.0')
+                               init_debug=False, init_version='1.0.2')
 
 if not config.from_file:
     config.input_files = 'auto'
@@ -258,18 +259,25 @@ if not config.from_file:
     
     config.time_col = 'datetime'
     
-    config.eddypro_fo.missing_data_codes = ['-9999']
-    config.eddypro_fo.time_col = 'time'
-    config.eddypro_fo.try_time_formats = ['%H:%M', '%H:%M:%S']
+    config.eddypro_fo.missing_data_codes = [-9999]
     config.eddypro_fo.date_col = 'date'
     config.eddypro_fo.try_date_formats = ['%d.%m.%Y', '%d/%m/%Y', '%Y-%m-%d']
+    config.eddypro_fo.time_col = 'time'
+    config.eddypro_fo.try_time_formats = ['%H:%M', '%H:%M:%S']
     config.eddypro_fo.repair_time = True
     
-    config.eddypro_biomet.missing_data_codes = ['-9999']
-    config.eddypro_biomet.repair_time = True
+    config.eddypro_biomet.missing_data_codes = [-9999]
     config.eddypro_biomet.datetime_col = 'TIMESTAMP_1'
     config.eddypro_biomet.try_datetime_formats = ['%Y-%m-%d %H%M', '%d.%m.%Y %H:%M']  # yyyy-mm-dd HHMM
-
+    config.eddypro_biomet.repair_time = True
+    
+    config.csf.missing_data_codes = [-9999, 'NAN']
+    config.csf.datetime_col = 'TIMESTAMP'
+    config.csf.try_datetime_formats = ['%Y-%m-%d %H:%M:%S', '%d.%m.%Y %H:%M']  # yyyy-mm-dd HHMM
+    config.csf.repair_time = True
+    
+    config.ias.missing_data_codes = [-9999]
+    config.ias.repair_time = True
 # %% [markdown] id="DtxFTNnEfENz"
 # ## Выбор колонок для графиков и фильтраций
 
@@ -1060,8 +1068,7 @@ ff_log.info(f"New basic file saved to {summary_fpath}")
 # В этом блоке выполняется 1) фильтрация по порогу динамической скорости ветра (u* threshold), 2) заполнение пропусков в метеорологических переменных и 30-минутных потоках, 3) разделение NEE на валовую первичную продукцию (GPP) и экосистемное дыхание (Reco), 4) вычисление суточных, месячных, годовых средних и среднего суточного хода по месяцам.
 # %% [markdown] id="a8aa54de"
 # ## Технический блок
-# Необходим и автоматически запускается, если детектируется окружение Google Colab.  
-# Загружает используемые в ячейках скрипты в директорию `src` и подготавливает R окружение.
+# Подготавливает R окружение, если детектируется окружение Google Colab.  
 # %% id="06859169"
 
 ipython_enable_word_wrap()
@@ -1094,7 +1101,7 @@ from src.reddyproc.preprocess_rg import prepare_rg
 # %% [markdown] id="034b04a5"
 # ## Фильтрация и заполнение пропусков
 #
-# Далее `config.reddyproc` - настройки, которые соответствуют опциям [онлайн-инструмента](https://www.bgc-jena.mpg.de/REddyProc/ui/REddyProc.php).
+# Далее `config_reddyproc` - настройки, которые соответствуют опциям [онлайн-инструмента](https://www.bgc-jena.mpg.de/REddyProc/ui/REddyProc.php).
 #
 # **Необходимо проверить:**  
 #
@@ -1109,7 +1116,7 @@ from src.reddyproc.preprocess_rg import prepare_rg
 #
 # По сравнению с исходным инструментом REddyProc в этой тетради добавлена **экспериментальная** возможность подстановки пользовательского значения порога в случае, когда порог невозможно рассчитать (например, если недостаточно данных или отсутствует солнечная коротковолновая радиация *Rg*). Для травянистых экосистем можно использовать `0.01`, для лесных - `0.1`, для отключения подстановки - `None`.  
 # `ustar_threshold_fallback=0.01`  
-# REddyProc по умолчанию применяет порог uStar только в ночное время, для определения которого требуется столбец *Rg*. Следующая **экспериментальная** опция позволяет использовать теоретическое значение `"Rg_th_Py"` или `"Rg_th_REP"`, либо игнорировать отсутствие *Rg* и применить порог ко всем данным без учета времени суток - `None`:  
+# REddyProc по умолчанию применяет порог uStar только в ночное время, для определения которого требуется столбец *Rg*. Следующая **экспериментальная** опция позволяет использовать теоретическое значение `"Rg_th_Py"` или `"Rg_th_REP"`, либо игнорировать отсутствие *Rg* и применить порог ко всем данным без учета времени суток - `""`:  
 # `ustar_rg_source="Rg"`  
 #
 # В случае ошибок фильтрации будет предупреждение в логе ячейки и повторная попытка запуска с переходом к заполнению пропусков.
@@ -1141,11 +1148,11 @@ from src.reddyproc.preprocess_rg import prepare_rg
 # **Дополнительные опции (согласованы с предыдущими секциями):**  
 #
 # Название станции, которое будет продублировано в названиях выходных файлов:    
-# `site_id=ias_output_prefix`  
+# `site_id=config.site_name`  
 # Файл, из которого загружаются временные ряды:  
-# `input_file=str(rep_input_fpath)`  
+# `input_file=str(gl.rep_level3_fpath)`  
 # Директория, в которую инструмент пишет контрольные изображения, базовую статистику по пропускам, заполненные ряды:  
-# `output_dir=str(out_dir / 'reddyproc')`
+# `output_dir=str(gl.out_dir / 'reddyproc')`
 # %% id="278caec5"
 
 config_reddyproc = RepConfig(
@@ -1183,6 +1190,10 @@ config_reddyproc = RepConfig(
 if not config.from_file:
     config.reddyproc = config_reddyproc
 
+config.reddyproc.input_file = config_reddyproc.input_file
+config.reddyproc.output_dir = config_reddyproc.output_dir
+config.reddyproc.site_id = config_reddyproc.site_id
+
 prepare_rg(config.reddyproc)
 ensure_empty_dir(config.reddyproc.output_dir)
 gl.rep_out_info, config.reddyproc = reddyproc_and_postprocess(config.reddyproc, gl.repo_dir)
@@ -1190,7 +1201,7 @@ gl.rep_out_info, config.reddyproc = reddyproc_and_postprocess(config.reddyproc, 
 # %% [markdown] id="0bed439c"
 # ## Контрольные графики
 # Отображение отдельных графиков из онлайн-инструмента в удобной для проверки форме.  
-# Заполненные данные, графики и проверочную статистику можно скачать одним архивом по кнопке **Download eddyproc outputs**.
+# Заполненные данные, графики и проверочную статистику можно скачать одним архивом по кнопке **Download reddyproc outputs**.
 #
 # **Дополнительные опции:**  
 #   
@@ -1226,7 +1237,7 @@ rep_arc_path = rep_out_dir / (gl.rep_out_info.fnames_prefix + '.zip')
 create_archive(arc_path=rep_arc_path, dirs=rep_out_dir, top_dir=rep_out_dir,
                include_fmasks=['*.png', '*.csv', '*.txt'], exclude_files=roh.img_proc.raw_img_duplicates)
 
-colab_add_download_button(rep_arc_path, 'Download eddyproc outputs')
+colab_add_download_button(rep_arc_path, 'Download reddyproc outputs')
 
 roh.display_images_safe()
 
