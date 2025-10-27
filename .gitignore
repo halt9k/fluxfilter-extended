@@ -33,3 +33,5 @@
 # /misc/archive/**
 # .gitattributes
 # README.md
+*.pyc
+test/fixtures/data_chunks/
