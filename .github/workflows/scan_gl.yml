@@ -2,6 +2,10 @@ name: Common Maintenance Jobs
 on:
     pull_request:
     push:
+        branches-ignore:
+          - wip
+          - 'TEST/**'
+          - 'TODO/**'
     workflow_dispatch:
     schedule:
         # run every month
