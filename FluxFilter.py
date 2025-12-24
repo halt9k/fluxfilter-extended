@@ -112,7 +112,7 @@
 # !rm -rf sample_data
 # !rm -rf scripts
 
-# %env clone_br=TEST/draft
+# %env clone_br=TEST/draft2
 # %env clone_repo=https://github.com/halt9k/fluxfilter-extended.git
 # !git clone -b $clone_br -n --depth=1 --filter=tree:0 $clone_repo scripts
 # !git -C scripts sparse-checkout set --no-cone src locale misc
@@ -269,7 +269,7 @@ init_logging(level=logging.INFO, fpath=gl.out_dir / 'log.log', to_stdout=True)
 # init_debug=True: быстрый режим скрипта с обработкой только нескольких месяцев
 # load_path=None disables lookup, load_path='myconfig.yaml' sets fixed expected name without pattern lookup
 config = FFConfig.load_or_init(load_path='auto', default_fpath=gl.repo_dir / 'misc/config_v1.0.5_default_ru.yaml',
-                               init_debug=False, init_version='v1.0.5')
+                               init_debug=True, init_version='v1.0.5')
 
 if not config.from_file:
     config.data_import.input_files = 'auto'
