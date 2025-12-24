@@ -146,12 +146,15 @@ check_seasons_arg <- function(eddyProcConfiguration, EddyDataWithPosix) {
 .ustar_estimate_rg <- function(eddyProcConfiguration, EProc) {
 	ep_cfg <- eddyProcConfiguration
 
-	if (ep_cfg$ustar_rg_source == 'Rg_th_REP') {
+	if (ep_cfg$debug | ep_cfg$ustar_rg_source == 'Rg_th_REP') {
 		# TODO 2 why timestamps are 15, 45 mins when input file is 0, 30? mean point?
 		hour_dec <- hour(EProc$sDATA$sDateTime) + minute(EProc$sDATA$sDateTime) / 60
 		doy <- yday(EProc$sDATA$sDateTime)
-		EProc$sDATA[[ep_cfg$ustar_rg_source]] <-
-			fCalcPotRadiation(doy, hour_dec, ep_cfg$latitude, ep_cfg$longitude, ep_cfg$timezone)
+		
+		EProc$sDATA[['Rg_th_REP']] <-
+			fCalcPotRadiation(doy, hour_dec, ep_cfg$latitude, ep_cfg$longitude, ep_cfg$timezone)			
+		if (!ep_cfg$debug)
+			EProc$sDATA[[ep_cfg$ustar_rg_source]] <- EProc$sDATA[['Rg_th_REP']]
 	}
 
 	if (ep_cfg$ustar_rg_source %in% c('Rg_th_REP', 'Rg_th_Py') && 'Rg' %in% colnames(EProc$sDATA))

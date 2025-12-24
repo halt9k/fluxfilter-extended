@@ -56,7 +56,8 @@ rep_user_options <- list(
     temperature_data_variable = "Tair",
 
     input_file = "output/REddyProc.txt",
-    output_dir = "output/reddyproc"
+    output_dir = "output/reddyproc",
+    debug = TRUE
 )
 
 

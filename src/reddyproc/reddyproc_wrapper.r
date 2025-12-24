@@ -40,7 +40,8 @@ OUTPUT_DIR <- NULL
     longitude = 32.6,
     timezone = +3,
 
-    t_temperatureDataVariable = "Tair"
+    t_temperatureDataVariable = "Tair",
+    debug = TRUE
 ), class)
 
 
@@ -82,6 +83,7 @@ OUTPUT_DIR <- NULL
     merge$timezone <- as.numeric(user_opts$timezone)
 
     merge$temperatureDataVariable <- user_opts$temperature_data_variable
+    merge$debug <- user_opts$debug
 
     return(merge)
 }

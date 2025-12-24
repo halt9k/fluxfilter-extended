@@ -290,14 +290,14 @@ if not config.from_file:
     config.data_import.eddypro_biomet.datetime_col = 'TIMESTAMP_1'
     config.data_import.eddypro_biomet.try_datetime_formats = ['%Y-%m-%d %H%M', '%d.%m.%Y %H:%M']  # yyyy-mm-dd HHMM
     config.data_import.eddypro_biomet.repair_time = True
-
+    
     config.data_import.eddypro_biomet_2.missing_data_codes = [-9999]
     config.data_import.eddypro_biomet_2.date_col = 'date'
     config.data_import.eddypro_biomet_2.try_date_formats = ['%d.%m.%Y', '%d/%m/%Y', '%Y-%m-%d']
     config.data_import.eddypro_biomet_2.time_col = 'time'
     config.data_import.eddypro_biomet_2.try_time_formats = ['%H:%M', '%H:%M:%S']
     config.data_import.eddypro_biomet_2.repair_time = True
-
+    
     config.data_import.csf.missing_data_codes = [-9999, 'NAN']
     config.data_import.csf.datetime_col = 'TIMESTAMP'
     config.data_import.csf.try_datetime_formats = ['%Y-%m-%d %H:%M:%S', '%d.%m.%Y %H:%M']  # yyyy-mm-dd HHMM
@@ -1228,6 +1228,7 @@ config_reddyproc = RepConfig(
     is_to_apply_gap_filling=True,
     input_file=str(gl.rep_level3_fpath),
     output_dir=str(gl.out_dir / 'reddyproc'),
+    debug=config.debug
 )
 
 if not config.from_file:
@@ -1285,6 +1286,84 @@ colab_add_download_button(rep_arc_path, 'Download reddyproc outputs')
 roh.display_images_safe()
 
 tag_handler.display_tag_info(roh.extended_tags())
+
+# %% id="E4rv4u88X8Yz"
+out_file = list(Path('output/reddyproc').glob('*fill*.txt'))[0]
+df_cmp = pd.read_csv(out_file, sep=r"\s+", skiprows=[1], parse_dates=[[0, 1]])
+df_cmp[df_cmp == -9999] = np.nan
+df_cmp.index = pd.to_datetime(df_cmp['Date_Time'], format='YYYY-MM-DD HH:MM:SS')
+
+from copy import deepcopy as copy
+from plotly import graph_objects as go, express as px
+from plotly.subplots import make_subplots
+
+
+def basic_plot_sim(data,
+                   col2plot,
+                   ias_output_prefix,
+                   min_days=8,
+                   window_days=10,
+                   steps_per_day=2 * 24,
+                   use_resample=False):
+    multiplot = isinstance(col2plot, list)
+    
+    window_days = window_days  # дней в окне
+    min_days = window_days // 2 - 1
+    pl_data = data.copy()
+    
+    layout = go.Layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+    color_data = 'darkorange'
+    color_line = 'darkslateblue'
+    
+    add_color_data = copy(px.colors.qualitative.Pastel1)
+    add_color_line = copy(px.colors.qualitative.Prism)
+    
+    add_color_data.insert(0, color_data)
+    add_color_line.insert(0, color_line)
+    
+    fig = go.Figure(layout=layout)
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True, figure=fig, subplot_titles=['Rg'])
+    
+    fig.update_xaxes(showline=True, linewidth=2, linecolor='black', gridcolor='Grey', minor_ticks='inside',
+                     minor_tickcolor='Grey')
+    fig.update_yaxes(showline=True, linewidth=2, linecolor='black', gridcolor='Grey')
+    
+    if not multiplot:
+        cols = [col2plot]
+    else:
+        cols = col2plot
+    
+    fig.update_layout(
+        # title = " ".join(cols),
+        xaxis_tickformat='%H:%M %d %B <br>%Y'
+    )
+    for row, col2plot in enumerate(cols):
+        if steps_per_day % 2 == 0:
+            closed = 'left'
+        else:
+            closed = 'both'
+        rolling_mean = bg.calc_rolling(pl_data[col2plot], step=steps_per_day, rolling_window=window_days,
+                                       min_periods=min_days)
+        
+        fig.add_trace(go.Scattergl(
+            x=pl_data.index, y=pl_data[col2plot], mode='lines', name=col2plot,
+            marker_color=add_color_data[row]
+        ), row=1, col=1)
+    
+    if use_resample:
+        fig = plotly_resampler.FigureResampler(fig, default_n_shown_samples=5000)
+    
+    fig_name = f"_{int(np.median(pl_data.index.year))}"
+    if "ias_output_prefix " in locals() or "ias_output_prefix" in globals():
+        fig_name = fig_name + "_" + ias_output_prefix
+    fig_config = {'toImageButtonOptions': {'filename': '_'.join(cols) + fig_name, }}
+    fig.show(config=fig_config)
+
+
+basic_plot_sim(df_cmp, col2plot=['Rg', 'Rg_th_Py', 'Rg_th_REP'], ias_output_prefix='')
 
 # %% [markdown] id="HEead6faY22W"
 # # Выгрузка результатов
