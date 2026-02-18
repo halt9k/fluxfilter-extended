@@ -41,6 +41,7 @@ OUTPUT_DIR <- NULL
     timezone = +3,
 
     t_temperatureDataVariable = 'Column name'
+    debug = TRUE
 ), class)
 
 
@@ -82,6 +83,7 @@ OUTPUT_DIR <- NULL
     merge$timezone <- as.numeric(user_opts$timezone)
 
     merge$temperatureDataVariable <- user_opts$temperature_data_variable
+    merge$debug <- user_opts$debug
 
     return(merge)
 }

@@ -51,6 +51,8 @@ class CSFImportConfig(MergedDateTimeFileConfig):
 
 
 class RepConfig(FFBaseModel):
+    debug: Annotated[bool | NoneType, Field(exclude=True)] = None
+    
     is_to_apply_u_star_filtering: bool = None
     ustar_threshold_fallback: float = None
     ustar_rg_source: Annotated[str, 'Rg_th_Py, Rg_th_REP, Rg, ""'] = None
