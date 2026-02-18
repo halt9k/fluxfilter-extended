@@ -40,7 +40,7 @@ OUTPUT_DIR <- NULL
     longitude = 32.6,
     timezone = +3,
 
-    t_temperatureDataVariable = 'Column name'
+    t_temperatureDataVariable = 'Column name',
     debug = TRUE
 ), class)
 
