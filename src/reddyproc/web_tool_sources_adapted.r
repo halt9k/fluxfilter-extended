@@ -470,6 +470,9 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
     # TODO 2 not intended way to put Rg_th_REP into outputs, there must be better option
     if (rg_source %in% colnames(EProc$sDATA))
         inputData[[rg_source]] <- EProc$sDATA[[rg_source]]
+    if (eddyProcConfiguration$debug)
+        inputData[['Rg_th_REP']] <- EProc$sDATA[['Rg_th_REP']]
+
 
 
     df_output <- writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName,
