@@ -73,6 +73,7 @@ class RepConfig(FFBaseModel):
     
     site_id: str = None
     u_star_method: str = None
+    skip_gap_filling_after_ustar: bool = None,
     is_to_apply_gap_filling: bool = None
     input_file: str = None
     output_dir: str = None

@@ -240,9 +240,29 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
 
 .gapFillAndPlotDataVariables <- function(eddyProcConfiguration, EProc, dataVariablesToFill) {
     print("------------- Gapfilling ---------------")
-
     gap_fill_call <- function() { .gapFillDataVariables(EProc, eddyProcConfiguration, dataVariablesToFill) }
     with_gapfill_interrupted(gap_fill_call, eddyProcConfiguration, EProc)
+    
+    ''' probably previous alternative already refactored patching ?
+    gap_fill_dummy_call <- function(original_closure, extra_args, Var,
+                                    QFVar='none', QFValue = NA_real_, FillAll=TRUE, isVerbose=TRUE, suffix='') {
+        EProc$sFillInit(Var, QFVar, QFValue, FillAll)
+        suffix_str <- if (REddyProc:::fCheckValString(suffix)) paste('_', suffix, sep = '') else ''
+        # suffix_str <- if (suffix == '') paste('_', suffix, sep = '') else ''
+        colnames(EProc$sTEMP) <<- gsub('VAR_', paste(Var, suffix_str, '_', sep = ''), colnames(EProc$sTEMP))
+        cat(RE, '.sMDSGapFill skipped due to skip_gap_filling_after_ustar = TRUE \n')
+        }
+
+    gap_fill_call <- function() {.gapFillDataVariables(EProc, eddyProcConfiguration, dataVariablesToFill)}
+    if (eddyProcConfiguration$skip_gap_filling_after_ustar) {
+        with_patched_func(s4 = EProc, closure_name = 'sMDSGapFill',
+                          patched_closure = gap_fill_dummy_call,
+                          extra_args = NULL, code = {gap_fill_call()})
+        return()
+    } else {
+        gap_fill_call()
+    }
+    '''
 
     if (length(get_ustar_suffixes(EProc)))
         .computeSdNEE(EProc)

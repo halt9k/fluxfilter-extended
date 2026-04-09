@@ -48,7 +48,7 @@ OUTPUT_DIR <- NULL
 
 # unlike template, is actually applied
 .reddyproc_extra_config <- list(
-    isCatchingErrorsEnabled = TRUE,
+    isCatchingErrorsEnabled = FALSE,
 
     input_format = "onlinetool",
     output_format = "onlinetool",

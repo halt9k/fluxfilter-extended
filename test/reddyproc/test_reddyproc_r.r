@@ -47,6 +47,7 @@ rep_user_options <- list(
     skip_gap_filling_after_ustar = TRUE,
 
     is_to_apply_gap_filling = TRUE,
+    skip_gap_filling_after_ustar = TRUE,
     is_to_apply_partitioning = TRUE,
 
     partitioning_methods = c("Reichstein05", "Lasslop10"),

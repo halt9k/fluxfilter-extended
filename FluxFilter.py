@@ -777,11 +777,12 @@ data[cols_to_investigate].describe()
 # %% [markdown] id="0oJLXYGbr73S"
 # # Separate REP Ustar experiment
 
+# %% id="06851169"
+setup_r_env(repo_dir)
 # %% id="06859169"
 
 from src.ustar import run_ustar
 ipython_enable_word_wrap()
-setup_r_env(repo_dir)
 
 # runs rep utsar, extracts ['NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f', 'NEE_orig'] cols
 # 'NEE_orig': after applying ustar filer
@@ -791,8 +792,9 @@ rep_ustar_data = run_ustar(config, gl, data, time_col, rep_ustar_cols)
 
 # plot and save to file
 rep_ustar_data['NEE_unfiltered'] = data['nee']
-rep_ustar_data.to_csv(gl.out_dir / 'rep_ustar_data.csv')
-plot_cols(rep_ustar_data, ['NEE_unfiltered'] + rep_ustar_cols, 'ustar')
+df_save = pd.concat([data, rep_ustar_data], axis=1)
+df_save.to_csv(gl.out_dir / 'rep_ustar_data.csv')
+plot_cols(rep_ustar_data, ['NEE_unfiltered', 'NEE_orig', 'NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f'], 'ustar')
 
 # text summary on exactly what ustar changed 
 nee_diff_mask = ~data['nee'].isna() & rep_ustar_data['NEE_orig'].isna()

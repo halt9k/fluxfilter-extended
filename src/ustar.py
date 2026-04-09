@@ -34,6 +34,7 @@ def run_ustar(config, gl, data, time_col, extract_rep_cols):
         # "Rg" - by real data, "" - ignore Rg and filter both days and nights
         ustar_rg_source="Rg",
         is_bootstrap_u_star=True,
+        skip_gap_filling_after_ustar=True,
         # u_star_seasoning: one of "WithinYear", "Continuous", "User"
         u_star_seasoning="Continuous",
         
