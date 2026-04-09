@@ -774,6 +774,13 @@ fig.show()
 
 data[cols_to_investigate].describe()
 
+# %% id="06859169"
+# Применение REP ustar 
+from src.ustar import run_ustar
+ipython_enable_word_wrap()
+setup_r_env(repo_dir)
+data = run_ustar(config, gl, data, time_col)
+
 # %% [markdown] id="0oJLXYGbr93S"
 # # Фильтрация данных физическая
 
@@ -1217,7 +1224,8 @@ ff_logger.info(f"New basic file saved to {summary_fpath}")
 # %% id="278caec5"
 
 config_reddyproc = RepConfig(
-    is_to_apply_u_star_filtering=True,
+	# TODO 1 ustar experiment
+    is_to_apply_u_star_filtering=False,
     # if default REP cannot detect threshold, this value may be used instead; None to disable
     ustar_threshold_fallback=0.01,
     # REP ustar requires Rg to detect nights; when real data is missing, 3 workarounds are possible
@@ -1256,7 +1264,8 @@ config.reddyproc.input_file = config_reddyproc.input_file
 config.reddyproc.output_dir = config_reddyproc.output_dir
 config.reddyproc.site_id = config_reddyproc.site_id
 
-ipython_enable_word_wrap()
+# TODO 1 check nothing got broken due to move above
+# ipython_enable_word_wrap()
 
 prepare_rg(config.reddyproc)
 ensure_empty_dir(config.reddyproc.output_dir)
