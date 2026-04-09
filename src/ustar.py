@@ -13,7 +13,7 @@ from src.reddyproc.preprocess_rg import prepare_rg
 from src.reddyproc.reddyproc_bridge import reddyproc_and_postprocess
 
 
-def run_ustar(config, gl, data, time_col):
+def run_ustar(config, gl, data, time_col, extract_rep_cols):
     cfg_ustar = copy(config)
     output_template = {
         'Year': ['-'], 'DoY': ['-'], 'Hour': ['-'], 'NEE': ['umol_m-2_s-1'], 'LE': ['Wm-2'], 'H': ['Wm-2'],
@@ -77,14 +77,16 @@ def run_ustar(config, gl, data, time_col):
     data_rep = data_rep_long.reindex(res.index)    
     if len(data_rep) != len(res):
         Exception('Cannot cut REP output to input')
-
+        
+    
+    '''    
     ustar_applied_mask = ~res['nee'].isna() & data_rep['NEE_orig'].isna()
     res['nee_without_ustar'] = res['nee']
     # assert ustar_applied_mask.sum() > 0 and data_rep['NEE_orig'][ustar_applied_mask].isna().all()
-    res['nee'][ustar_applied_mask] = np.nan
-    
+    res['nee'][ustar_applied_mask] = np.nan    
     print('Applied uStar threshold to NEE values: \n\n', res[['nee', 'nee_without_ustar']][ustar_applied_mask], '\n')
+    '''
     
     ensure_empty_dir(cfg_ustar.reddyproc.output_dir)
-    return res
+    return data_rep[extract_rep_cols]
     

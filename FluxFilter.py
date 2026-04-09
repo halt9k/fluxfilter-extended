@@ -774,12 +774,34 @@ fig.show()
 
 data[cols_to_investigate].describe()
 
+# %% [markdown] id="0oJLXYGbr73S"
+# # Separate REP Ustar experiment
+
 # %% id="06859169"
-# Применение REP ustar 
+
 from src.ustar import run_ustar
 ipython_enable_word_wrap()
 setup_r_env(repo_dir)
-data = run_ustar(config, gl, data, time_col)
+
+# runs rep utsar, extracts ['NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f', 'NEE_orig'] cols
+# 'NEE_orig': after applying ustar filer
+# 'NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f': gapfill options (?) by bootstrap option
+rep_ustar_cols = ['NEE_orig', 'NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f']
+rep_ustar_data = run_ustar(config, gl, data, time_col, rep_ustar_cols)
+
+# plot and save to file
+rep_ustar_data['NEE_unfiltered'] = data['nee']
+rep_ustar_data.to_csv(repo_dir / 'rep_ustar_data.csv')
+plot_cols(rep_ustar_data, ['NEE_unfiltered'] + rep_ustar_cols, 'ustar')
+
+# text summary on exactly what ustar changed 
+nee_diff_mask = ~data['nee'].isna() & rep_ustar_data['NEE_orig'].isna()
+# assert ustar_applied_mask.sum() > 0 and data_rep['NEE_orig'][ustar_applied_mask].isna().all()
+df_info = pd.concat([data['nee'], rep_ustar_data['NEE_orig']], axis=1)
+print('\n\n' 'uStar threshold removed NEE values: \n\n', df_info[nee_diff_mask], '\n')
+
+# use ustar filter in the next cells 
+# data['nee'] = rep_ustar_data['NEE_orig']
 
 # %% [markdown] id="0oJLXYGbr93S"
 # # Фильтрация данных физическая
@@ -1224,7 +1246,7 @@ ff_logger.info(f"New basic file saved to {summary_fpath}")
 # %% id="278caec5"
 
 config_reddyproc = RepConfig(
-	# TODO 1 ustar experiment
+    # TODO 1 ustar experiment
     is_to_apply_u_star_filtering=False,
     # if default REP cannot detect threshold, this value may be used instead; None to disable
     ustar_threshold_fallback=0.01,
