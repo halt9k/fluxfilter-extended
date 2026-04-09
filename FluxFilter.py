@@ -791,7 +791,7 @@ rep_ustar_data = run_ustar(config, gl, data, time_col, rep_ustar_cols)
 
 # plot and save to file
 rep_ustar_data['NEE_unfiltered'] = data['nee']
-rep_ustar_data.to_csv(repo_dir / 'rep_ustar_data.csv')
+rep_ustar_data.to_csv(gl.out_dir / 'rep_ustar_data.csv')
 plot_cols(rep_ustar_data, ['NEE_unfiltered'] + rep_ustar_cols, 'ustar')
 
 # text summary on exactly what ustar changed 
