@@ -73,7 +73,7 @@ def update_config_version(config: dict, tgt_ver) -> dict:
             'try_time_formats': ['%H:%M', '%H:%M:%S'],
             'repair_time': True
         }
-        
+        config['reddyproc']['ustar_bootstrap_percentiles'] = [5, 25, 50, 75, 95]
         config['filters']['quantile_iqr'] = {
             'enabled': False,
             'tgt_cols': config['filters']['quantile']

@@ -1225,6 +1225,7 @@ config_reddyproc = RepConfig(
     # "Rg" - by real data, "" - ignore Rg and filter both days and nights
     ustar_rg_source="Rg",
     is_bootstrap_u_star=False,
+    ustar_bootstrap_percentiles=[5, 25, 50, 75, 95],
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
     u_star_seasoning="Continuous",
     

@@ -16,6 +16,7 @@ config_reddyproc = RepConfig(
     # TODO 2 test when fallback activated + (multuyear or bootstrap): if all ok?
     ustar_rg_source="Rg",
     is_bootstrap_u_star=False,
+    ustar_bootstrap_percentiles=[5, 25, 50, 75, 95],
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
     u_star_seasoning="Continuous",
     
@@ -43,10 +44,11 @@ config_reddyproc = RepConfig(
 
 if not config.from_file:
     config.reddyproc = config_reddyproc
-
 config.reddyproc.input_file = config_reddyproc.input_file
 config.reddyproc.output_dir = config_reddyproc.output_dir
 config.reddyproc.site_id = config_reddyproc.site_id
+
+ipython_enable_word_wrap()
 
 prepare_rg(config.reddyproc)
 ensure_empty_dir(config.reddyproc.output_dir)

@@ -192,6 +192,8 @@ reddyproc:
     ustar_rg_source: 'Rg'  # Rg_th_Py, Rg_th_REP, Rg, ''
     # итеративная оценка точности вычисленного порога u* (bootstrap)
     is_bootstrap_u_star: false
+    # 
+    ustar_bootstrap_percentiles: [5, 25, 50, 75, 95]
     # выбор метода разметки сезонов, для каждого из которых отдельно определяется уровень насыщения
     u_star_seasoning: 'Continuous'  # WithinYear, Continuous, User
     # включает заполнение пропусков в 30-минутных потоках

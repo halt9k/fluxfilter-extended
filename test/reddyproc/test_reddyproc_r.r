@@ -43,6 +43,7 @@ rep_user_options <- list(
     u_star_method = factor("RTw", levels = "RTw"),
 
     is_bootstrap_u_star = FALSE,
+    ustar_bootstrap_percentiles = c(5, 25, 50, 75, 95),
 
     is_to_apply_gap_filling = TRUE,
     is_to_apply_partitioning = TRUE,

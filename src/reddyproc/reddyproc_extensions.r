@@ -191,8 +191,30 @@ check_seasons_arg <- function(eddyProcConfiguration, EddyDataWithPosix) {
 }
 
 
+.with_custom_bootstrap_percentiles <- function(call, eddyProcConfiguration, EProc) {
+	estimate_with_custom_percentiles <- function(original_closure, eddyProcConfiguration, ...) {
+		# TODO 1 test null same as before
+		if (!is.null(eddyProcConfiguration$ustar_bootstrap_quantiles)) {
+			cat(RE, 'sEstimateUstarScenarios arg was overriden with ustar_bootstrap_quantiles \n')
+			original_closure(..., probs = eddyProcConfiguration$ustar_bootstrap_quantiles)
+		} else {
+			original_closure(...)
+		}
+
+	}
+
+	# dummy call to make closure avaliable for patching
+	EProc$sEstimateUstarScenarios
+	with_patched_func(s4 = EProc, closure_name = 'sEstimateUstarScenarios',
+					  patched_closure = estimate_with_custom_percentiles,
+					  extra_args = eddyProcConfiguration, code = {call()})
+}
+
+
 est_ustar_threshold_fixes <- function(estUStarThreshold_call, eddyProcConfiguration, EProc) {
+	estimate_with_safeguard <- function() {.ustar_rg_safeguard(estUStarThreshold_call, eddyProcConfiguration, EProc)}
+
 	.ustar_estimate_rg(eddyProcConfiguration, EProc)
-	.ustar_rg_safeguard(estUStarThreshold_call, eddyProcConfiguration, EProc)
+	.with_custom_bootstrap_percentiles(estimate_with_safeguard, eddyProcConfiguration, EProc)
 	.ustar_threshold_fallback(eddyProcConfiguration, EProc)
 }

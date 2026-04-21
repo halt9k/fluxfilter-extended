@@ -31,6 +31,7 @@ OUTPUT_DIR <- NULL
     uStarMethod = factor("RTw", levels = "RTw"),
 
     isBootstrapUStar = FALSE,
+    ustar_bootstrap_percentiles = c(-1, 1),
 
     isToApplyGapFilling = TRUE,
     isToApplyPartitioning = TRUE,
@@ -58,7 +59,9 @@ OUTPUT_DIR <- NULL
 
 
 .convert_options_types <- function(user_opts){
-    as_numeric_or_nan <- function(x) ifelse(is.null(x), NaN, as.numeric(x))
+    as_numeric_or_nan <- function(x) { if (is.null(x)) NaN else as.numeric(x) }
+    as_double_or_nan <- function(x) { if (is.null(x)) NaN else as.double(x) }
+
 
     merge <- list()
 
@@ -72,6 +75,7 @@ OUTPUT_DIR <- NULL
     merge$uStarMethod <- factor(user_opts$u_star_method)
 
     merge$isBootstrapUStar <- user_opts$is_bootstrap_u_star
+    merge$ustar_bootstrap_quantiles <- as_numeric_or_nan(user_opts$ustar_bootstrap_percentiles) / 100.0
 
     merge$isToApplyGapFilling <- user_opts$is_to_apply_gap_filling
     merge$isToApplyPartitioning <- user_opts$is_to_apply_partitioning

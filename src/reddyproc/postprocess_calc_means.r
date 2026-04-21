@@ -90,7 +90,20 @@ source('src/reddyproc/r_helpers.r' %>% repo_path)
     # indeed, R have no default list(str) better than %>% select
     cols_f <- colnames(df %>% select(ends_with("_f")))
 
-    expected_cols_in <- sub("_f$", "", setdiff(cols_f, known_unpaired_out))
+    cols_known_unpaired <- c()
+    for (col in known_unpaired_out) {
+        if (grepl("\\*", col)) {
+            pattern <- gsub("\\*", "[0-9]", col)
+            matches = grep(pattern, cols_f, value = TRUE)
+            cols_known_unpaired <- c(cols_known_unpaired, matches)
+            }
+        else if (col %in% cols_f) {
+            cols_known_unpaired <- c(cols_known_unpaired, col)
+        }
+    }
+
+
+    expected_cols_in <- sub("_f$", "", setdiff(cols_f, cols_known_unpaired))
     cols_in = intersect(expected_cols_in, colnames(df))
 
     # TODO 2 ensure Bootstrap -> NEE cols are sorted correctly
@@ -109,8 +122,8 @@ calc_averages <- function(df_full){
     df <- add_column(df, Month = month(df$DateTime), .after = 'Year')
     df <- add_column(df, DoM = day(df$DateTime), .after = 'Year')
 
-    known_unpaired_out <- c('NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f',
-                            'GPP_U05_f', 'GPP_U95_f', 'GPP_U50_f', 'GPP_f')
+    # 'NEE_U05_f', 'NEE_U50_f', 'NEE_U95_f', 'GPP_U05_f', 'GPP_U95_f', 'GPP_U50_f'
+    known_unpaired_out <- c('NEE_U**_f', 'GPP_U**_f', 'GPP_f')
     col_pairs <- .get_gapfill_column_pairs(df, known_unpaired_out)
 
 
