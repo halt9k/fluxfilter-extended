@@ -211,6 +211,37 @@ check_seasons_arg <- function(eddyProcConfiguration, EddyDataWithPosix) {
 }
 
 
+
+with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
+	# NEE_U.*_orig contains NEE after ustar, but before gapfill;
+	# to skip gapfill, need to pinpoint where it's created to stop there
+
+	# NEE_U.*_orig will be added to outputs after MDS so goal of this patch is just to stop before gapfill
+	# currently, not stopping because it's not that slow
+
+	gap_fill_wrapped <- function(original_closure, extra_args, ...) {
+		if (!eddyProcConfiguration$skip_gap_filling_after_ustar)
+			return(original_closure(...))
+
+		gap_fill_dummy_call <- function(Var, QFVar='none', QFValue = NA_real_, FillAll=TRUE, isVerbose=TRUE, suffix='') {
+			EProc$sFillInit(Var, QFVar, QFValue, FillAll)
+			suffix_str <- if (REddyProc:::fCheckValString(suffix)) paste('_', suffix, sep = '') else ''
+			# suffix_str <- if (suffix == '') paste('_', suffix, sep = '') else ''
+			colnames(EProc$sTEMP) <<- gsub('VAR_', paste(Var, suffix_str, '_', sep = ''), colnames(EProc$sTEMP))
+			cat(RE, '.sMDSGapFill skipped due to skip_gap_filling_after_ustar = TRUE \n')
+		}
+		return(gap_fill_dummy_call(...))
+	}
+
+	# dummy call to make closure avaliable for patching
+	EProc$sMDSGapFill
+	with_patched_func(s4 = EProc, closure_name = 'sMDSGapFill',
+					  patched_closure = gap_fill_wrapped,
+					  extra_args = EProc, code = {call()})
+}
+
+
+
 est_ustar_threshold_fixes <- function(estUStarThreshold_call, eddyProcConfiguration, EProc) {
 	estimate_with_safeguard <- function() {.ustar_rg_safeguard(estUStarThreshold_call, eddyProcConfiguration, EProc)}
 

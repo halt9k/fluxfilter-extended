@@ -57,6 +57,7 @@ class RepConfig(FFBaseModel):
     ustar_rg_source: Annotated[str, 'Rg_th_Py, Rg_th_REP, Rg, ""'] = None
     is_bootstrap_u_star: bool = None
     ustar_bootstrap_percentiles: list[int] = None
+    skip_gap_filling_after_ustar: bool = None
     # TODO 3 add enums?
     u_star_seasoning: Annotated[str, 'WithinYear, Continuous, User'] = None
     

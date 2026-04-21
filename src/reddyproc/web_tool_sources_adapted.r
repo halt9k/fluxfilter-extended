@@ -241,9 +241,14 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
 .gapFillAndPlotDataVariables <- function(eddyProcConfiguration, EProc, dataVariablesToFill) {
     print("------------- Gapfilling ---------------")
 
-    .gapFillDataVariables(EProc, eddyProcConfiguration, dataVariablesToFill)
+    gap_fill_call <- function() { .gapFillDataVariables(EProc, eddyProcConfiguration, dataVariablesToFill) }
+    with_gapfill_interrupted(gap_fill_call, eddyProcConfiguration, EProc)
+
     if (length(get_ustar_suffixes(EProc)))
         .computeSdNEE(EProc)
+
+    if (eddyProcConfiguration$skip_gap_filling_after_ustar)
+        return()
 
     .plotUnfilledDataVariables(eddyProcConfiguration, EProc, dataVariablesToFill)
     .plotFilledDataVariables(eddyProcConfiguration, EProc, dataVariablesToFill)
@@ -467,9 +472,14 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
     }
 
 
-    # TODO 2 not intended way to put Rg_th_REP into outputs, there must be better option
+    # writeProcessingResultsToFile keeps only specific cols from EProc$sDATA and all from inputData
+    # so workaround to save them is to add cols into inputData
     if (rg_source %in% colnames(EProc$sDATA))
         inputData[[rg_source]] <- EProc$sDATA[[rg_source]]
+
+    # keep ustar filtered, but not gapfilled in the output text file
+    orig_colnames <- grep('NEE_U.*_orig', colnames(EProc$sTEMP), value = TRUE)
+    inputData <- c(inputData, EProc$sTEMP[orig_colnames])
 
 
     df_output <- writeProcessingResultsToFile(inputData, EProc, outputFileName = outputFileName,

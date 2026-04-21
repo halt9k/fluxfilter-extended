@@ -116,6 +116,7 @@ reddyproc:
     ustar_rg_source: 'Rg'  # Rg_th_Py, Rg_th_REP, Rg, ''
     is_bootstrap_u_star: false
     ustar_bootstrap_percentiles: [5, 25, 50, 75, 95]
+    skip_gap_filling_after_ustar: false
     u_star_seasoning: 'Continuous'  # WithinYear, Continuous, User
     is_to_apply_partitioning: true
     partitioning_methods: [Reichstein05, Lasslop10]  # Reichstein05, Lasslop10

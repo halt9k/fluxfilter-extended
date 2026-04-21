@@ -74,6 +74,7 @@ def update_config_version(config: dict, tgt_ver) -> dict:
             'repair_time': True
         }
         config['reddyproc']['ustar_bootstrap_percentiles'] = [5, 25, 50, 75, 95]
+        config['reddyproc']['skip_gap_filling_after_ustar'] = False
         config['filters']['quantile_iqr'] = {
             'enabled': False,
             'tgt_cols': config['filters']['quantile']

@@ -23,7 +23,7 @@ OUTPUT_DIR <- NULL
 .reddyproc_user_config_types <- sapply(list(
     siteId = 'DefaultID',
 
-    isToApplyUStarFiltering = FALSE,
+    isToApplyUStarFiltering = TRUE,
     ustar_threshold_fallback = 0.123456,
     ustar_rg_source = 'Column name',
 
@@ -34,6 +34,7 @@ OUTPUT_DIR <- NULL
     ustar_bootstrap_percentiles = c(-1, 1),
 
     isToApplyGapFilling = TRUE,
+    skip_gap_filling_after_ustar = TRUE,
     isToApplyPartitioning = TRUE,
 
     partitioningMethods = c("Reichstein05", "Lasslop10"),
@@ -78,6 +79,7 @@ OUTPUT_DIR <- NULL
     merge$ustar_bootstrap_quantiles <- as_numeric_or_nan(user_opts$ustar_bootstrap_percentiles) / 100.0
 
     merge$isToApplyGapFilling <- user_opts$is_to_apply_gap_filling
+    merge$skip_gap_filling_after_ustar <- user_opts$skip_gap_filling_after_ustar
     merge$isToApplyPartitioning <- user_opts$is_to_apply_partitioning
 
     merge$partitioningMethods <- user_opts$partitioning_methods
