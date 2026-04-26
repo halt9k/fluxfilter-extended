@@ -191,5 +191,5 @@ reddyproc_and_postprocess <- function(user_options){
 
     # wr_res$df_output better not be returned to python, since it's extra large df
     return(list(info = wr_res$EProc$sINFO, out_prefix = wr_res$out_prefix,
-                changed_config = wr_res$changed_config))
+                changed_config = wr_res$changed_config, bootstrap_values = wr_res$EProc$sUSTAR_DETAILS$bootstrap_stats))
 }

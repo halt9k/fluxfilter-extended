@@ -2,7 +2,9 @@ from pathlib import Path
 from types import NoneType
 from typing import Annotated, Any
 
+import pandas as pd
 from pandas import Timedelta
+import numpy as np
 from pydantic import field_validator, BaseModel, Field
 from pydantic_core.core_schema import ValidationInfo
 
@@ -209,6 +211,7 @@ class RepOutInfo(FFBaseModel):
     start_year: int
     end_year: int
     fnames_prefix: str
+    bootstrap_values: pd.DataFrame
 
 
 class FFGlobals(FFBaseModel):

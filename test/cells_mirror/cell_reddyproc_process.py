@@ -17,6 +17,7 @@ config_reddyproc = RepConfig(
     ustar_rg_source="Rg",
     is_bootstrap_u_star=True,
     ustar_bootstrap_percentiles=[5, 25, 50, 75, 95],
+    skip_gap_filling_after_ustar=True,
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
     u_star_seasoning="Continuous",
     

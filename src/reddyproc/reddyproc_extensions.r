@@ -241,8 +241,37 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 }
 
 
+.keep_stats_from_ustar <- function(EProc) {
+	# stats contain information on every bootstrap result, which is nessesary to get percentile weights
+
+
+	# EProc$sEstimateUstarScenarios
+	# f <- getMethod("sEstimateUstarScenarios", signature = "sEddyProc")
+
+	# assert parent.env(environment(f)) == REddyProc
+	e <- environment(EProc$sEstimateUstarScenarios)
+
+	f <- e$sEstimateUstarScenarios
+	b <- body(f)
+
+	i <- which(vapply(b, identical, logical(1), quote(.self$sUSTAR <- resDf)))
+	b[[i]] <- quote({
+		.self$sUSTAR <- resDf
+		.self$sUSTAR_DETAILS$bootstrap_stats <- stat
+	})
+
+	body(f) <- as.call(b)
+	# TODO 1 which was correct
+	# setMethod("sEstimateUstarScenarios", "EProc", f)
+	e$sEstimateUstarScenarios <- f
+
+	cat(RE, '.sEstimateUstarScenarios modified to keep bootstrap scenarios \n')
+}
+
+
 
 est_ustar_threshold_fixes <- function(estUStarThreshold_call, eddyProcConfiguration, EProc) {
+	.keep_stats_from_ustar(EProc)
 	estimate_with_safeguard <- function() {.ustar_rg_safeguard(estUStarThreshold_call, eddyProcConfiguration, EProc)}
 
 	.ustar_estimate_rg(eddyProcConfiguration, EProc)

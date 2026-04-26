@@ -93,12 +93,14 @@ def reddyproc_and_postprocess(rep_cfg: RepConfig, repo_dir: Path):
             py_res.changed_config = conversion.rpy2py(py_res.changed_config)
             py_res.out_prefix = conversion.rpy2py(py_res.out_prefix)
             py_res.info = conversion.rpy2py(py_res.info)
+            py_res.bootstrap_values = conversion.rpy2py(py_res.bootstrap_values)
             
         roi = RepOutInfo(
             # workaround due to . in name
             start_year=int(py_res.info.__dict__['Y.START'][0]),
             end_year=int(py_res.info.__dict__['Y.END'][0]),
             fnames_prefix=py_res.out_prefix,
+            bootstrap_values=py_res.bootstrap_values
         )
     
     changed_config = py_res.changed_config

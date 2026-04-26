@@ -10,7 +10,7 @@ repo_dir <- '.'
 repo_path_test <- function(src_path) {file.path(repo_dir, src_path)}
 
 # uninstall REddyProc package and enable this for the full debug
-# devtools::load_all(file.path(Sys.getenv('DEV'), '/R/REddyProc-1.3.3'), reset = TRUE)
+devtools::load_all(file.path(Sys.getenv('DEV'), '/R/REddyProc-1.3.3'), reset = TRUE)
 
 debugSource('test/reddyproc/helpers/io.r' %>% repo_path_test)
 debugSource('src/reddyproc/reddyproc_wrapper.r' %>% repo_path_test)
