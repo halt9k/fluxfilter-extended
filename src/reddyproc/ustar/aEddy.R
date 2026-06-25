@@ -31,7 +31,7 @@ sEddyProc <- setRefClass('sEddyProc', fields = list(
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #' @export
-sEddyProc_initialize <- function(
+sEddyProc_initialize <- function(EProc,
   ### Initializing sEddyProc class during \code{sEddyProc$new}.
   ID = ID.s                ##<< String with site ID
   , Data = Data.F             ##<< Data frame with at least three month
@@ -65,6 +65,7 @@ sEddyProc_initialize <- function(
   if (!missing(ColNamesNonNumeric.V.s)) ColNamesNonNumeric <- ColNamesNonNumeric.V.s
   if (!missing(ColPOSIXTime.s)) ColPOSIXTime <- ColPOSIXTime.s
   if (!missing(Lat_deg.n)) LatDet <- Lat_deg.n
+
   varNamesDepr <- c(
     "ID.s","Data.F","ColNames.V.s","ColPOSIXTime.s","DTS.n"
     ,"ColNamesNonNumeric.V.s","Lat_deg.n","Long_deg.n","TimeZone_h.n")
@@ -107,16 +108,17 @@ sEddyProc_initialize <- function(
 
   ##details<< There are several fields initialized within the class.
   ##details<< sID is a string for the site ID.
-  sID <<- ID
+  EProc$sID <- ID
   ##details<< sDATA is a data frame with site data.
-  sDATA <<- cbind(sDateTime = Time.V.p, as.data.frame(Data[, ColNames, drop = FALSE]))
+  EProc$sDATA <- cbind(sDateTime = Time.V.p, as.data.frame(Data[, ColNames, drop = FALSE]))
   ##details<< sTEMP is a temporal data frame with the processing results.
-  sTEMP <<- data.frame(sDateTime = Time.V.p)
+  EProc$sTEMP <- data.frame(sDateTime = Time.V.p)
   # initialized column season in sTEMP, if it was specified with data
-  if (!is.null(sDATA$season)) sTEMP$season <<- sDATA$season
+  if (!is.null(EProc$sDATA$season))
+  	EProc$sTEMP$season <- EProc$sDATA$season
   #Initialization of site data information from POSIX time stamp.
-  YStart.n <- as.numeric(format(sDATA$sDateTime[1], '%Y'))
-  YEnd.n <- as.numeric(format(sDATA$sDateTime[length(sDATA$sDateTime)], '%Y'))
+  YStart.n <- as.numeric(format(EProc$sDATA$sDateTime[1], '%Y'))
+  YEnd.n <- as.numeric(format(EProc$sDATA$sDateTime[length(EProc$sDATA$sDateTime)], '%Y'))
   YNums.n <- (YEnd.n - YStart.n + 1)
   if (YNums.n > 1) {
     YName.s <- paste(substr(YStart.n, 3, 4), '-', substr(YEnd.n, 3, 4), sep = '')
@@ -127,8 +129,8 @@ sEddyProc_initialize <- function(
   ##details<<
   ## sINFO is a list containing the time series information:
   ##describe<<
-  sINFO <<- list(
-    DIMS = length(sDATA$sDateTime) ##<< Number of data rows
+  EProc$sINFO <- list(
+    DIMS = length(EProc$sDATA$sDateTime) ##<< Number of data rows
     , DTS = DTS                   ##<< Number of daily time steps (24 or 48)
     , Y.START = YStart.n            ##<< Starting year
     , Y.END = YEnd.n                ##<< Ending year
@@ -141,12 +143,12 @@ sEddyProc_initialize <- function(
   ## \code{sUSTAR_SCEN} a data.frame 	with first column the season, and other
   ## columns different uStar threshold estimates, as returned by
   ## \code{\link{usGetAnnualSeasonUStarMap}}
-  sUSTAR_SCEN <<- data.frame()
+  EProc$sUSTAR_SCEN <- data.frame()
 
   ##details<<
   ## sLOCATION is a list of information on site location and timezone
   ## (see \code{\link{sEddyProc_sSetLocationInfo}}).
-  .self$sSetLocationInfo( LatDeg , LongDeg , TimeZoneHour)
+  sEddyProc_sSetLocationInfo(EProc, LatDeg , LongDeg , TimeZoneHour)
 
   ##details<<
   ## sTEMP is a data frame used only temporally.
@@ -155,7 +157,9 @@ sEddyProc_initialize <- function(
   message('New sEddyProc class for site \'', ID, '\'')
 
   # Required for initialization of class fields as last call of function
-  callSuper(...)
+  # EProc$callSuper(...)
+  message('WARN: callSuper(...) for REP removed')
+
   ##value<<
   ## Initialized fields of sEddyProc.
 }
@@ -168,7 +172,7 @@ sEddyProc$methods( initialize = sEddyProc_initialize)
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #' @export
-sEddyProc_sSetLocationInfo <- function(
+sEddyProc_sSetLocationInfo <- function(self,
 	### set Location and time Zone information to sLOCATION
   LatDeg = if (!missing(Lat_deg.n)) Lat_deg.n else NA_real_    	##<< Latitude
   ##  in (decimal) degrees (-90 to + 90)
@@ -197,7 +201,7 @@ sEddyProc_sSetLocationInfo <- function(
 	    (TimeZoneHour < -12 | TimeZoneHour > +12 |
 	     TimeZoneHour != as.integer(TimeZoneHour))) stop(
 	       "Timezone must be an integer in interval -12 to 12")
-	sLOCATION <<- list(
+  self$sLOCATION <- list(
 			LatDeg = LatDeg
 			, LongDeg = LongDeg
 			, TimeZoneHour = TimeZoneHour
@@ -206,7 +210,7 @@ sEddyProc_sSetLocationInfo <- function(
 sEddyProc$methods(sSetLocationInfo = sEddyProc_sSetLocationInfo)
 
 #' @export
-sEddyProc_sSetUstarScenarios <- function(
+sEddyProc_sSetUstarScenarios <- function(.self,
   ### set uStar processing scenarios
   uStarTh              ##<< data.frame as returned by
   ## \code{\link{usGetAnnualSeasonUStarMap}} or
@@ -260,7 +264,7 @@ sEddyProc_sSetUstarScenarios <- function(
   ## introduced by not knowing the exact value of the u* threshold.
   #
   ##seealso<< \code{\link{sEddyProc_sGetUstarScenarios}}
-  if (!("season" %in% colnames(sTEMP)) ) stop(
+  if (!("season" %in% colnames(.self$sTEMP)) ) stop(
     "Seasons not defined yet. Add column 'season' to dataset with entries"
     , " matching column season in UstarThres.df, e.g. by calling"
     , " yourEddyProcClass$sSetUStarSeasons(...)")
@@ -280,8 +284,9 @@ sEddyProc_sSetUstarScenarios <- function(
   if (length(uStarSuffixes) != nEstimates) stop(
     "umber of unique suffixes must correspond to number of uStar-thresholds"
     ,", i.e. number of columns in uStarTh - 1.")
-  sUSTAR_SCEN <<- uStarTh
-  colnames(sUSTAR_SCEN)[-1] <<- uStarSuffixes
+
+  .self$sUSTAR_SCEN <- uStarTh
+  colnames(.self$sUSTAR_SCEN)[-1] <- uStarSuffixes
 }
 sEddyProc$methods(sSetUstarScenarios = sEddyProc_sSetUstarScenarios)
 
@@ -291,26 +296,26 @@ sEddyProc_useSeaonsalUStarThresholds <- function(
 ) {
   ##seealso<< \code{\link{sEddyProc_sSetUstarScenarios}},
   ## \code{\link{sEddyProc_useAnnualUStarThresholds}}
-  uStarThAgg <- .self$sGetEstimatedUstarThresholdDistribution()
+  uStarThAgg <- sEddyProc_sGetEstimatedUstarThresholdDistribution(.self)
   uStarMap <- usGetSeasonalSeasonUStarMap(uStarThAgg)
-  .self$sSetUstarScenarios(uStarMap)
+  sEddyProc_sSetUstarScenarios(.self, uStarMap)
 }
 sEddyProc$methods(useSeaonsalUStarThresholds = sEddyProc_useSeaonsalUStarThresholds)
 
 #' @export
-sEddyProc_useAnnualUStarThresholds <- function(
+sEddyProc_useAnnualUStarThresholds <- function(.self
   ### use seasonal estimates of uStar thresholds
 ) {
   ##seealso<< \code{\link{sEddyProc_sSetUstarScenarios}},
   ## \code{\link{sEddyProc_useSeaonsalUStarThresholds}}
-  uStarThAgg <- .self$sGetEstimatedUstarThresholdDistribution()
+  uStarThAgg <- sEddyProc_sGetEstimatedUstarThresholdDistribution(.self)
   uStarMap <- usGetAnnualSeasonUStarMap(uStarThAgg)
-  .self$sSetUstarScenarios(uStarMap)
+  sEddyProc_sSetUstarScenarios(.self, uStarMap)
 }
 sEddyProc$methods(useAnnualUStarThresholds = sEddyProc_useAnnualUStarThresholds)
 
 #' @export
-sEddyProc_sGetUstarScenarios <- function(
+sEddyProc_sGetUstarScenarios <- function(.self
   ### get the current uStar processing scenarios
 ) {
   ##seealso<<

@@ -33,13 +33,13 @@ validateInputData <- function(inputData) {
         # calculate VPD
         print("Calculating VPD from rH and Tair.")
         c("rH", "Tair") %>%
-            REddyProc:::fCheckColNum(inputData, ., "validateInputData")
+            fCheckColNum(inputData, ., "validateInputData")
         inputData$VPD <- fCalcVPDfromRHandTair(inputData$rH, inputData$Tair)
     }
 
     # filter long runs
     c("NEE") %>%
-        REddyProc:::fCheckColNum(inputData, ., "validateInputData")
+        fCheckColNum(inputData, ., "validateInputData")
     inputData <- filterLongRuns(inputData, "NEE")
     inputData
 }
@@ -66,7 +66,7 @@ getDataVariablesToFill <- function(allDataVariables, eddyProcConfiguration) {
 get_ustar_suffixes <- function(EProc) {
     if (nrow(EProc$sUSTAR_SCEN) == 0)
         return(character(0))
-    names(EProc$sGetUstarScenarios())[-1L]
+    names(sEddyProc_sGetUstarScenarios(EProc))[-1L]
 }
 
 
@@ -99,7 +99,9 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
         stop("unknown value of eddyProcConfiguration$uStarSeasoning")
 
     uStarRes <- if (isTRUE(eddyProcConfiguration$isBootstrapUStar)) {
-        EProc$sEstUstarThresholdDistribution(seasonFactor = seasonFactor, nSample = nSample)
+        # EProc$sEstUstarThresholdDistribution(seasonFactor = seasonFactor, nSample = nSample)
+        sEddyProc_sEstUstarThresholdDistribution(EProc, seasonFactor = seasonFactor, nSample = nSample)
+
     } else {
         # EProc$trace(sEstUstarThold, browser);
         # EProc$untrace(sEstUstarThold) trace(usEstUstarThreshold, recover);
@@ -117,11 +119,12 @@ getAdditionalDataVariablesToKeep <- function(allDataVariables, keepDataVariables
     } else {
         print(uStarRes[uStarRes$aggregationMode == "year", ])
         # usGetAnnualSeasonUStarMap(EProc$sGetEstimatedUstarThresholdDistribution())
-        EProc$useAnnualUStarThresholds()
+        sEddyProc_useAnnualUStarThresholds(EProc)
     }
 
-    uStarTh <- EProc$sGetUstarScenarios()
-    list(StarTh = EProc$sGetUstarScenarios(), seasonFactor = seasonFactor,
+
+    uStarTh <- sEddyProc_sGetUstarScenarios(EProc)
+    list(StarTh = sEddyProc_sGetUstarScenarios(EProc), seasonFactor = seasonFactor,
          suffixes = get_ustar_suffixes(EProc))
 }
 
@@ -160,7 +163,7 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
             any_rg_missing <- eddyProcConfiguration$ustar_rg_source == ''
 
             # only uStar bootstrap to NEE gapfilling, not to the other variables
-            EProc$sMDSGapFillUStarScens(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty),
+            sEddyProc_sMDSGapFillUStarScens(EProc, dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty),
                                         isVerbose = TRUE, RgColName = eddyProcConfiguration$ustar_rg_source,
                                         isFilterDayTime = any_rg_missing)
 
@@ -450,7 +453,8 @@ processEddyData <- function(eddyProcConfiguration, dataFileName = INPUT_FILE,
         rg_source %in% colnames(EddyDataWithPosix))
             addVariableNames <- c(addVariableNames, rg_source)
 
-    EProc <- sEddyProc$new(eddyProcConfiguration$siteId, EddyDataWithPosix,
+    EProc <- new.env()
+    sEddyProc_initialize(EProc, eddyProcConfiguration$siteId, EddyDataWithPosix,
                            union(dataVariablesToFill, addVariableNames), ColNamesNonNumeric = "season")
 
     if (eddyProcConfiguration$isToApplyUStarFiltering) {

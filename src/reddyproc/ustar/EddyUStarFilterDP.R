@@ -8,7 +8,7 @@
 #if (!exists("sEddyProc")) source("R / aEddy.R")
 
 #' @export
-sEddyProc_sEstUstarThold <- function(
+sEddyProc_sEstUstarThold <- function(.self,
   ##title<<
   ## sEddyProc$sEstUstarThreshold - Estimating ustar threshold
   ##description<<
@@ -36,26 +36,24 @@ sEddyProc_sEstUstarThold <- function(
   ds <- .self$sDATA[,reqCols, drop = FALSE]
   colnames(ds) <- c("sDateTime", "Ustar", "NEE", "Tair", "Rg")
   resEst <- usEstUstarThreshold(ds, seasonFactor = .self$sTEMP$season, ...)
-  sUSTAR_DETAILS <<- resEst
+  .self$sUSTAR_DETAILS <- resEst
     #resEst[c("uStarTh", "seasonYear", "season", "tempInSeason")]
   ##value<< result component \code{uStarTh} of \code{\link{usEstUstarThreshold}}.
   ## In addition the result is stored in class variable \code{sUSTAR_DETAILS}.
   resEst$uStar
 }
-sEddyProc$methods(sEstUstarThold = sEddyProc_sEstUstarThold)
+# sEddyProc$methods(sEstUstarThold = sEddyProc_sEstUstarThold)
 
 #' @export
-sEddyProc_sSetUStarSeasons <- function(
+sEddyProc_sSetUStarSeasons <- function(self,
   ### Defining seasons for the uStar threshold estimation
   seasonFactor = usCreateSeasonFactorMonth(sDATA$sDateTime)
   ### factor for subsetting times with different uStar threshold (see details)
 ) {
-  ##author<< TW
-  sTEMP$season <<- as.factor(seasonFactor)
-  ##value<< class with updated \code{seasonFactor}
-  invisible(.self)
+	self$sTEMP$season <- as.factor(seasonFactor)
+
 }
-sEddyProc$methods(sSetUStarSeasons = sEddyProc_sSetUStarSeasons)
+# sEddyProc$methods(sSetUStarSeasons = sEddyProc_sSetUStarSeasons)
 
 #' @export
 sEddyProc_sEstUstarThreshold <- function(
@@ -80,7 +78,10 @@ sEddyProc_sEstUstarThreshold <- function(
     , " the current result. The other components are still available"
     , " with class variable sUSTAR_DETAILS.")
   reqCols <- c("sDateTime", UstarColName, NEEColName, TempColName, RgColName)
+
+  # <<-
   browser()
+
   iMissing <- which(!(reqCols %in% names(.self$sDATA)))
   if (length(iMissing)) stop(
     "Missing columns in dataset: ",paste(reqCols[iMissing], collapse = ","))
@@ -98,7 +99,7 @@ sEddyProc_sEstUstarThreshold <- function(
   ## additional columns to sTemp
   resEst
 }
-sEddyProc$methods(sEstUstarThreshold = sEddyProc_sEstUstarThreshold)
+# sEddyProc$methods(sEstUstarThreshold = sEddyProc_sEstUstarThreshold)
 
 #' @export
 usEstUstarThreshold = function(
@@ -1241,7 +1242,7 @@ usGetSeasonalSeasonUStarMap <- function(
 
 
 #' @export
-sEddyProc_sEstUstarThresholdDistribution <- function(
+sEddyProc_sEstUstarThresholdDistribution <- function(.self,
 		### Estimate the distribution of u* threshold by bootstrapping over data
 		...  ##<< further parameters to
 		## \code{\link{sEddyProc_sEstimateUstarScenarios}}
@@ -1251,17 +1252,20 @@ sEddyProc_sEstUstarThresholdDistribution <- function(
   ## using method \code{\link{sEddyProc_sEstimateUstarScenarios}} to
   ## update the class and then getting the results from the class by
   ## \code{\link{sEddyProc_sGetEstimatedUstarThresholdDistribution}}.
-  updatedClass <- .self$sEstimateUstarScenarios(...)
+
+  # updatedClass <- .self$sEstimateUstarScenarios(...)
+  sEddyProc_sEstimateUstarScenarios(.self, ...)
+
   ##value<< result of
   ## \code{\link{sEddyProc_sGetEstimatedUstarThresholdDistribution}}
-  updatedClass$sGetEstimatedUstarThresholdDistribution()
+  sEddyProc_sGetEstimatedUstarThresholdDistribution(.self)
 }
-sEddyProc$methods(sEstUstarThresholdDistribution =
-                    sEddyProc_sEstUstarThresholdDistribution)
+# sEddyProc$methods(sEstUstarThresholdDistribution =
+#                    sEddyProc_sEstUstarThresholdDistribution)
 
 
 #' @export
-sEddyProc_sEstimateUstarScenarios <- function(
+sEddyProc_sEstimateUstarScenarios <- function(.self,
   ### Estimate the distribution of u* threshold by bootstrapping over data
   ctrlUstarEst = usControlUstarEst()			    ##<< control parameters
   ## for estimating uStar on a single binned series,
@@ -1303,8 +1307,12 @@ sEddyProc_sEstimateUstarScenarios <- function(
   ##, \code{\link{sEddyProc_sGetEstimatedUstarThresholdDistribution}}
   ##, \code{\link{sEddyProc_sSetUstarScenarios}}
   ##, \code{\link{sEddyProc_sMDSGapFillUStarScens}}
-  .self$sSetUStarSeasons(seasonFactor)
-  ds <- sDATA[, c("sDateTime", UstarColName, NEEColName, TempColName, RgColName)]
+
+  # .self$sSetUStarSeasons(seasonFactor)
+  sEddyProc_sSetUStarSeasons(.self, seasonFactor)
+
+
+  ds <- .self$sDATA[, c("sDateTime", UstarColName, NEEColName, TempColName, RgColName)]
   colnames(ds) <- c("sDateTime", "Ustar", "NEE", "Tair", "Rg")
   ds$seasonFactor <- .self$sTEMP$season
   # the segmented regression somehow seems to reset the random generator
@@ -1312,14 +1320,15 @@ sEddyProc_sEstimateUstarScenarios <- function(
   # sample.
   # Need to be done before the first call to .self$sEstUstarThold
   bootSeeds <- sample.int(.Machine$integer.max, nSample - 1L)
-  res0 <- suppressMessages(.self$sEstUstarThold(
-    UstarColName = UstarColName
-    , NEEColName = NEEColName
-    , TempColName = TempColName
-    , RgColName = RgColName
-    , ...
-    , ctrlUstarEst = ctrlUstarEst, ctrlUstarSub = ctrlUstarSub
-    , seasonFactor = NULL	))
+  res0 <- suppressMessages(sEddyProc_sEstUstarThold(
+  	.self,
+    UstarColName = UstarColName,
+    NEEColName = NEEColName,
+    TempColName = TempColName,
+    RgColName = RgColName,
+    ...,
+    ctrlUstarEst = ctrlUstarEst, ctrlUstarSub = ctrlUstarSub,
+    seasonFactor = NULL	))
   iPosAgg <- which(res0$aggregationMode == "single")
   iPosYears <- which(res0$aggregationMode == "year")
   iPosSeasons <- which(res0$aggregationMode == "season")
@@ -1389,8 +1398,6 @@ sEddyProc_sEstimateUstarScenarios <- function(
   resQuantiles[iInvalid, ] <- NA_real_
   rownames(resQuantiles) <- NULL
   resDf <- cbind(res0, resQuantiles)
-
-  # TODEL
   # browser()
 
   message(paste("Estimated UStar distribution of:\n"
@@ -1400,17 +1407,17 @@ sEddyProc_sEstimateUstarScenarios <- function(
                 , paste(capture.output(unlist(ctrlUstarSub)), collapse = "\n")
   ))
   .self$sUSTAR <- resDf
-  .self$sSetUstarScenarios(usGetAnnualSeasonUStarMap(resDf))
+  sEddyProc_sSetUstarScenarios(.self, usGetAnnualSeasonUStarMap(resDf))
   ##value<< updated class. Request results by
   ##\code{\link{sEddyProc_sGetEstimatedUstarThresholdDistribution}}
-  invisible(.self)
+  # invisible(.self)
 }
-sEddyProc$methods(sEstimateUstarScenarios =
-                    sEddyProc_sEstimateUstarScenarios)
+# sEddyProc$methods(sEstimateUstarScenarios =
+#                    sEddyProc_sEstimateUstarScenarios)
 
 
 #' @export
-sEddyProc_sGetEstimatedUstarThresholdDistribution <- function(
+sEddyProc_sGetEstimatedUstarThresholdDistribution <- function(.self
   ### return the results of \code{\link{sEddyProc_sEstimateUstarScenarios}}
 ) {
   ##seealso<< \code{\link{sEddyProc_sSetUstarScenarios}}
@@ -1430,8 +1437,8 @@ sEddyProc_sGetEstimatedUstarThresholdDistribution <- function(
     .self$sUSTAR_DETAILS$uStarTh
   }
 }
-sEddyProc$methods(sGetEstimatedUstarThresholdDistribution =
-                    sEddyProc_sGetEstimatedUstarThresholdDistribution)
+# sEddyProc$methods(sGetEstimatedUstarThresholdDistribution =
+#                    sEddyProc_sGetEstimatedUstarThresholdDistribution)
 
 #' @export
 sEddyProc_sApplyUStarScen <- function(
@@ -1473,6 +1480,6 @@ sEddyProc_sApplyUStarScen <- function(
   ), uStarSuffixes[iKeep])
   resScen <- c(resScenKeep, resScenOther)
 }
-sEddyProc$methods(sApplyUStarScen =
-                    sEddyProc_sApplyUStarScen)
+# sEddyProc$methods(sApplyUStarScen =
+#                    sEddyProc_sApplyUStarScen)
 

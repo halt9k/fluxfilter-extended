@@ -440,7 +440,7 @@ sEddyProc$methods(sFillMDC = sEddyProc_sFillMDC)
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #' @export
-sEddyProc_sMDSGapFill <- function(
+sEddyProc_sMDSGapFill <- function(.self,
   ### MDS gap filling algorithm adapted after the PV-Wave code and paper by Markus Reichstein.
   Var = Var.s                 ##<< Variable to be filled
   , QFVar = if (!missing(QFVar.s)) QFVar.s else 'none'       ##<< Quality flag
@@ -671,7 +671,7 @@ sEddyProc$methods(sMDSGapFill = sEddyProc_sMDSGapFill)
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #' @export
-sEddyProc_sMDSGapFillAfterUstar <- function(
+sEddyProc_sMDSGapFillAfterUstar <- function(.self,
   ### sEddyProc$sMDSGapFillAfterUstar - MDS gap filling algorithm after u* filtering
   fluxVar                ##<< Flux variable to gap fill after ustar filtering
   , uStarVar = 'Ustar'   ##<< Column name of friction velocity u * (ms-1),
@@ -721,7 +721,7 @@ sEddyProc_sMDSGapFillAfterUstar <- function(
       , " but got a vector.")
     uStarThresVec <- rep(uStarTh, nrow(.self$sDATA) )
   } else {
-    if (!("season" %in% colnames(sTEMP)) ) stop(
+    if (!("season" %in% colnames(.self$sTEMP)) ) stop(
       "Seasons not defined yet. Provide argument seasonFactor to sEstUstarThold.")
     # make sure merge will work
     colnames(uStarTh) <- c("season", "uStarThreshold")
@@ -731,25 +731,25 @@ sEddyProc_sMDSGapFillAfterUstar <- function(
     if (length(iMissingLevels) ) stop(
       "missing uStarTrheshold for seasons "
       , paste(levels(.self$sTEMP$season)[iMissingLevels], collapse = ", "))
-    tmpDs <- merge(subset(sTEMP, select = "season"), uStarTh, all.x = TRUE)
+    tmpDs <- merge(subset(.self$sTEMP, select = "season"), uStarTh, all.x = TRUE)
     uStarThresVec <- tmpDs[, 2L]
   }
   # Check column names (with 'none' as dummy)
   # (Numeric type and plausibility have been checked on initialization of sEddyProc)
   # browser()
-  fCheckColNames(sDATA, c(fluxVar, uStarVar), 'sMDSGapFillAfterUstar')
+  fCheckColNames(.self$sDATA, c(fluxVar, uStarVar), 'sMDSGapFillAfterUstar')
 
   # Filter data
-  uStar <- sDATA[, uStarVar]
-  qfUStar <- integer(nrow(sDATA) )	# 0L
+  uStar <- .self$sDATA[, uStarVar]
+  qfUStar <- integer(nrow(.self$sDATA) )	# 0L
   # if not filtering dayTimeValues, create a vector that is TRUE only for nightTime
   isRowFiltered <- if (isFilterDayTime) TRUE else
-    (!is.finite(sDATA[, RgColName]) | sDATA[, RgColName] < swThr)
+    (!is.finite(.self$sDATA[, RgColName]) | .self$sDATA[, RgColName] < swThr)
   # mark low uStar or bad uStar as 1L
   qfUStar[
     isRowFiltered &
       !is.na(uStarThresVec) &
-      (sDATA[[uStarVar]] < uStarThresVec)
+      (.self$sDATA[[uStarVar]] < uStarThresVec)
     ] <- 1L
   if (isTRUE(isFlagEntryAfterLowTurbulence) ) {
     ##details<<
@@ -783,9 +783,9 @@ sEddyProc_sMDSGapFillAfterUstar <- function(
   attr(qfUStar, 'varnames') <- paste(
     'Ustar', suffixDash.s, '_fqc', sep = '')
   attr(qfUStar, 'units') <- '-'
-  sTEMP$USTAR_Thres <<- uStarThresVec
-  sTEMP$USTAR_fqc <<- qfUStar
-  colnames(sTEMP) <<- gsub(
+  .self$sTEMP$USTAR_Thres <- uStarThresVec
+  .self$sTEMP$USTAR_fqc <- qfUStar
+  colnames(.self$sTEMP) <- gsub(
     'USTAR_', paste('Ustar', suffixDash.s, '_', sep = ''), colnames(.self$sTEMP))
   # Check for duplicate columns (to detect if different processing setups
   # were executed without different suffix)
@@ -794,6 +794,11 @@ sEddyProc_sMDSGapFillAfterUstar <- function(
             , ' Please specify different suffix when processing different"
             , " setups on the same dataset!')
   }
+
+  # EXRTRACTION DONE !!!
+  browser()
+
+
   # Gap fill data after applying ustar filtering
   sMDSGapFill(
     fluxVar, QFVar = attr(qfUStar, 'varnames'), QFValue = 0, ...
@@ -847,7 +852,7 @@ sEddyProc$methods(
   sMDSGapFillAfterUStarDistr = sEddyProc_sMDSGapFillAfterUStarDistr)
 
 #' @export
-sEddyProc_sMDSGapFillUStarScens <- function(
+sEddyProc_sMDSGapFillUStarScens <- function(.self,
   ### gapfilling for several filters of estimated friction velocity Ustar thresholds.
   ...                 ##<< other arguments to
   ## \code{\link{sEddyProc_sMDSGapFillAfterUstar}} and
@@ -875,7 +880,7 @@ sEddyProc_sMDSGapFillUStarScens <- function(
   nEstimates <- ncol(uStarTh) - 1L
   #iCol <- 1L
   filterCols <- lapply(seq(1L:nEstimates), function(iCol) {
-    .self$sMDSGapFillAfterUstar(
+    sEddyProc_sMDSGapFillAfterUstar(.self,
       ...
       , uStarTh = uStarTh[, c(1L, 1L + iCol)]
       , uStarSuffix = uStarSuffixes[iCol]

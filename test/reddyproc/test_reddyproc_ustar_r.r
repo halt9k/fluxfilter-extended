@@ -1,0 +1,120 @@
+# this file allows running cell_reddyproc_process directly without rpy2
+# which enables RStudio interactive debug
+library(dplyr)
+
+debugSource('test/reddyproc/helpers/init_test_env.r')
+
+setwd(rstudioapi::getSourceEditorContext()$path %>% dirname %>% dirname %>% dirname)
+
+repo_dir <- '.'
+repo_path_test <- function(src_path) {file.path(repo_dir, src_path)}
+
+
+# extract ustar from REddyProc package
+library(purrr)
+debugSource('src/reddyproc/ustar/aEddy.R' %>% repo_path_test)
+# Rcpp::sourceCpp("src/reddyproc/ustar/RcppExports.cpp")
+debugSource('src/reddyproc/ustar/RcppExports.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/EddyUStarFilterDP.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/EddyGapfilling.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/FileHandling.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/DataFunctions.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/CheckVal.R' %>% repo_path_test)
+
+
+debugSource('test/reddyproc/helpers/io.r' %>% repo_path_test)
+debugSource('src/reddyproc/reddyproc_wrapper.r' %>% repo_path_test)
+debugSource('src/reddyproc/postprocess_calc_means.r' %>% repo_path_test)
+debugSource('src/reddyproc/web_tool_sources_adapted.r' %>% repo_path_test)
+debugSource('src/reddyproc/reddyproc_extensions.r' %>% repo_path_test)
+debugSource('src/reddyproc/r_helpers.r' %>% repo_path_test)
+
+# duplicates cell code to run from pure R
+# avoiding R dupe here can be too complicated
+rep_user_options <- list(
+    site_id = 'Pet',
+
+    is_to_apply_u_star_filtering = TRUE,
+    # NA to disable or double
+    ustar_threshold_fallback = 0.01,
+    # TODO 2 remove leftovers after one of two theoretical Rg options are removed?
+    # TODO 2 check if RG_th_REP placed to the output files and it is intended
+    # REP ustar requires Rg to detect nights; when real data is missing, 3 workarounds are possible
+    # 'Rg_th_Py', 'Rg_th_REP' - estimate by theoretical algs,
+    # 'Rg' - by real data, '' - ignore Rg and filter both days and nights
+    ustar_rg_source = 'Rg',
+
+
+    # TODO 2 User and col season = [1, 1, ...], ensure outputs are same as if Continuous or WithinYear expect 1-2 cols
+    # this is correct and verified on the original REP
+    # test: 2 years, continious all seasons = 1, years swap seasons = 1 ... 2
+    # TODO 2 Ustar_Thres is only correct col name, but broken uStar[..., 1] columns emerges under some tests, check todo's
+    u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
+    u_star_method = factor("RTw", levels = "RTw"),
+
+    is_bootstrap_u_star = TRUE,
+    ustar_bootstrap_percentiles = c(5, 25, 50, 75, 95),
+    skip_gap_filling_after_ustar = TRUE,
+
+    is_to_apply_gap_filling = TRUE,
+    is_to_apply_partitioning = TRUE,
+
+    partitioning_methods = c("Reichstein05", "Lasslop10"),
+    latitude = 59.9,
+    longitude = 29.8,
+    timezone = +3,
+
+    # TSoil
+    temperature_data_variable = "Tair",
+
+    input_file = "output/REddyProc.txt",
+    output_dir = "output/reddyproc"
+)
+
+
+run_rep <- function(options, input_file = NULL) {
+    # input_file = NULL to use path from options, usually project dir
+    # input_file = *
+
+    if (is.not.null(input_file)) {
+        input_finfo <- find_rep_file(input_file)
+        if (basename(input_finfo$fname) != basename(input_file))
+            message('Using input file: ', input_finfo$fname)
+        options$input_file <- input_finfo$fname
+        options$site_id <- input_finfo$site_id
+    }
+    reddyproc_and_postprocess(options)
+
+    # stopifnot(...)
+    if (is.not.null(input_file)) {
+        unexpected_out_dir = dirname(input_file) != dirname(options$output_dir)
+        if (unexpected_out_dir)
+            utils::browseURL(dirname(options$input_file))
+    }
+}
+
+
+test_rep <- function(options, input_file) {
+    # create a temp dir and run test in it
+
+    # possibly copy all used files into temp dir and work only from it
+    test_dir = tempdir()
+    message('Test dir is: ', test_dir)
+
+    options$input_file <- input_file
+    options$output_dir <- test_dir
+    run_rep(options, input_file)
+
+    # stopifnot(...)
+
+
+    utils::browseURL(test_dir)
+}
+
+
+# run_rep(rep_user_options)
+run_rep(rep_user_options, 'output/*REddyProc*.txt')
+
+# test_rep(rep_user_options, "test\\reddyproc\\test_process_fixtures\\test_3_years.txt")
+# test_rep(rep_user_options, "test\\reddyproc\\test_process_fixtures\\test_3_months.txt")
+

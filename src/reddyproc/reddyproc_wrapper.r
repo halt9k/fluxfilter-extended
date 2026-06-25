@@ -1,6 +1,7 @@
 # formatR::tidy_rstudio()
-library(REddyProc)
-cat('REddyProc version: ', paste(packageVersion('REddyProc')), '\n')
+
+# library(REddyProc)
+# cat('REddyProc version: ', paste(packageVersion('REddyProc')), '\n')
 
 # must be preset be caller env, script-wide routine
 stopifnot(file.exists(repo_dir))

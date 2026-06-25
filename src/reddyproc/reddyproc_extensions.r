@@ -29,6 +29,39 @@ patch_daily_sums_plot_name <- function(orig_call, var_name, ...) {
 }
 
 
+
+with_patched_global_func <- function(func, patched_closure, extra_args, code = {}){
+	# patches s4.closure_name with patched_closure(original_closure, extra_args, ...),
+	# runs code,
+	# ensures patch is removed after tha call
+
+	code_str = substitute(code)
+	if (!is.call(code_str))
+		stop('with_patched_func code arg must be code block, not a bare function.',
+			 'Correct example: with_patched_func(... , code = {function_to_call(...)}, ...)')
+
+	# s4[['sEstimateUstarScenarios']] = NULL
+	# s4$sEstimateUstarScenarios
+	# s4[['sEstimateUstarScenarios']] != NULL
+	# to fix, do one dummy call before patching: s4$closure_name
+	# stopifnot(!is.null(s4[[closure_name]]))
+
+	original_closure <- func
+	tryCatch(
+		expr = {
+			func <- function(...) {
+				return(patched_closure(original_closure, extra_args, ...))
+			}
+			code
+		},
+		finally = {
+			func <- original_closure
+		}
+	)
+}
+
+
+
 with_patched_func <- function(s4, closure_name, patched_closure, extra_args, code = {}){
     # patches s4.closure_name with patched_closure(original_closure, extra_args, ...),
     # runs code,
@@ -204,10 +237,15 @@ check_seasons_arg <- function(eddyProcConfiguration, EddyDataWithPosix) {
 	}
 
 	# dummy call to make closure avaliable for patching
-	EProc$sEstimateUstarScenarios
-	with_patched_func(s4 = EProc, closure_name = 'sEstimateUstarScenarios',
+	# EProc$sEstimateUstarScenarios
+	# sEddyProc_sEstimateUstarScenarios
+	# with_patched_func(s4 = EProc, closure_name = 'sEstimateUstarScenarios',
+	#				  patched_closure = estimate_with_custom_percentiles,
+	#				  extra_args = eddyProcConfiguration, code = {call()})
+	with_patched_func(s4 = globalenv(), closure_name = 'sEddyProc_sEstimateUstarScenarios',
 					  patched_closure = estimate_with_custom_percentiles,
-					  extra_args = eddyProcConfiguration, code = {call()})
+	 				  extra_args = eddyProcConfiguration, code = {call()})
+
 }
 
 
@@ -225,7 +263,7 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 
 		gap_fill_dummy_call <- function(Var, QFVar='none', QFValue = NA_real_, FillAll=TRUE, isVerbose=TRUE, suffix='') {
 			EProc$sFillInit(Var, QFVar, QFValue, FillAll)
-			suffix_str <- if (REddyProc:::fCheckValString(suffix)) paste('_', suffix, sep = '') else ''
+			suffix_str <- if (fCheckValString(suffix)) paste('_', suffix, sep = '') else ''
 			# suffix_str <- if (suffix == '') paste('_', suffix, sep = '') else ''
 			colnames(EProc$sTEMP) <<- gsub('VAR_', paste(Var, suffix_str, '_', sep = ''), colnames(EProc$sTEMP))
 			cat(RE, '.sMDSGapFill skipped due to skip_gap_filling_after_ustar = TRUE \n')
@@ -235,9 +273,12 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 
 	# dummy call to make closure avaliable for patching
 	EProc$sMDSGapFill
-	with_patched_func(s4 = EProc, closure_name = 'sMDSGapFill',
-					  patched_closure = gap_fill_wrapped,
-					  extra_args = EProc, code = {call()})
+	# with_patched_func(s4 = EProc, closure_name = 'sMDSGapFill',
+	#				  patched_closure = gap_fill_wrapped,
+	#				  extra_args = EProc, code = {call()})
+	with_patched_global_func(func=sEddyProc_sMDSGapFill,
+							 patched_closure = gap_fill_wrapped,
+							 extra_args = EProc, code = {call()})
 }
 
 
@@ -249,9 +290,12 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 	# f <- getMethod("sEstimateUstarScenarios", signature = "sEddyProc")
 
 	# assert parent.env(environment(f)) == REddyProc
-	e <- environment(EProc$sEstimateUstarScenarios)
+	# e <- environment(EProc$sEstimateUstarScenarios)
+	e <- environment(sEddyProc_sEstimateUstarScenarios)
 
-	f <- e$sEstimateUstarScenarios
+	# f <- e$sEstimateUstarScenarios
+	f <- e$sEddyProc_sEstimateUstarScenarios
+
 	b <- body(f)
 
 	i <- which(vapply(b, identical, logical(1), quote(.self$sUSTAR <- resDf)))
@@ -263,7 +307,8 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 	body(f) <- as.call(b)
 	# TODO 1 which was correct
 	# setMethod("sEstimateUstarScenarios", "EProc", f)
-	e$sEstimateUstarScenarios <- f
+	# e$sEstimateUstarScenarios <- f
+	e$sEddyProc_sEstimateUstarScenarios <- f
 
 	cat(RE, '.sEstimateUstarScenarios modified to keep bootstrap scenarios \n')
 }
