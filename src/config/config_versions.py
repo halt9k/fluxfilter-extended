@@ -86,6 +86,15 @@ def update_config_version(config: dict, tgt_ver) -> dict:
 
         config['version'] = 'v1.0.5'
     
+    # TODO 1 test change, remove
+    if config['version'] == 'v1.0.5':
+        config['filters']['quantile_iqr'] = {
+            'enabled': True,
+            'window_size_days': 7,            
+            'tgt_cols': {'co2_flux': 1.5, 'nee': 1.5}
+        }
+        config['version'] = 'v1.0.6'
+    
     if config['version'] != tgt_ver:
         raise NotImplementedError(
             f'Current config version: {tgt_ver} does not match loaded version: {src_ver}. \n'

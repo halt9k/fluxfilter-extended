@@ -1,5 +1,5 @@
 # технические настройки (только для опытных пользователей)
-version: 'v1.0.5'
+version: 'v1.0.6'
 # отладочный режим (загружается только несколько месяцев данных)
 debug: false
 #
@@ -155,6 +155,7 @@ filters:
         tgt_cols:
             co2_flux: 1.5
             nee: 1.5
+
     #
     # фильтрация выбросов MAD и Hampel
     madhampel:
@@ -169,6 +170,13 @@ filters:
         swin_1_1_1: {z: 8.0, hampel_window: 10}
         ppfd_1_1_1: {z: 8.0, hampel_window: 10}
         nee: {z: 5.5, hampel_window: 10}
+    #
+    rolling_diurnal:
+        enabled: false
+        window_size_days: 7
+        hour_tolerance: 2
+        iqr_multiplier: 1.5
+        variables_to_filter: [h, le, nee, nme_1_1_1]
     #
     # фильтрация зимних периодов
     winter_date_ranges:

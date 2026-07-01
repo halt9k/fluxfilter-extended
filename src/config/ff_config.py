@@ -90,8 +90,8 @@ class QuantileFilterConfig(FFBaseModel):
     
 
 class QuantileIQRFilterConfig(FFBaseModel):
-    enabled: bool = True
-    window_size_days: int | None = 7
+    enabled: bool = None
+    window_size_days: int | None
     tgt_cols: dict[str, float] = {}
     
     @field_validator('tgt_cols', mode='before')
@@ -99,6 +99,20 @@ class QuantileIQRFilterConfig(FFBaseModel):
     def none_to_dict(cls, v: any, info: ValidationInfo) -> dict:
         return v if v is not None else {}
 
+
+class RollingDiurnalOutlierFilterConfig(FFBaseModel):
+    enabled: bool = None
+    
+    window_size_days: int = None
+    hour_tolerance: int = None
+    iqr_multiplier: float = None
+    variables_to_filter: list = []
+    
+    @field_validator('variables_to_filter', mode='before')
+    @classmethod
+    def none_to_list(cls, v: any, info: ValidationInfo) -> dict:
+        return v if v is not None else []
+    
 
 class FiltersConfig(FFBaseModel):
     # TODO 1 auto = initial; changed or not? make this config-wide approach
@@ -109,6 +123,7 @@ class FiltersConfig(FFBaseModel):
     quantile: QuantileFilterConfig = QuantileFilterConfig.model_construct()
     quantile_iqr: QuantileIQRFilterConfig = QuantileIQRFilterConfig.model_construct()
     madhampel: dict = {}
+    rolling_diurnal: RollingDiurnalOutlierFilterConfig = RollingDiurnalOutlierFilterConfig.model_construct()
     winter_date_ranges: list[list[str]] = []
     man_ranges: list[list[str]] = []
     

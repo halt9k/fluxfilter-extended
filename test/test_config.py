@@ -21,9 +21,10 @@ def os_view_path(fpath):
 def test_config_io(tmp_path):
     init_logging(level=logging.INFO, fpath=tmp_path / 'log.log', to_stdout=True)
     
-    last_ver = 'v1.0.5'
+    last_ver = 'v1.0.6'
     default_fpath = Path(f'misc/config_{last_ver}_default_ru.yaml')
-    disabled_physical_filters_path = Path(f'misc/config_{last_ver}_disabled_physical_filters.yaml')
+    # TODO 1 update, fix line
+    disabled_physical_filters_path = Path(f'misc/config_{'v1.0.5'}_disabled_physical_filters.yaml')
     
     # if ipynb validation after construct works
     config = FFConfig.load_or_init(load_path=None, default_fpath=default_fpath,
