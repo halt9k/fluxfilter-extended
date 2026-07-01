@@ -147,7 +147,8 @@ import bglabutils.basic as bg
 
 from src.colab_routines import colab_no_scroll, colab_enable_custom_widget_manager, colab_add_download_button, \
     colab_xor_demo_data
-from src.config.ff_config import FFConfig, RepConfig, FFGlobals, QuantileIQRFilterConfig, QuantileFilterConfig
+from src.config.ff_config import FFConfig, RepConfig, FFGlobals, QuantileIQRFilterConfig, QuantileFilterConfig, \
+    RollingDiurnalOutlierFilterConfig
 from src.config.config_types import IasExportIntervals, InputFileType, ColabDemoMixPolicy  # noqa: F401
 from src.data_quality import try_compare_stats
 from src.ff_logger import init_logging, ff_logger
@@ -161,6 +162,7 @@ from src.ipynb_routines import setup_plotly, ipython_enable_word_wrap, ipython_e
 from src.filters import min_max_filter, qc_filter, std_window_filter, meteorological_rh_filter, \
     meteorological_night_filter, meteorological_day_filter, meteorological_co2ss_filter, meteorological_ch4ss_filter, \
     meteorological_rain_filter, quantile_filter, quantile_iqr_filter, mad_hampel_filter, manual_filter, winter_filter
+from src.filters_experiment import rolling_diurnal_outlier
 from src.plots import get_column_filter, basic_plot, plot_nice_year_hist_plotly, make_filtered_plot, plot_albedo, \
     debug_plot_changes
 from src.plots import plot_cols  # noqa: F401
@@ -893,6 +895,28 @@ plot_data, filters_db = std_window_filter(plot_data, filters_db, config.filters.
 # %% id="gl9cImVr2MO3"
 unroll_filters_db = filters_db.copy()
 plot_data, tmp_filter = mad_hampel_filter(plot_data, filters_db, config.filters.madhampel)
+
+# %% [markdown] id="iXl5RdINss5D"
+# ## *IQR фильтрация дневных выбросов в скользящем окне
+
+# %% id="gl9cImVr5MO3"
+
+cfg_rolling_diurnal = RollingDiurnalOutlierFilterConfig()
+cfg_rolling_diurnal.enabled = True
+cfg_rolling_diurnal.window_size_days = 7
+cfg_rolling_diurnal.hour_tolerance = 2
+cfg_rolling_diurnal.iqr_multiplier = 1.5
+
+# H+SH added to H, no extra variable yet
+# TODO 2 introduce *_1_1_2 comprehension
+# target_cols = [col for col in df.columns if col.startswith(f'{var_prefix}_') or col == var_prefix]
+cfg_rolling_diurnal.variables_to_filter = ['h', 'le', 'nee', 'nme_1_1_1']
+
+if not config.from_file:
+    config.filters.rolling_diurnal = cfg_rolling_diurnal
+
+with debug_plot_changes(config.debug, plot_data, cfg_rolling_diurnal.variables_to_filter, None, 'rolling_diurnal'):
+    plot_data, filters_db = rolling_diurnal_outlier(plot_data, filters_db, config.filters.rolling_diurnal)
 
 # %% [markdown] id="iu8MLKyh1AFk"
 # ## Ручная фильтрация
