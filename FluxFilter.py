@@ -758,6 +758,28 @@ plot_data = data.copy()
 filters_db = {col: [] for col in plot_data.columns.to_list()}
 print(plot_data.columns.to_list())
 
+# %% [markdown] id="soyyX-MCbиXt"
+# ## *по футпринту FETCH_FILTER
+# `fetch = 1 или 0. 1 – остаются, 0 – убираются `
+
+# %% id="mAdYXJ4dSRbJ"
+
+
+def fetch_filter(df, tgt_cols):
+    # renames from IAS: 'x_peak': 'FETCH_MAX_1_1_1', 'x_70%': 'FETCH_70_1_1_1', 'x_90%': 'FETCH_90_1_1_1',
+    src_col = 'FETCH_FILTER'
+    if src_col not in df.columns:
+        ff_logger.info(f'Fetch filter not applied, column {src_col} missing')
+        return
+    
+    df.loc[df[src_col] == 0, tgt_cols] = np.nan
+
+
+cols = data.columns.intersection({'h', 'le', 'sh_1_1_1', 'ch4_flux'})
+with debug_plot_changes(config.debug, data, cols, None, 'fetch_filter'):
+    fetch_filter(data, cols)
+
+
 # %% [markdown] id="BL_6XxGGsCBK"
 # ## по флагам качества
 
@@ -816,12 +838,6 @@ if config.calc.has_meteo:
     # date_ranges.append(['25.8.2014 00:00', '26.8.2014 00:00'])
     plot_data, filters_db = winter_filter(plot_data, filters_db, config.filters.meteo,
                                           config.filters.winter_date_ranges)
-
-# %% [markdown] id="iipFLxf6fu5Y"
-# Фильтрация по футпринту
-# будет в следующей версии скрипта
-#
-# `fetch = 1 #или 0. 1 – остаются, 0 – убираются `
 
 # %% [markdown] id="UAdRtCPGq6_y"
 # # Фильтрация данных статистическая
