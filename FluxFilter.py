@@ -147,7 +147,7 @@ import bglabutils.basic as bg
 
 from src.colab_routines import colab_no_scroll, colab_enable_custom_widget_manager, colab_add_download_button, \
     colab_xor_demo_data
-from src.config.ff_config import FFConfig, RepConfig, FFGlobals
+from src.config.ff_config import FFConfig, RepConfig, FFGlobals, QuantileIQRFilterConfig, QuantileFilterConfig
 from src.config.config_types import IasExportIntervals, InputFileType, ColabDemoMixPolicy  # noqa: F401
 from src.data_quality import try_compare_stats
 from src.ff_logger import init_logging, ff_logger
@@ -160,7 +160,7 @@ from src.data_io.ias_io import export_ias
 from src.ipynb_routines import setup_plotly, ipython_enable_word_wrap, ipython_edit_function  # noqa: F401
 from src.filters import min_max_filter, qc_filter, std_window_filter, meteorological_rh_filter, \
     meteorological_night_filter, meteorological_day_filter, meteorological_co2ss_filter, meteorological_ch4ss_filter, \
-    meteorological_rain_filter, quantile_filter, mad_hampel_filter, manual_filter, winter_filter
+    meteorological_rain_filter, quantile_filter, quantile_iqr_filter, mad_hampel_filter, manual_filter, winter_filter
 from src.plots import get_column_filter, basic_plot, plot_nice_year_hist_plotly, make_filtered_plot, plot_albedo, \
     debug_plot_changes
 from src.plots import plot_cols  # noqa: F401
@@ -299,14 +299,14 @@ if not config.from_file:
     config.data_import.eddypro_biomet.datetime_col = 'TIMESTAMP_1'
     config.data_import.eddypro_biomet.try_datetime_formats = ['%Y-%m-%d %H%M', '%d.%m.%Y %H:%M']  # yyyy-mm-dd HHMM
     config.data_import.eddypro_biomet.repair_time = True
-
+    
     config.data_import.eddypro_biomet_2.missing_data_codes = [-9999]
     config.data_import.eddypro_biomet_2.date_col = 'date'
     config.data_import.eddypro_biomet_2.try_date_formats = ['%d.%m.%Y', '%d/%m/%Y', '%Y-%m-%d']
     config.data_import.eddypro_biomet_2.time_col = 'time'
     config.data_import.eddypro_biomet_2.try_time_formats = ['%H:%M', '%H:%M:%S']
     config.data_import.eddypro_biomet_2.repair_time = True
-
+    
     config.data_import.csf.missing_data_codes = [-9999, 'NAN']
     config.data_import.csf.datetime_col = 'TIMESTAMP'
     config.data_import.csf.try_datetime_formats = ['%Y-%m-%d %H:%M:%S', '%d.%m.%Y %H:%M']  # yyyy-mm-dd HHMM
@@ -471,7 +471,10 @@ if not config.from_file:
     config.filters.window = filters_window
 
 # %% [markdown] id="KF_MGD7pSGre"
-# Параметры фильтрации выше-ниже порога по квантилям (выпадающие строки отфильтровываются)
+# Параметры фильтрации выше-ниже порога по квантилям (выпадающие строки отфильтровываются):
+# * `filters_quantile` - по всему столбцу, значения в квадратных скобках задают квантили 
+# * `filters_quantile_iqr` - IQR фильтр в скользящем окне, параметр задает IQR множитель межквартильного размаха (стандартно 1.5, при увеличении будет отфильтровываться меньше данных)  
+# * 'window_size_days' временной размер скользящего IQR окна в днях
 
 # %% id="asO_t2tZmiD0"
 filters_quantile = {}
@@ -479,8 +482,13 @@ filters_quantile['co2_flux'] = [0.01, 0.99]
 filters_quantile['ch4_flux'] = [0.01, 0.99]
 filters_quantile['co2_strg'] = [0.01, 0.99]
 
+filters_quantile_iqr = {}
+# filters_quantile_iqr['co2_flux'] = 1.5
+
 if not config.from_file:
-    config.filters.quantile = filters_quantile
+    config.filters.quantile = QuantileFilterConfig(enabled=True, tgt_cols=filters_quantile)
+    config.filters.quantile_iqr = QuantileIQRFilterConfig(enabled=True, window_size_days=7,
+                                                          tgt_cols=filters_quantile_iqr)
 
 # %% [markdown] id="cPiTN288UaP3"
 # Параметры для фильтрации по отклонению от соседних точек, фильтры MAD и Hampel.
@@ -692,12 +700,24 @@ if config.calc.calc_nee and 'co2_strg' in data.columns:
     tmp_data = data.copy()
     tmp_data['co2_strg_tmp'] = tmp_data['co2_strg'].copy()
     tmp_filter_db = {'co2_strg_tmp': []}
-    if 'co2_strg' in config.filters.quantile.keys():
-        tmp_q_config = {'co2_strg_tmp': config.filters.quantile['co2_strg']}
+    if config.filters.quantile.enabled and 'co2_strg' in config.filters.quantile.tgt_cols.keys():
+        tmp_q_config = QuantileFilterConfig(enabled=True,
+                                            tgt_cols={'co2_strg_tmp': config.filters.quantile.tgt_cols['co2_strg']})
     else:
-        tmp_q_config = {}
+        tmp_q_config = QuantileFilterConfig(enabled=False)
     tmp_filter_db = {'co2_strg_tmp': []}
     tmp_data, tmp_filter_db = quantile_filter(tmp_data, tmp_filter_db, tmp_q_config)
+    
+    # TODO 1 co2_strg - iqr or same as previous	
+    # tgt_cols = config.filters.quantile.tgt_cols
+    # if 'co2_strg' in config.filters.quantile.tgt_cols.keys():
+    #     tmp_q_config = QuantileFilterConfig(enabled=True, window_size_days=7,
+    #                                         tgt_cols={'co2_strg_tmp': tgt_cols['co2_strg']})
+    # else:
+    #     tmp_q_config = QuantileFilterConfig(enabled=False)
+    # tmp_filter_db = {'co2_strg_tmp': []}
+    # tmp_data, tmp_filter_db = quantile_filter(tmp_data, tmp_filter_db, config.debug, tmp_q_config)	
+    
     tmp_data.loc[~get_column_filter(tmp_data, tmp_filter_db, 'co2_strg_tmp').astype(bool), 'co2_strg_tmp'] = np.nan
     # tmp_data['co2_strg_tmp'] = tmp_data['co2_strg_tmp'].interpolate(limit=3)
     # tmp_data['co2_strg_tmp'].fillna(bg.calc_rolling(tmp_data['co2_strg_tmp'], rolling_window=10 , step=gl.points_per_day, min_periods=4))
@@ -724,9 +744,12 @@ if config.calc.calc_nee and 'co2_strg' in data.columns:
     
     if not config.from_file:
         for filter_config in [config.filters.qc, config.filters.meteo, config.filters.min_max,
-                              config.filters.window, config.filters.quantile, config.filters.madhampel]:
+                              config.filters.window,
+                              config.filters.quantile.tgt_cols, config.filters.quantile_iqr.tgt_cols,
+                              config.filters.madhampel]:
             if 'co2_flux' in filter_config:
                 filter_config['nee'] = filter_config['co2_flux']
+
 
 # %% [markdown] id="mUgwuaFYribB"
 # # Обзор статистики по интересующим колонкам
@@ -856,6 +879,7 @@ plot_data, filters_db = min_max_filter(plot_data, filters_db, config.filters.min
 # %% id="aNQ4XDK01DME"
 # if config.calc.has_meteo:
 plot_data, filters_db = quantile_filter(plot_data, filters_db, config.filters.quantile)
+plot_data, filters_db = quantile_iqr_filter(plot_data, filters_db, config.debug, config.filters.quantile_iqr)
 
 # %% [markdown] id="7Sg76Bwasnb4"
 # ## по отклонению от среднего хода
