@@ -42,7 +42,7 @@ rep_user_options <- list(
     u_star_seasoning =  factor("Continuous", levels = c("Continuous", "WithinYear", "User")),
     u_star_method = factor("RTw", levels = "RTw"),
 
-    is_bootstrap_u_star = FALSE,
+    is_bootstrap_u_star = TRUE,
     ustar_bootstrap_percentiles = c(5, 25, 50, 75, 95),
     skip_gap_filling_after_ustar = TRUE,
 

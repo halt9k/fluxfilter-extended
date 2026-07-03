@@ -407,8 +407,8 @@ filters_meteo['rain_forward_flag'] = 2
 # meteo_filter_config['RH_max'] = 98
 
 # Какие значения допускаются днем/ночью
-filters_meteo['use_day_filter'] = True
-filters_meteo['use_night_filter'] = True
+filters_meteo['use_day_filter'] = False
+filters_meteo['use_night_filter'] = False
 filters_meteo['day_nee_max'] = 5
 filters_meteo['night_nee_min'] = -5
 filters_meteo['day_swin_limit'] = 10
@@ -416,7 +416,7 @@ filters_meteo['night_h_limits'] = [-50, 20]
 filters_meteo['night_le_limits'] = [-50, 20]
 
 # Какие значения допускаются зимой. Для травянистых экосистем правый порог обычно ниже
-filters_meteo['winter_nee_limits'] = [-1, 5]
+# filters_meteo['winter_nee_limits'] = [-1, 5]
 filters_meteo['winter_ch4_flux_limits'] = [-1, 1]
 filters_meteo['CH4SS_min'] = 20.
 
@@ -485,10 +485,10 @@ filters_quantile['ch4_flux'] = [0.01, 0.99]
 filters_quantile['co2_strg'] = [0.01, 0.99]
 
 filters_quantile_iqr = {}
-# filters_quantile_iqr['co2_flux'] = 1.5
+filters_quantile_iqr['co2_flux'] = 1.5
 
 if not config.from_file:
-    config.filters.quantile = QuantileFilterConfig(enabled=True, tgt_cols=filters_quantile)
+    config.filters.quantile = QuantileFilterConfig(enabled=False, tgt_cols=filters_quantile)
     config.filters.quantile_iqr = QuantileIQRFilterConfig(enabled=True, window_size_days=7,
                                                           tgt_cols=filters_quantile_iqr)
 
@@ -687,8 +687,9 @@ if not config.calc.has_meteo or 'ta_1_1_1' not in data.columns:
 df_ias_export = data.copy()
 try_compare_stats(data, repo_dir / 'misc/expected_stats.xlsx')
 
+
 # %% [markdown] id="soyyX-MCbaXt"
-# ## Получение NEE из потока CO2 и накопления
+# ## Фильтрация накопления
 
 # %% [markdown] id="lqWwGSMObro4"
 # Проверка накопления. Рассчитанное по одному уровню в EddyPro (full output - колонка co2_strg) не всегда корректно. Корректность проверяется суточным ходом: должен быть рост запаса в течение ночи, резкое уменьшение утром.
@@ -726,6 +727,33 @@ if config.calc.calc_nee and 'co2_strg' in data.columns:
     basic_plot(tmp_data, ['co2_strg_tmp'], config.metadata.site_name, tmp_filter_db, steps_per_day=gl.points_per_day)
     if 'co2_strg_tmp_quantilefilter' in tmp_data:
         print(tmp_q_config, tmp_filter_db, tmp_data['co2_strg_tmp_quantilefilter'].value_counts())
+
+
+# %% [markdown] id="soyyX-DCbиXt"
+# ## *Суммирование потоков
+
+# %% id="mAdYXJ4dSRbJ"
+
+# TODO 2 introduce dynamic redirects 'H' + 'sh_1_1_1' -> 'Hs', ...
+# TODO 1 test on data with sh_1_1_1, sle_1_1_1, 'co2_flux', 'co2_strg' (FC+SC), 'ch4_flux', 'sch4_1_1_1' (FCH4+SCH4)
+# TODO 1 add only if base variable exists or even create a base col if missing?
+
+def add_flows(df):
+    if {'h', 'sh_1_1_1'} < set(df.columns):
+        df['h'] += df['sh_1_1_1']
+    if {'le', 'sle_1_1_1'} < set(df.columns):
+        df['le'] += df['sle_1_1_1']
+    if {'co2_flux', 'co2_strg'} < set(df.columns):
+        df['co2_flux'] += df['co2_strg']
+    if {'ch4_flux', 'sch4_1_1_1'} < set(df.columns):
+        df['ch4_flux'] = df['sch4_1_1_1']
+
+
+with debug_plot_changes(config.debug, data, ['h', 'le', 'co2_flux', 'ch4_flux'], None, 'add_flows'):
+    add_flows(data)
+
+# %% [markdown] id="soyyX-MDbaXt"
+# ## Получение NEE из потока CO2 и накопления
 
 # %% id="2IQ7W6pslYF-"
 # Решаем, суммировать ли исходный co2_flux и co2_strg_filtered_filled для получения NEE
@@ -812,15 +840,6 @@ with debug_plot_changes(config.debug, data, cols, None, 'fetch_filter'):
 # %% id="GGwe7_uU1C8U"
 plot_data, filters_db = qc_filter(plot_data, filters_db, config.filters.qc)
 
-# %% [markdown] id="M_gKSTNYyzjS"
-# ## по порогу CO2SS и CH4SS
-
-# %% id="viq7BZue9Ett"
-plot_data, filters_db = meteorological_co2ss_filter(plot_data, filters_db, config.filters.meteo)
-
-# %% id="5RrPfxfiJGhN"
-plot_data, filters_db = meteorological_ch4ss_filter(plot_data, filters_db, config.filters.meteo)
-
 # %% [markdown] id="qwqVDeH6y73_"
 # ## по допустимым значениям RH
 
@@ -844,6 +863,15 @@ if config.calc.has_meteo:
 # %% id="X3Vguu8MK635"
 if config.calc.has_meteo:
     plot_data, filters_db = meteorological_day_filter(plot_data, filters_db, config.filters.meteo)
+
+# %% [markdown] id="M_gKSTNYyzjS"
+# ## *по порогу CO2SS и CH4SS
+
+# %% id="viq7BZue9Ett"
+plot_data, filters_db = meteorological_co2ss_filter(plot_data, filters_db, config.filters.meteo)
+
+# %% id="5RrPfxfiJGhN"
+plot_data, filters_db = meteorological_ch4ss_filter(plot_data, filters_db, config.filters.meteo)
 
 # %% [markdown] id="fzfTJdNe68Eu"
 # ## фильтрация зимних периодов, уточните даты!
@@ -1248,9 +1276,9 @@ config_reddyproc = RepConfig(
     # "Rg_th_Py", "Rg_th_REP" - estimate by theoretical algs,
     # "Rg" - by real data, "" - ignore Rg and filter both days and nights
     ustar_rg_source="Rg",
-    is_bootstrap_u_star=False,
+    is_bootstrap_u_star=True,
     ustar_bootstrap_percentiles=[5, 25, 50, 75, 95],
-    skip_gap_filling_after_ustar=False,
+    skip_gap_filling_after_ustar=True,
     # u_star_seasoning: one of "WithinYear", "Continuous", "User"
     u_star_seasoning="Continuous",
     
@@ -1285,6 +1313,58 @@ ipython_enable_word_wrap()
 prepare_rg(config.reddyproc)
 ensure_empty_dir(config.reddyproc.output_dir)
 gl.rep_out_info, config.reddyproc = reddyproc_and_postprocess(config.reddyproc, gl.repo_dir)
+
+# %% [markdown] id="soyyX-MEbиXt"
+# ## *Контроль результатов фильтрации NEE по ustar (1го этапа REddyProc из 3х) 
+
+# %% id="278cbec5"
+
+rep_out_file = Path(config.reddyproc.output_dir) / (gl.rep_out_info.fnames_prefix + '_filled.txt')
+assert rep_out_file.exists()
+data_rep_long = pd.read_csv(rep_out_file, sep="\t", header=0, skiprows=[1], na_values=-9999.0)
+
+# test on ias, drop first row
+data_rep_long.index = pd.to_datetime(data_rep_long['Date Time'], format='%Y-%m-%d %H:%M:%S')
+data_rep: pd.DataFrame = data_rep_long.reindex(data.index)
+if len(data_rep) != len(data):
+    Exception('Cannot match (crop) REP output to input')
+
+if config.reddyproc.is_bootstrap_u_star:
+    orig_cols = [f'NEE_U{prc:02}_orig' for prc in config.reddyproc.ustar_bootstrap_percentiles]
+    gapfilled_cols = [f'NEE_U{prc:02}_f' for prc in config.reddyproc.ustar_bootstrap_percentiles]
+    
+    plot_cols(data_rep, ['NEE'] + orig_cols)
+    plot_cols(data_rep, ['NEE'] + gapfilled_cols)
+
+
+# %% [markdown] id="soyyX-MDbиXt"
+# ## *Фильтрация метана по порогу u\*
+# Результат сохраняется в файл `output\reddyproc\*_filled.csv`, соответствующий выходному `txt` файлу ReddyProc с добавлением метана, отфильтрованного (вместе с NEE) по ustar перцентилям
+
+# %% id="mAdYXJ5dSRbJ"
+def filter_by_ustar_percentiles(df) -> tuple[pd.DataFrame, list[str]]:
+    rep_ch4_col = 'CH4flux'
+    if rep_ch4_col not in df.columns:
+        print(f'Applying ustar filter to FCH4 skipped, missing {rep_ch4_col} variable to apply on.')
+        return df, []
+    
+    new_cols = []
+    for prc in config.reddyproc.ustar_bootstrap_percentiles:        
+        filter = data_rep[f'NEE_U{prc:02}_orig'].isna() & ~data_rep[f'NEE'].isna()
+        print(f'filter NEE_U{prc:02}_orig count: ', np.count_nonzero(filter))
+        cn = f'{rep_ch4_col}_{prc:02}_orig'
+        df[cn] = df[rep_ch4_col]
+        df.loc[filter, cn] = np.nan
+        new_cols += [cn]
+    return df, new_cols
+
+
+data_rep, new_cols = filter_by_ustar_percentiles(data_rep)
+if config.debug and 'CH4flux' in data_rep.columns:
+    plot_cols(data_rep, ['CH4flux'] + new_cols)
+    
+data_rep.to_csv(rep_out_file.with_suffix('.csv'), na_rep=-9999, index=False)
+
 
 # %% [markdown] id="0bed439c"
 # ## Контрольные графики
