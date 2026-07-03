@@ -34,6 +34,7 @@ class ColabDemoMixPolicy(Enum):
 
 
 # TODO 3 ensure cut is applied to all import types
-# reddyproc requires 3 months
+# reddyproc requires 3 months, None to load all file even in debug mode
 # DEBUG_NROWS = 31 * 3 * 24 * 2 * 2
-DEBUG_NROWS = 31 * 3 * 24 * 2
+# DEBUG_NROWS = 31 * 3 * 24 * 2
+DEBUG_NROWS = None
