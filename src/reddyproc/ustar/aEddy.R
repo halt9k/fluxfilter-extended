@@ -65,6 +65,7 @@ sEddyProc_initialize <- function(
   if (!missing(ColNamesNonNumeric.V.s)) ColNamesNonNumeric <- ColNamesNonNumeric.V.s
   if (!missing(ColPOSIXTime.s)) ColPOSIXTime <- ColPOSIXTime.s
   if (!missing(Lat_deg.n)) LatDet <- Lat_deg.n
+  
   varNamesDepr <- c(
     "ID.s","Data.F","ColNames.V.s","ColPOSIXTime.s","DTS.n"
     ,"ColNamesNonNumeric.V.s","Lat_deg.n","Long_deg.n","TimeZone_h.n")

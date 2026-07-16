@@ -6,6 +6,10 @@ RHLightResponseCostC <- function(theta, flux, sdFlux, parameterPrior, sdParamete
 }
 
 whichValueGreaterEqualC <- function(x, threshold, iStart) {
-    .Call('_REddyProc_whichValueGreaterEqualC', PACKAGE = 'REddyProc', x, threshold, iStart)
+	# TODO 1 somtheing wrong when directly importing
+    # .Call('_REddyProc_whichValueGreaterEqualC', PACKAGE = 'REddyProc', x, threshold, iStart)
+	idx <- which(x[iStart:length(x)] >= threshold)
+	if (length(idx) == 0) return(NA_integer_)
+	idx[1] + iStart - 1L
 }
 

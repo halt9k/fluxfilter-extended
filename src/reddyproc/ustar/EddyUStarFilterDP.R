@@ -80,6 +80,7 @@ sEddyProc_sEstUstarThreshold <- function(
     , " the current result. The other components are still available"
     , " with class variable sUSTAR_DETAILS.")
   reqCols <- c("sDateTime", UstarColName, NEEColName, TempColName, RgColName)
+  
   browser()
   iMissing <- which(!(reqCols %in% names(.self$sDATA)))
   if (length(iMissing)) stop(
@@ -1304,6 +1305,7 @@ sEddyProc_sEstimateUstarScenarios <- function(
   ##, \code{\link{sEddyProc_sSetUstarScenarios}}
   ##, \code{\link{sEddyProc_sMDSGapFillUStarScens}}
   .self$sSetUStarSeasons(seasonFactor)
+  
   ds <- sDATA[, c("sDateTime", UstarColName, NEEColName, TempColName, RgColName)]
   colnames(ds) <- c("sDateTime", "Ustar", "NEE", "Tair", "Rg")
   ds$seasonFactor <- .self$sTEMP$season
@@ -1311,6 +1313,7 @@ sEddyProc_sEstimateUstarScenarios <- function(
   # hence we need to initialize by different seeds to avoid repeating the same
   # sample.
   # Need to be done before the first call to .self$sEstUstarThold
+  
   bootSeeds <- sample.int(.Machine$integer.max, nSample - 1L)
   res0 <- suppressMessages(.self$sEstUstarThold(
     UstarColName = UstarColName
@@ -1386,11 +1389,10 @@ sEddyProc_sEstimateUstarScenarios <- function(
   resQuantiles <- t(resQuantiles0[-1,,drop = FALSE])
   iInvalid <- colSums(is.finite(stat)) / nrow(stat) <
     ctrlUstarEst$minValidBootProp
+  
   resQuantiles[iInvalid, ] <- NA_real_
   rownames(resQuantiles) <- NULL
   resDf <- cbind(res0, resQuantiles)
-
-  # TODEL
   # browser()
 
   message(paste("Estimated UStar distribution of:\n"
@@ -1399,6 +1401,7 @@ sEddyProc_sEstimateUstarScenarios <- function(
                 , "\nby using ", nSample, "bootstrap samples and controls:\n"
                 , paste(capture.output(unlist(ctrlUstarSub)), collapse = "\n")
   ))
+  
   .self$sUSTAR <- resDf
   .self$sSetUstarScenarios(usGetAnnualSeasonUStarMap(resDf))
   ##value<< updated class. Request results by

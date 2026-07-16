@@ -9,8 +9,24 @@ debugSource('test/reddyproc/helpers/init_test_env.r')
 repo_dir <- '.'
 repo_path_test <- function(src_path) {file.path(repo_dir, src_path)}
 
-# uninstall REddyProc package and enable this for the full debug
-devtools::load_all(file.path(Sys.getenv('DEV'), '/R/REddyProc-1.3.3'), reset = TRUE)
+# extract ustar from REddyProc package
+library(purrr)
+debugSource('src/reddyproc/ustar/GeoFunctions.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/FileHandling.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/LRC_rectangular.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/DataFunctions.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/CheckVal.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/zzzDebugCode.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/aEddy.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/imports.R' %>% repo_path_test)
+# Rcpp::sourceCpp("src/reddyproc/ustar/RcppExports.cpp")
+debugSource('src/reddyproc/ustar/RcppExports.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/EddyUStarFilterDP.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/EddyGapfilling.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/EddyPlotting.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/EddyPartitioning.R' %>% repo_path_test)
+debugSource('src/reddyproc/ustar/PartitioningLasslop10.R' %>% repo_path_test)
+
 
 debugSource('test/reddyproc/helpers/io.r' %>% repo_path_test)
 debugSource('src/reddyproc/reddyproc_wrapper.r' %>% repo_path_test)

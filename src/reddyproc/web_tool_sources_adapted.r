@@ -33,13 +33,13 @@ validateInputData <- function(inputData) {
         # calculate VPD
         print("Calculating VPD from rH and Tair.")
         c("rH", "Tair") %>%
-            REddyProc:::fCheckColNum(inputData, ., "validateInputData")
+            fCheckColNum(inputData, ., "validateInputData")
         inputData$VPD <- fCalcVPDfromRHandTair(inputData$rH, inputData$Tair)
     }
 
     # filter long runs
     c("NEE") %>%
-        REddyProc:::fCheckColNum(inputData, ., "validateInputData")
+        fCheckColNum(inputData, ., "validateInputData")
     inputData <- filterLongRuns(inputData, "NEE")
     inputData
 }

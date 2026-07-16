@@ -225,7 +225,7 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 
 		gap_fill_dummy_call <- function(Var, QFVar='none', QFValue = NA_real_, FillAll=TRUE, isVerbose=TRUE, suffix='') {
 			EProc$sFillInit(Var, QFVar, QFValue, FillAll)
-			suffix_str <- if (REddyProc:::fCheckValString(suffix)) paste('_', suffix, sep = '') else ''
+			suffix_str <- if (fCheckValString(suffix)) paste('_', suffix, sep = '') else ''
 			# suffix_str <- if (suffix == '') paste('_', suffix, sep = '') else ''
 			colnames(EProc$sTEMP) <<- gsub('VAR_', paste(Var, suffix_str, '_', sep = ''), colnames(EProc$sTEMP))
 			cat(RE, '.sMDSGapFill skipped due to skip_gap_filling_after_ustar = TRUE \n')
@@ -261,8 +261,6 @@ with_gapfill_interrupted <- function(call, eddyProcConfiguration, EProc) {
 	})
 
 	body(f) <- as.call(b)
-	# TODO 1 which was correct
-	# setMethod("sEstimateUstarScenarios", "EProc", f)
 	e$sEstimateUstarScenarios <- f
 
 	cat(RE, '.sEstimateUstarScenarios modified to keep bootstrap scenarios \n')
