@@ -57,7 +57,7 @@ rep_user_options <- list(
     skip_gap_filling_after_ustar = TRUE,
 
     is_to_apply_gap_filling = TRUE,
-    is_to_apply_partitioning = TRUE,
+    is_to_apply_partitioning = FALSE,
 
     partitioning_methods = c("Reichstein05", "Lasslop10"),
     latitude = 59.9,

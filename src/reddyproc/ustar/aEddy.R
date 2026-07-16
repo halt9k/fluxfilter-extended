@@ -396,7 +396,7 @@ sEddyProc$methods( sExportData = sEddyProc_sExportData)
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #' @export
-sEddyProc_sExportResults <- function(
+sEddyProc_sExportResults <- function(.self,
   ### Export class internal sTEMP data frame with result columns
   isListColumnsExported = FALSE	##<< if TRUE export list columns in addition
 	  ## to numeric columns,
@@ -405,9 +405,9 @@ sEddyProc_sExportResults <- function(
   ##author<< AMM
   ##seealso<< \code{\link{help_export}}
   'Export class internal sTEMP data frame with result columns'
-	iListColumns <- which(sapply(sTEMP, is.list) )
+	iListColumns <- which(sapply(.self$sTEMP, is.list) )
 	iOmit <- if (isListColumnsExported) c(1L) else c(1L, iListColumns)
-    sTEMP[, -iOmit]
+	.self$sTEMP[, -iOmit]
     ##value<<
     ## Return data frame sTEMP with results.
 }

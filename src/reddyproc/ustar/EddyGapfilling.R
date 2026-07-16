@@ -796,8 +796,8 @@ sEddyProc_sMDSGapFillAfterUstar <- function(.self,
   }
 
   # EXRTRACTION DONE !!!
-  browser()
-
+  # browser()
+  return(invisible(qfUStar))
 
   # Gap fill data after applying ustar filtering
   sMDSGapFill(

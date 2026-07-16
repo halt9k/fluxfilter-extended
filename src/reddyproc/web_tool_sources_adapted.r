@@ -170,7 +170,7 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
             # EProc$sMDSGapFillAfterUStarDistr(dataVariable \t\t, uStarTh = uStarRes$uStarTh \t\t, uStarSuffixes =
             # uStarRes$suffixes \t\t, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty) \t\t, isVerbose = T)
         } else {
-            EProc$sMDSGapFill(dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty), isVerbose = T)
+            # sEddyProc_sMDSGapFill(EProc, dataVariable, FillAll = !(dataVariable %in% dataVariablesWithoutUncertainty), isVerbose = T)
         }
     }
 }
@@ -178,7 +178,7 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
 
 .computeSdNEE <- function(EProc) {
     # calculate the range over quantiles for each record suffixes <- EProc$sGetUstarSuffixes() # only in newer version
-    suffixes <- names(EProc$sGetUstarScenarios())[-1L]
+    suffixes <- names(sEddyProc_sGetUstarScenarios(EProc))[-1L]
     if (length(suffixes) > 1L) {
 
         # if suffix is empty do not add underscore
@@ -247,11 +247,11 @@ estUStarThresholdOrError <- function(eddyProcConfiguration, EProc, ...) {
     gap_fill_call <- function() { .gapFillDataVariables(EProc, eddyProcConfiguration, dataVariablesToFill) }
     with_gapfill_interrupted(gap_fill_call, eddyProcConfiguration, EProc)
 
-    if (length(get_ustar_suffixes(EProc)))
-        .computeSdNEE(EProc)
-
     if (eddyProcConfiguration$skip_gap_filling_after_ustar)
         return()
+
+    if (length(get_ustar_suffixes(EProc)))
+        .computeSdNEE(EProc)
 
     .plotUnfilledDataVariables(eddyProcConfiguration, EProc, dataVariablesToFill)
     .plotFilledDataVariables(eddyProcConfiguration, EProc, dataVariablesToFill)
@@ -353,7 +353,7 @@ writeProcessingResultsToFile <- function(inputData, EProc, outputFileName,
     ## output_format << if equals 'onlinetool' then for backward compatibility
     ##     the columns '*_ustar_*' are renamed to '*_*' in the generated output file
 
-    processedEddyData <- EProc$sExportResults()
+    processedEddyData <- sEddyProc_sExportResults(EProc)
     if (isTRUE(isIncludeOnlyFilledBootColumns)) {
 
         # remove all columns generated during bootstrap, unless the filled,
