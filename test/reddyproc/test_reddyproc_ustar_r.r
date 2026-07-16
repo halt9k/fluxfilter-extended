@@ -12,6 +12,7 @@ repo_path_test <- function(src_path) {file.path(repo_dir, src_path)}
 
 # extract ustar from REddyProc package
 library(purrr)
+library(solartime)
 debugSource('src/reddyproc/ustar/aEddy.R' %>% repo_path_test)
 # Rcpp::sourceCpp("src/reddyproc/ustar/RcppExports.cpp")
 debugSource('src/reddyproc/ustar/RcppExports.R' %>% repo_path_test)
