@@ -187,8 +187,11 @@ reddyproc_and_postprocess <- function(user_options){
     wr_res <- .run_reddyproc_via_ustar_fallback_wrapper(eddyproc_config)
 
     # processEddyData guaranteed to output equi-time-distant series
-    dfs = calc_averages(wr_res$df_output)
-    save_averages(dfs, OUTPUT_DIR, wr_res$out_prefix, tools::file_ext(STATS_FNAME_MASK))
+    if (!user_options$skip_gap_filling_after_ustar)
+    {
+        dfs = calc_averages(wr_res$df_output)
+        save_averages(dfs, OUTPUT_DIR, wr_res$out_prefix, tools::file_ext(STATS_FNAME_MASK))
+    }
 
     # wr_res$df_output better not be returned to python, since it's extra large df
     return(list(info = wr_res$EProc$sINFO, out_prefix = wr_res$out_prefix,

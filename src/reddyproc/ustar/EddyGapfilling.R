@@ -7,7 +7,7 @@
 
 #' @include aEddy.R
 #' @export
-sEddyProc_sFillInit <- function(
+sEddyProc_sFillInit <- function(.self,
   ### Initializes data frame sTEMP for newly generated gap filled data and qualifiers.
   ##title<< sEddyProc$sFillInit - Initialize gap filling
   Var.s                   ##<< Variable to be filled
@@ -22,8 +22,8 @@ sEddyProc_sFillInit <- function(
   'Initializes data frame sTEMP for newly generated gap filled data and qualifiers.'
 
   # Check variable to fill and apply quality flag
-  fCheckColNames(cbind(sDATA, sTEMP), c(Var.s, QFVar.s), 'sFillInit')
-  Var.V.n <- fSetQF(cbind(sDATA, sTEMP), Var.s, QFVar.s, QFValue.n, 'sFillInit')
+  fCheckColNames(cbind(.self$sDATA, .self$sTEMP), c(Var.s, QFVar.s), 'sFillInit')
+  Var.V.n <- fSetQF(cbind(.self$sDATA, .self$sTEMP), Var.s, QFVar.s, QFValue.n, 'sFillInit')
   #! Var.V.n[QF.V.b == FALSE]   <-   NA_real_
 
   # Abort if variable to be filled contains no data
@@ -83,7 +83,7 @@ sEddyProc_sFillInit <- function(
   #! Not congruent with PV-Wave, there the code is performed on single years
   #only with long gaps of 60 days in the beginning or end skipped.
   GapLength.V.n <- fCalcLengthOfGaps(lTEMP$VAR_orig)
-  kMaxGap.n <- sINFO$DTS * 60 #Halfhours in 60 days
+  kMaxGap.n <- .self$sINFO$DTS * 60 #Halfhours in 60 days
   while (max(GapLength.V.n) > kMaxGap.n) {
     #Flag long gap with -9999.0
     End.i <- which(GapLength.V.n == max(GapLength.V.n))
@@ -106,7 +106,7 @@ sEddyProc_sFillInit <- function(
   }
 
   # twutz: error prone if sTEMP already contains columns of lTEMP
-  sTEMP <<- data.frame(c(sTEMP, lTEMP))
+  .self$sTEMP <- data.frame(c(.self$sTEMP, lTEMP))
   return(invisible(NULL))
 }
 sEddyProc$methods(sFillInit = sEddyProc_sFillInit)
@@ -513,23 +513,27 @@ sEddyProc_sMDSGapFill <- function(.self,
   ## Initialize temporal data frame sTEMP for newly generated gap filled data and
   ## qualifiers, see \code{\link{sEddyProc_sFillInit}} for explanations on suffixes.
   # sTEMP <<- sTEMP[, 1L, drop = FALSE]
-  if (!is.null(sFillInit(Var, QFVar, QFValue, FillAll)) ) #! , QF.V.b = QF.V.b)) )
+  if (!is.null(sEddyProc_sFillInit(.self, Var, QFVar, QFValue, FillAll)) ) #! , QF.V.b = QF.V.b)) )
     return(invisible(-111)) # Abort gap filling if initialization of sTEMP failed
   ##details<<
   ## Runs of numerically equal numbers hint to problems of the data and cause
   ## unreasonable estimates of uncertainty. This routine warns the user.
-  if (is.finite(minNWarnRunLength) & (nrow(sTEMP) >= minNWarnRunLength)) {
-    rl <- .runLength(as.vector(sTEMP$VAR_orig), minNRunLength = minNWarnRunLength)
+  if (is.finite(minNWarnRunLength) & (nrow(.self$sTEMP) >= minNWarnRunLength)) {
+    rl <- .runLength(as.vector(.self$sTEMP$VAR_orig), minNRunLength = minNWarnRunLength)
     if (length(rl$index)) {
       rlSorted <- rl[rev(order(rl$nRep)),,drop = FALSE]
       warning(
         "Variable ", Var, " contains long runs of numerically equal numbers."
         , " Longest of ", rlSorted$nRep[1], " repeats of value "
-        , sTEMP$VAR_orig[ rlSorted$index[1] ]
+        , .self$sTEMP$VAR_orig[ rlSorted$index[1] ]
         , " starts at index ", rlSorted$index[1]
       )
     }
   }
+
+  message('MDSGap fill skipped')
+  return(invisible(NULL))
+
   #+++ Handling of special cases of meteo condition variables V1, V2, V3
   # If variables are at default values but do not exist as columns, set to 'none'
   # (= disabled identifier).
@@ -795,12 +799,9 @@ sEddyProc_sMDSGapFillAfterUstar <- function(.self,
             , " setups on the same dataset!')
   }
 
-  # EXRTRACTION DONE !!!
-  # browser()
-  return(invisible(qfUStar))
 
   # Gap fill data after applying ustar filtering
-  sMDSGapFill(
+  sEddyProc_sMDSGapFill(.self,
     fluxVar, QFVar = attr(qfUStar, 'varnames'), QFValue = 0, ...
     , suffix = uStarSuffix)
   ##value<<
