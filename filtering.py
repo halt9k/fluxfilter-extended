@@ -6,7 +6,8 @@ from scipy.ndimage import uniform_filter1d
 # 1. ВАШИ РЕАЛЬНЫЕ ДАННЫЕ
 # ============================================================
 
-df = pd.read_csv('output/REddyProc_tv_fy4_3m_2025.txt', delimiter=' ')
+# df = pd.read_csv('output/REddyProc_tv_fy4_3m_2025.txt', delimiter=' ')
+df = pd.read_csv('output/REddyProc_kr_iga_2015.txt', delimiter=' ')
 
 # Удаляем первую строку, которая содержит единицы измерения и нечисловые значения
 df = df.iloc[1:].copy()
