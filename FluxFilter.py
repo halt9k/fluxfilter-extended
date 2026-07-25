@@ -1336,6 +1336,71 @@ if config.reddyproc.is_bootstrap_u_star:
     plot_cols(data_rep, ['NEE'] + orig_cols)
     plot_cols(data_rep, ['NEE'] + gapfilled_cols)
 
+# %% [markdown] id="soyyX-MEaиXt"
+# ## *Расчет весов порогов из бутстреп-распределений  
+
+# %% id="278cbec5"
+
+# cell and this script variation relies on these values extracted
+assert config.reddyproc.is_bootstrap_u_star
+
+# also avaliable per year
+bootstrap_thresholds_values = gl.rep_out_info.bootstrap_values['aggYears']
+# TODO 2 cleanup if cell result is confirmed
+quantiles = [x / 100.0 for x in config_reddyproc.ustar_bootstrap_percentiles]
+threshold_quantiles = np.percentile(bootstrap_thresholds_values, [q * 100 for q in quantiles])
+
+# Вычисляем веса: доля бутстреп-оценок между квантилями
+sorted_th = np.sort(bootstrap_thresholds_values)
+n_boot = len(bootstrap_thresholds_values)
+
+# Границы зон (середины между квантилями)
+boundaries = [np.min(sorted_th)]
+for i in range(len(threshold_quantiles) - 1):
+    boundaries.append((threshold_quantiles[i] + threshold_quantiles[i + 1]) / 2)
+boundaries.append(np.max(sorted_th))
+
+# Веса = доля точек в каждой зоне
+weights = []
+for i in range(len(threshold_quantiles)):
+    # Учитываем, что последняя граница должна быть включена для последнего интервала
+    if i == len(threshold_quantiles) - 1:
+        count = np.sum((sorted_th >= boundaries[i]) & (sorted_th <= boundaries[i + 1]))
+    else:
+        count = np.sum((sorted_th >= boundaries[i]) & (sorted_th < boundaries[i + 1]))
+    weights.append(count / n_boot)
+
+# ============================================================
+# 5. РЕЗУЛЬТАТЫ
+# ============================================================
+
+print("\n=== РЕЗУЛЬТАТЫ БУТСТРАППИНГА ===")
+print(f"Всего бутстреп-итераций: {n_boot}")
+print(f"\n5 порогов (квантили распределения):")
+for q, th in zip(quantiles, threshold_quantiles):
+    print(f"  {q * 100:.0f}%: {th:.4f} м/с")
+
+print(f"\nВеса порогов (из бутстреп-распределения):")
+for q, th, w in zip(quantiles, threshold_quantiles, weights):
+    print(f"  {q * 100:.0f}% ({th:.4f} м/с): вес = {w:.4f} ({w * 100:.1f}%)")
+
+print(f"\nСумма весов: {sum(weights):.4f}")
+
+
+results = pd.DataFrame({
+    'quantile': quantiles,
+    'threshold_ms': threshold_quantiles,
+    'weight': weights
+})
+bootstrap_fpath = gl.out_dir / 'bootstrap_thresholds_with_weights.csv'
+results.to_csv(bootstrap_fpath, index=False)
+print(f"\nРезультаты сохранены в {bootstrap_fpath}")
+
+
+print("\nПервые 5 строк сохраненных результатов:")
+saved_results = pd.read_csv(bootstrap_fpath)
+print(saved_results.head())
+
 
 # %% [markdown] id="soyyX-MDbиXt"
 # ## *Фильтрация метана по порогу u\*
