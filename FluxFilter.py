@@ -113,7 +113,7 @@
 # !rm -rf sample_data
 # !rm -rf scripts
 
-# %env clone_br=TEST/draft
+# %env clone_br=TEST/draft3
 # %env clone_repo=https://github.com/halt9k/fluxfilter-extended.git
 # !git clone -b $clone_br -n --depth=1 --filter=tree:0 $clone_repo scripts
 # !git -C scripts sparse-checkout set --no-cone src locale misc
