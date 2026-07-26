@@ -44,7 +44,7 @@ rep_user_options <- list(
 
     is_bootstrap_u_star = TRUE,
     ustar_bootstrap_percentiles = c(5, 25, 50, 75, 95),
-    skip_gap_filling_after_ustar = TRUE,
+    skip_gap_filling_after_ustar = FALSE,
 
     is_to_apply_gap_filling = TRUE,
     is_to_apply_partitioning = TRUE,
