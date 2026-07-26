@@ -10,9 +10,6 @@ repo_dir <- '.'
 repo_path_test <- function(src_path) {file.path(repo_dir, src_path)}
 
 
-# extract ustar from REddyProc package
-library(purrr)
-library(solartime)
 debugSource('src/reddyproc/ustar/aEddy.R' %>% repo_path_test)
 # Rcpp::sourceCpp("src/reddyproc/ustar/RcppExports.cpp")
 debugSource('src/reddyproc/ustar/RcppExports.R' %>% repo_path_test)
@@ -29,6 +26,7 @@ debugSource('src/reddyproc/postprocess_calc_means.r' %>% repo_path_test)
 debugSource('src/reddyproc/web_tool_sources_adapted.r' %>% repo_path_test)
 debugSource('src/reddyproc/reddyproc_extensions.r' %>% repo_path_test)
 debugSource('src/reddyproc/r_helpers.r' %>% repo_path_test)
+
 
 # duplicates cell code to run from pure R
 # avoiding R dupe here can be too complicated

@@ -1,7 +1,20 @@
 # formatR::tidy_rstudio()
 
+# this version works dircetly from files
 # library(REddyProc)
 # cat('REddyProc version: ', paste(packageVersion('REddyProc')), '\n')
+
+library(purrr)
+library(solartime)
+debugSource('src/reddyproc/ustar/aEddy.R' %>% repo_path_test)
+# Rcpp::sourceCpp("src/reddyproc/ustar/RcppExports.cpp")
+source('src/reddyproc/ustar/RcppExports.R' %>% repo_path_test)
+source('src/reddyproc/ustar/EddyUStarFilterDP.R' %>% repo_path_test)
+source('src/reddyproc/ustar/EddyGapfilling.R' %>% repo_path_test)
+source('src/reddyproc/ustar/FileHandling.R' %>% repo_path_test)
+source('src/reddyproc/ustar/DataFunctions.R' %>% repo_path_test)
+source('src/reddyproc/ustar/CheckVal.R' %>% repo_path_test)
+
 
 # must be preset be caller env, script-wide routine
 stopifnot(file.exists(repo_dir))
