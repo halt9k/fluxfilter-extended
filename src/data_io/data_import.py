@@ -56,7 +56,7 @@ from src.config.ff_config import FFConfig
 # TODO 2 QOA are any of these supposed to be known as some format? 
 # 'UNNAMED', 'RN_1_1_1', 'LOGGERTEMP', 'SHFSENS3', 'SHF_1_1_1', 'SWIN_1_1_1', 'LOGGERPWR', 'LWOUT_1_1_1', 'SHFSENS2', 'LWIN_1_1_1', 'VIN_1_1_1', 'SHFSENS1', 'SWOUT_1_1_1', 'PPFD_1_1_1'
 
-def import_data(config: FFConfig):
+def import_data(config: FFConfig) -> tuple[pd.DataFrame, list, bool]:
     if config.debug and DEBUG_NROWS:
         config.data_import.debug_nrows = DEBUG_NROWS
     else:
