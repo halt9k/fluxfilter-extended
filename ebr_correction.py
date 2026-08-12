@@ -54,6 +54,12 @@ t_delta = pd.Timedelta(15, 'days')
 # t_delta = pd.Timedelta(3, 'hours')
 data['ebc_cf_15_days_count'] = data['ebc_cf_filtered'].rolling(window=t_delta, center=True).count()
 
+more_than_5 = data['ebc_cf_15_days_count'] > 5
+
+data['h_corr'] = np.nan
+data['l_corr'] = np.nan
+data['h_corr'][more_than_5] = data['h'][more_than_5] * data['ebc_cf'] 
+data['l_corr'][more_than_5] = data['l'][more_than_5] * data['ebc_cf']
 
 
 pass
