@@ -87,5 +87,3 @@ data['l_corr'] = data_b1_5['l'] * data_b1_5['ebc_cf_f_mean']
 
 data['h_corr'][gr_5_ecf] = data['h'][gr_5_ecf] * data['ebc_cf']
 data['l_corr'][gr_5_ecf] = data['l'][gr_5_ecf] * data['ebc_cf']
-
-pass
