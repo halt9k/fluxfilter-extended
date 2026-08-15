@@ -461,14 +461,18 @@ def quantile_filter(data_in, filters_db_in, cfg_quantile: QuantileFilterConfig):
     return data, filters_db
 
 
-def quantile_iqr_filter(df_in: pd.DataFrame, filters_db_in: dict, debug: bool, cfg_quantile: QuantileIQRFilterConfig):
+def quantile_iqr_filter(df_in: pd.DataFrame, filters_db_in: dict, debug: bool, cfg_quantile: QuantileIQRFilterConfig, df_copy=True):
     # TODO 2 why [0, 1] quantile produces 0 and 1 row? nan? or just combined with previous values?
     # #@unroll_filters_db
+    # cfg_quantile.window_size_days: None to apply IQR to all data instead of slifdng window
     
     if not cfg_quantile.enabled or len(cfg_quantile.tgt_cols) == 0:
         return df_in, filters_db_in
     
-    df: pd.DataFrame = df_in.copy()
+    if df_copy:
+        df: pd.DataFrame = df_in.copy()
+    else:
+        df = df_in
     filters_db = filters_db_in.copy()
     
     for col, multiplier in cfg_quantile.tgt_cols.items():
@@ -512,6 +516,8 @@ def quantile_iqr_filter(df_in: pd.DataFrame, filters_db_in: dict, debug: bool, c
         
         # f_inds = df.query(f"{col}_quantilefilter==1").index
         # df.loc[f_inds, cn] = ((df.loc[f_inds, col] <= up_limit) & (df.loc[f_inds, col] >= down_limit)).astype(int)
+        
+        # TODO 1 None or 0?
         df.loc[df[col] > up_limit, cn] = 0
         df.loc[df[col] < down_limit, cn] = 0
         

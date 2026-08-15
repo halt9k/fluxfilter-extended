@@ -2,7 +2,7 @@ from copy import deepcopy as copy
 
 import numpy as np
 import pandas as pd
-import plotly_resampler
+
 from plotly import graph_objects as go, express as px
 from plotly.subplots import make_subplots
 
@@ -114,6 +114,8 @@ def basic_plot(data,
             ), row=2, col=1)
     
     if use_resample:
+        ff_logger.debug('import plotly_resampler can be very slow, moved to the first use')
+        import plotly_resampler
         fig = plotly_resampler.FigureResampler(fig, default_n_shown_samples=5000)
     
     fig_name = f"_{int(np.median(pl_data.index.year))}"
