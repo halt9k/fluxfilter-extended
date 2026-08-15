@@ -7,14 +7,15 @@ from src.filters import quantile_iqr_filter
 from src.plots import debug_plot_changes, plot_cols
 
 # data.to_pickle("test.pkl")
-data: pd.DataFrame = pd.read_pickle("test.pkl")
+# load pre-saved final result of FluxFilter from file
+data: pd.DataFrame = pd.read_pickle("tv_fy4_2016_v01.xlsx.pkl")
 # 'Rn_1_1_1' = 'NETRAD_1_1_1'
 # shf_1_1_1 = g_1_1_1
 
 
 WINDOW_DAYS=30 
 # WINDOW_DAYS = 2
-data = pd.concat([data[0: 1000], data[14000:14200]])
+# data = pd.concat([data[0: 1000], data[14000:14200]])
 
 
 # assert в местное время 22:00 – 02:30 и 10:00-14:30 (ensure via solar radiation?)
@@ -60,30 +61,29 @@ t_delta = pd.Timedelta(WINDOW_DAYS, 'days')
 # t_delta = pd.Timedelta(3, 'hours')
 data['ebc_cf_f_count_in_15_days'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).count()
 
-data['ebc_cf_f_q25'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).quantile(0.25)
-data['ebc_cf_f_q50'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).quantile(0.50)
-data['ebc_cf_f_q75'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).quantile(0.75)
-data['ebc_cf_f_mean'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).mean()
+data['ebc_cf_f_30d_q25'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).quantile(0.25)
+data['ebc_cf_f_30d_q50'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).quantile(0.50)
+data['ebc_cf_f_30d_q75'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).quantile(0.75)
+data['ebc_cf_f_30d_mean'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).mean()
 
 gr_5_ecf = data['ebc_cf_f_count_in_15_days'] > 5
 data_gr5 = data[gr_5_ecf]
 between_1_5_ecf = data['ebc_cf_f_count_in_15_days'].isin(range(1, 5 + 1))
 data_b1_5 = data[between_1_5_ecf]
 
-plot_cols(data, ['ebc_cf_f', 'ebc_cf_f_count_in_15_days', 'ebc_cf_f_mean', 'ebc_cf_f_q25', 'ebc_cf_f_q50', 'ebc_cf_f_q75'])
+plot_cols(data, ['ebc_cf_f', 'ebc_cf_f_count_in_15_days', 'ebc_cf_f_30d_mean', 'ebc_cf_f_30d_q25', 'ebc_cf_f_30d_q50', 'ebc_cf_f_30d_q75'])
 
 
 # ### applying corrections where possible
-data['h_corr_25'] = data_gr5['h'] * data_gr5['ebc_cf_f_q25']
-data['h_corr'] = data_gr5['h'] * data_gr5['ebc_cf_f_q50']
-data['h_corr_75'] = data_gr5['h'] * data_gr5['ebc_cf_f_q75']
-data['l_corr_25'] = data_gr5['l'] * data_gr5['ebc_cf_f_q25']
-data['l_corr'] = data_gr5['l'] * data_gr5['ebc_cf_f_q50']
-data['l_corr_75'] = data_gr5['l'] * data_gr5['ebc_cf_f_q75']
+data['h_corr_25'] = data_gr5['h'] * data_gr5['ebc_cf_f_30d_q25']
+data['h_corr'] = data_gr5['h'] * data_gr5['ebc_cf_f_30d_q50']
+data['h_corr_75'] = data_gr5['h'] * data_gr5['ebc_cf_f_30d_q75']
+data['l_corr_25'] = data_gr5['l'] * data_gr5['ebc_cf_f_30d_q25']
+data['l_corr'] = data_gr5['l'] * data_gr5['ebc_cf_f_30d_q50']
+data['l_corr_75'] = data_gr5['l'] * data_gr5['ebc_cf_f_30d_q75']
 
-data['h_corr'] = data_b1_5['l'] * data_b1_5['ebc_cf_f_mean']
-data['l_corr'] = data_b1_5['l'] * data_b1_5['ebc_cf_f_mean']
+data['h_corr'] = data_b1_5['l'] * data_b1_5['ebc_cf_f_30d_mean']
+data['l_corr'] = data_b1_5['l'] * data_b1_5['ebc_cf_f_30d_mean']
 
-
-data['h_corr'][gr_5_ecf] = data['h'][gr_5_ecf] * data['ebc_cf']
-data['l_corr'][gr_5_ecf] = data['l'][gr_5_ecf] * data['ebc_cf']
+plot_cols(data, ['h', 'h_corr_25', 'h_corr', 'h_corr_75'])
+plot_cols(data, ['l', 'l_corr_25', 'l_corr', 'l_corr_75'])
