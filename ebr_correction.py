@@ -6,8 +6,8 @@ from src.config.ff_config import QuantileIQRFilterConfig
 from src.filters import quantile_iqr_filter
 from src.plots import debug_plot_changes, plot_cols
 
-WINDOW_DAYS=30 
-# WINDOW_DAYS = 1
+# WINDOW_DAYS=30 
+WINDOW_DAYS = 1
 
 # data.to_pickle("test.pkl")
 data: pd.DataFrame = pd.read_pickle("test.pkl")
