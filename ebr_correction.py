@@ -27,7 +27,7 @@ data: pd.DataFrame = pd.read_pickle("test.pkl")
 # 'Rn_1_1_1' = 'NETRAD_1_1_1'
 # shf_1_1_1 = g_1_1_1
 
-data = data[0: 100]
+data = data[0: 200]
 
 # assert в местное время 22:00 – 02:30 и 10:00-14:30 (ensure via solar radiation?)
 
@@ -48,31 +48,38 @@ Index(['timestamp_start', 'timestamp_end', 'dtime', 'alb_1_1_1',
 
 data['ebc_cf'] = (data['rn_1_1_1'] - data['shf_1_1_1']) / (data['h'] + data['le'])
 
-# removing spikes with IQR 1.5
-iqr_cfg = QuantileIQRFilterConfig(enabled=True, window_size_days=31, tgt_cols={'ebc_cf': 1.5})
-with debug_plot_changes(debug=True, df=data, cols=['ebc_cf'], extra_cols=None, title='iqr_filter'):
-    data, _ = quantile_iqr_filter(df_in=data, filters_db_in={'ebc_cf': []}, debug=False, cfg_quantile=iqr_cfg, df_copy=False)
-    data.loc[~data['ebc_cf_quantile_iqr_filter'].astype(bool), 'ebc_cf'] = np.nan
 
-# важны только в местное время 22:00 – 02:30 и selected_time_index = data.index.indexer_between_time('22:00', '02:30') or data.index.indexer_between_time('22:00', '02:30')10:00-14:30
+# removing spikes with IQR 1.5
+data['ebc_cf_f'] = data['ebc_cf'] 
+iqr_cfg = QuantileIQRFilterConfig(enabled=True, window_size_days=31, tgt_cols={'ebc_cf_f': 1.5})
+with debug_plot_changes(debug=True, df=data, cols=['ebc_cf_f'], extra_cols=None, title='iqr_filter'):
+    data, _ = quantile_iqr_filter(df_in=data, filters_db_in={'ebc_cf_f': []}, debug=False, cfg_quantile=iqr_cfg, df_copy=False)
+    data.loc[~data['ebc_cf_f_quantile_iqr_filter'].astype(bool), 'ebc_cf_f'] = np.nan
+
+
+# важны только в местное время 22:00–02:30 и 10:00-14:30
 idx_1 = data.index.indexer_between_time('22:00', '02:30')
-idx_2 = data.index.indexer_between_time('22:00', '02:30')
+idx_2 = data.index.indexer_between_time('10:00', '14:30')
 idx = np.hstack((idx_1, idx_2))
 time_mask = np.zeros(len(data), dtype=bool)
 time_mask[idx] = True
 
-data['ebc_cf_filtered'] = data['ebc_cf']
-data.loc[time_mask, 'ebc_cf_filtered'] = np.nan
+data.loc[time_mask, 'ebc_cf_f'] = np.nan
 
-t_delta = pd.Timedelta(15, 'days')
+
+t_delta = pd.Timedelta(30, 'days')
 # t_delta = pd.Timedelta(3, 'hours')
-data['ebc_cf_count_in_15_days'] = data['ebc_cf_filtered'].rolling(window=t_delta, center=True).count()
+data['ebc_cf_f_count_in_15_days'] = data['ecf'].rolling(window=t_delta, center=True).count()
 
-more_than_5 = data['ebc_cf_count_in_15_days'] > 5
+data['ebc_cf_f_q25'].rolling(window=t_delta, center=True).quantile(0.25)
+data['ebc_cf_f_q50'].rolling(window=t_delta, center=True).quantile(0.50)
+data['ebc_cf_f_q75'].rolling(window=t_delta, center=True).quantile(0.75)
+
+more_than_5_ecf = data['ebc_cf_f_count_in_15_days'] > 5
 
 data['h_corr'] = np.nan
 data['l_corr'] = np.nan
-data['h_corr'][more_than_5] = data['h'][more_than_5] * data['ebc_cf']
-data['l_corr'][more_than_5] = data['l'][more_than_5] * data['ebc_cf']
+data['h_corr'][more_than_5_ecf] = data['h'][more_than_5_ecf] * data['ebc_cf']
+data['l_corr'][more_than_5_ecf] = data['l'][more_than_5_ecf] * data['ebc_cf']
 
 pass
