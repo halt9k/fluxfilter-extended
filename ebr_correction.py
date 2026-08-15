@@ -4,7 +4,10 @@ import pandas as pd
 
 from src.config.ff_config import QuantileIQRFilterConfig
 from src.filters import quantile_iqr_filter
-from src.plots import debug_plot_changes
+from src.plots import debug_plot_changes, plot_cols
+
+WINDOW_DAYS=30 
+# WINDOW_DAYS = 1
 
 # data.to_pickle("test.pkl")
 data: pd.DataFrame = pd.read_pickle("test.pkl")
@@ -35,24 +38,24 @@ data['ebc_cf'] = (data['rn_1_1_1'] - data['shf_1_1_1']) / (data['h'] + data['le'
 
 # ### removing spikes with IQR 1.5
 data['ebc_cf_f'] = data['ebc_cf'] 
-iqr_cfg = QuantileIQRFilterConfig(enabled=True, window_size_days=31, tgt_cols={'ebc_cf_f': 1.5})
-# with debug_plot_changes(debug=True, df=data, cols=['ebc_cf_f'], extra_cols=None, title='iqr_filter'):
+iqr_cfg = QuantileIQRFilterConfig(enabled=True, window_size_days=WINDOW_DAYS, tgt_cols={'ebc_cf_f': 1.5})
 data, _ = quantile_iqr_filter(df_in=data, filters_db_in={'ebc_cf_f': []}, debug=False, cfg_quantile=iqr_cfg, df_copy=False)
 data.loc[~data['ebc_cf_f_quantile_iqr_filter'].astype(bool), 'ebc_cf_f'] = np.nan
-
+# plot_cols(data, ['ebc_cf', 'ebc_cf_f'], title='after IQR')
 
 # ### важны только в местное время 22:00–02:30 и 10:00-14:30
-idx_1 = data.index.indexer_between_time('22:00', '02:30')
-idx_2 = data.index.indexer_between_time('10:00', '14:30')
-idx = np.hstack((idx_1, idx_2))
+idx_night = data.index.indexer_between_time('22:00', '02:30')
+idx_day = data.index.indexer_between_time('10:00', '14:30')
+idx_ok = np.hstack((idx_night, idx_day))
 time_mask = np.zeros(len(data), dtype=bool)
-time_mask[idx] = True
+time_mask[idx_ok] = True
 
-data.loc[time_mask, 'ebc_cf_f'] = np.nan
+data.loc[~time_mask, 'ebc_cf_f'] = np.nan
+plot_cols(data, ['ebc_cf', 'ebc_cf_f'], title='after IQR and sunset sunrise remove')
 
 
 # ### preparing ebr_cf quantiles
-t_delta = pd.Timedelta(30, 'days')
+t_delta = pd.Timedelta(WINDOW_DAYS, 'days')
 # t_delta = pd.Timedelta(3, 'hours')
 data['ebc_cf_f_count_in_15_days'] = data['ebc_cf_f'].rolling(window=t_delta, center=True).count()
 
@@ -66,6 +69,9 @@ data_gr5 = data[gr_5_ecf]
 between_1_5_ecf = data['ebc_cf_f_count_in_15_days'].isin(range(1, 5))
 data_b15 = data[between_1_5_ecf]
 
+data['gr_5_ecf'] = gr_5_ecf
+plot_cols(data, ['ebc_cf_f', 'gr_5_ecf', 'ebc_cf_f_mean', 'ebc_cf_f_q25', 'ebc_cf_f_q50', 'ebc_cf_f_q75'])
+
 
 # ### applying corrections where possible
 data['h_corr_25'] = data_gr5['h'] * data_gr5['ebc_cf_f_q25']
@@ -77,7 +83,6 @@ data['l_corr_75'] = data_gr5['l'] * data_gr5['ebc_cf_f_q75']
 
 data['h_corr'] = data_b15['l'] * data_b15['ebc_cf_f_mean']
 data['l_corr'] = data_b15['l'] * data_b15['ebc_cf_f_mean']
-
 
 
 data['h_corr'][gr_5_ecf] = data['h'][gr_5_ecf] * data['ebc_cf']
