@@ -415,8 +415,8 @@ filters_meteo['night_h_limits'] = [-50, 20]
 filters_meteo['night_le_limits'] = [-50, 20]
 
 # Какие значения допускаются зимой. Для травянистых экосистем правый порог обычно ниже
-filters_meteo['winter_nee_limits'] = [-1, 5]
-filters_meteo['winter_ch4_flux_limits'] = [-1, 1]
+filters_meteo['winter_nee_limits'] = [-10, 50]
+filters_meteo['winter_ch4_flux_limits'] = [-10, 10]
 filters_meteo['CH4SS_min'] = 20.
 
 if not config.from_file:
@@ -444,6 +444,7 @@ filters_min_max['swin_1_1_1'] = [0, 1200]  # min
 filters_min_max['ppfd_1_1_1'] = [0, 2400]  # min
 filters_min_max['rg_1_1_1'] = [0, 2400]  # min
 filters_min_max['ch4_flux'] = [-10, 10]
+filters_min_max = {}
 
 if not config.from_file:
     config.filters.min_max = filters_min_max
@@ -467,6 +468,7 @@ for col in ['h', 'le', 'rh_1_1_1', 'vpd_1_1_1']:
     filters_window[col] = {'sigmas': 7, 'window': 10, 'min_periods': 4}
 for col in ['swin_1_1_1', 'ppfd_1_1_1']:
     filters_window[col] = {'sigmas': 8, 'window': 10, 'min_periods': 4}
+filters_window = {}
 
 if not config.from_file:
     config.filters.window = filters_window
@@ -481,7 +483,7 @@ if not config.from_file:
 filters_quantile = QuantileFilterConfig()
 filters_quantile_iqr = QuantileIQRFilterConfig()
 
-filters_quantile.enabled = True
+filters_quantile.enabled = False
 filters_quantile.tgt_cols['co2_flux'] = [0.01, 0.99]
 filters_quantile.tgt_cols['ch4_flux'] = [0.01, 0.99]
 filters_quantile.tgt_cols['co2_strg'] = [0.01, 0.99]
@@ -512,6 +514,7 @@ filters_madhampel['rh_1_1_1'] = {'z': 5.5, 'hampel_window': 10}
 filters_madhampel['vpd_1_1_1'] = {'z': 5.5, 'hampel_window': 10}
 filters_madhampel['swin_1_1_1'] = {'z': 8.0, 'hampel_window': 10}
 filters_madhampel['ppfd_1_1_1'] = {'z': 8.0, 'hampel_window': 10}
+filters_madhampel = {}
 
 if not config.from_file:
     config.filters.madhampel = filters_madhampel
