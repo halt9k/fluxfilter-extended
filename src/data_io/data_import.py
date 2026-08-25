@@ -61,18 +61,37 @@ def import_data(config: FFConfig):
         config.data_import.debug_nrows = DEBUG_NROWS
     else:
         config.data_import.debug_nrows = None
-            
+    
     config.data_import.time_freq = pd.Timedelta(minutes=30)
     
-    if config.data_import.import_mode in [ImportMode.EDDYPRO_FO, ImportMode.EDDYPRO_FO_AND_BIOMET]:        
-        df = import_eddypro_and_biomet(config.data_import) 
-         
-         # TODO 1 test: fix EDDYPRO_BIOMET_2 and still test
+    if config.data_import.import_mode in [ImportMode.EDDYPRO_FO, ImportMode.EDDYPRO_FO_AND_BIOMET]:
+        df = import_eddypro_and_biomet(config.data_import)
+        
+        # TODO 1 test: fix EDDYPRO_BIOMET_2 and still test
+        # datetime_biomet is different from E because it's resampled after load
+        # previously 1) filter 30min 2) merge 3) rebuild 30 min
+        # now possibly worse than 1) filter 30min, rebuild 30 min 2) merge, rebuild
         if config.data_import.debug and InputFileType.EDDYPRO_BIOMET_2 not in config.data_import.input_files.values():
             ff_logger.disabled = True
+            print('\n\nDebug legacy check:')
+            
             df_check = load_eddypro_via_bgl_todel(config.data_import)[0]
-            # df_check.rename(columns={'date': 'date_STR', 'time': 'time_STR'}, inplace=True)            
+            # df_check.rename(columns={'date': 'date_STR', 'time': 'time_STR'}, inplace=True)
+            
+            # biomet resample on load before merges makes sense especially if biomet is 1 min step
+            tc = config.data_import.time_col
+            mask_time_fixed = df_check[tc].isna() & ~df[tc].isna()
+            df_check.loc[mask_time_fixed, tc] = df[tc]
+            
+            # TODO 1 why _meteo is different here?
+            tc = config.data_import.time_col + '_meteo'
+            if tc in df.columns: 
+                mask_time_fixed = df_check[tc].isna() & ~df[tc].isna()
+                df_check.loc[mask_time_fixed, tc] = df[tc]
+
             ensure_dfs_same(df, df_check)
+            
+            print('\n\n')
             ff_logger.disabled = False
     
     elif config.data_import.import_mode == ImportMode.IAS:
@@ -81,13 +100,17 @@ def import_data(config: FFConfig):
         df = import_csf_and_biomet(config.data_import)
     else:
         raise Exception(f"Please double check value of config['mode'], {config['mode']} is probably typo")
-
+    
     # print('Переменные после загрузки: \n', df.columns.to_list()) # duplicate
-
+    
+    # time_col duplicates df index, but probably there was a reason for this
+    # anyway this col must be withut missing entries here
+    # time gaps (or slides) in csf will cause missing entries here
     # TODO 1 this ckeck is supposed to never be used, move to subroutine
-    if df[config.data_import.time_col].isna().sum() > 0:
-        raise Exception("Cannot merge time columns during import. Check if years mismatch in different files")
-
+    missing_time_rows = df[config.data_import.time_col].isna().sum()
+    if missing_time_rows > 0:
+        raise Exception(f"Missing time in {missing_time_rows} rows during import. This is expected if years mismatch in different files or when some time entries are broken.")
+    
     # TODO 3 remove whole biomet_cols_index from the script E, OA: ok
     # TODO 1 test: if psn csf + biomet recognised correctly
     biomet_columns = [col for col in df.columns.str.lower() if col in BIOMET_USED_COLS_LOWER]
@@ -95,5 +118,5 @@ def import_data(config: FFConfig):
     
     paths = format_dict(config.data_import.input_files, separator=': ')
     ff_logger.info(f'Data imported from files: {paths}' '\n')
-       
+    
     return df, biomet_columns, has_meteo
