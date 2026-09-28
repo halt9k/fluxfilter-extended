@@ -1251,9 +1251,9 @@ config_reddyproc = RepConfig(
     # partitioning_methods: one or both of "Reichstein05", "Lasslop10"
     partitioning_methods=["Reichstein05", "Lasslop10"],
     
-    latitude=56.5,
-    longitude=32.6,
-    timezone=+3.0,
+    latitude=,
+    longitude=,
+    timezone=,
     
     # "Tsoil"
     temperature_data_variable="Tair",
