@@ -573,6 +573,11 @@ if data_type_error_flag:
 #
 
 # %% id="mAdYXJFdSRbJ"
+
+# TODO 1 REMOVE
+# data = data.drop(columns=['swin_1_1_1', 'sw_in_1_1_1'])
+# data = data.drop(columns=['swin_1_1_1'])
+
 have_rh_flag = False
 have_vpd_flag = False
 have_par_flag = False
